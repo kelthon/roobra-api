@@ -1,0 +1,17 @@
+# Artifacts
+build/
+coverage/
+dist/
+node_modules/
+generated/prisma/
+
+# Git
+.git/
+.github/
+
+# Minified files
+*.min.js
+
+# Config files
+tsconfig.build.json
+tsconfig.json
