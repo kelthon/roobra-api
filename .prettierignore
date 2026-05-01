@@ -13,5 +13,6 @@ generated/prisma/
 *.min.js
 
 # Config files
+*.tsbuildinfo
 tsconfig.build.json
 tsconfig.json
