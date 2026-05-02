@@ -43,7 +43,7 @@ This document describes the TypeScript configuration and best practices for this
 
 ## Documentation of Core Modules
 
-- All core modules must be documented in the local `docs/` folder of this repository.
+- All core modules must be documented in the local `ph-docs/` folder of this repository.
 - Documentation must explain both **why** (the rationale and purpose) and **how** (usage and implementation) for each core module, to provide clear guidance and examples for contributors.
 
-For more details, see `docs/guidelines/coding.md` and `docs/guidelines/testing.md` in the root repository.
+For more details, see `ph-docs/guidelines/coding.md` and `ph-docs/guidelines/testing.md` in the root repository.

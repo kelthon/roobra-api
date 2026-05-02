@@ -38,4 +38,4 @@ This document describes the testing strategy, tools, and best practices for this
 
 ---
 
-Include test examples in pull requests whenever possible. For more details, see `docs/guidelines/testing.md` in the root repository.
+Include test examples in pull requests whenever possible. For more details, see `ph-docs/guidelines/testing.md` in the root repository.

@@ -29,13 +29,14 @@ flowchart
 ## Folder and Module Structure
 
 - `src/`: Main application source code. Contains controllers, services, and modules.
+  - `common/`: Common NestJS module for providers, guards, interceptors, and decorators shared across modules.
+  - `config/`: Configuration module for environment variables, settings, and configuration providers.
   - `modules/`: Main business modules (feature modules, domain logic).
-    - `common/`: Common NestJS module for providers, guards, interceptors, and decorators shared across modules.
   - `shared/`: Shared utilities and cross-cutting helpers (not NestJS modules).
   - Unit and integration tests may be co-located with source files.
 - `test/`: (Optional) Additional automated tests (e.g., e2e, integration) if not co-located.
 - `docs/`: API-specific and specialized documentation for this backend (e.g., API usage, module details, implementation notes).
-  - Note: There is also a shared `docs/` folder at the parent repository level for ecosystem-wide and cross-service documentation.
+  - Note: There is also a shared `ph-docs/` folder at the parent repository level for ecosystem-wide and cross-service documentation.
 
 ## Key Dependencies and Frameworks
 
@@ -65,4 +66,4 @@ flowchart
 - Use of Redis for caching and background jobs.
 - Use of Docker Compose for local development and orchestration.
 
-For detailed flows and diagrams, see the `docs/architecture/` folder in the root repository.
+For detailed flows and diagrams, see the `ph-docs/architecture/` folder in the root repository.
