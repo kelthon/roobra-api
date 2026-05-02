@@ -1,0 +1,282 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(nanoid()) @db.Char(21)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  name            String    @db.VarChar(120)
+  email           String    @unique @db.VarChar(255)
+  photoUrl        String?   @map("photo_url") @db.VarChar(255)
+  googleId        String?   @unique @map("google_id") @db.VarChar(255)
+  hashedPassword  String?   @map("hashed_password") @db.VarChar(64)
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
+  refreshToken    String?   @map("refresh_token") @db.VarChar(255)
+  birthdate       DateTime? @db.Date
+
+  clientProfiles Viewer[]
+  staffProfiles  Staff[]
+
+  @@map("users")
+}
+
+model Viewer {
+  id BigInt @id @default(autoincrement())
+
+  accessExpirationDate DateTime @map("access_expiration_date") @db.Date()
+  renovationDate       DateTime @map("renovation_date") @db.Date()
+
+  userId          String           @unique @map("user_id") @db.VarChar(21)
+  user            User             @relation(references: [id], fields: [userId])
+  subscriptionId  BigInt           @map("subscription_id")
+  subscription    Subscription     @relation(fields: [subscriptionId], references: [id])
+  viewHistory     ViewHistory[]
+  promotionUsages PromotionUsage[]
+  orders          Order[]
+
+  @@map("viewers")
+}
+
+enum StaffRole {
+  ADMIN         @map("admin")
+  CONTENT_STAFF @map("content_manager")
+  SUPPORT_AGENT @map("support_agent")
+  STAFF         @map("staff")
+
+  @@map("staff_roles")
+}
+
+model Staff {
+  id BigInt @id @default(autoincrement())
+
+  isActive Boolean   @default(true)
+  role     StaffRole @default(STAFF)
+
+  userId String @unique @map("user_id") @db.VarChar(21)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("staff")
+}
+
+model Media {
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  name             String   @db.VarChar(100)
+  slug             String   @unique @default(nanoid()) @db.VarChar(21)
+  summary          String?  @db.Text
+  authors          String[]
+  isPrivate        Boolean  @default(false) @map("is_private")
+  allowFreeReading Boolean  @default(false) @map("allow_free_reading")
+
+  volumes MediaVolume[]
+  genres  MediaGenres[]
+
+  @@map("medias")
+}
+
+model MediaVolume {
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  number           Int      @default(1) @db.SmallInt
+  title            String   @db.VarChar(100)
+  summary          String?  @db.Text
+  authors          String[]
+  isPrivate        Boolean  @default(false) @map("is_private")
+  allowFreeReading Boolean  @default(false) @map("allow_free_reading")
+
+  mediaId       BigInt         @map("media_id")
+  media         Media          @relation(fields: [mediaId], references: [id])
+  chapters      MediaChapter[]
+  viewHistories ViewHistory[]
+
+  @@unique([mediaId, number])
+  @@map("media_volumes")
+}
+
+model MediaChapter {
+  id BigInt @id @default(autoincrement())
+
+  number           Int     @default(1) @db.SmallInt
+  title            String  @db.VarChar(100)
+  isPrivate        Boolean @default(false) @map("is_private")
+  allowFreeReading Boolean @default(false) @map("allow_free_reading")
+
+  volumeId   BigInt      @map("volume_id")
+  volume     MediaVolume @relation(fields: [volumeId], references: [id])
+  mediaPages MediaPage[]
+
+  @@unique([volumeId, number])
+  @@map("media_chapters")
+}
+
+model MediaPage {
+  id       BigInt @id @default(autoincrement())
+  number   Int    @default(1) @db.SmallInt
+  imageUrl String @db.VarChar(255)
+
+  chapterId BigInt       @map("chapter_id")
+  chapter   MediaChapter @relation(fields: [chapterId], references: [id])
+
+  @@unique([chapterId, number])
+  @@map("media_pages")
+}
+
+model MediaGenres {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  medias Media[]
+
+  @@map("media_genres")
+}
+
+model ViewHistory {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  clientId BigInt      @map("client_id")
+  client   Viewer      @relation(fields: [clientId], references: [id])
+  volumeId BigInt      @map("page_id")
+  volume   MediaVolume @relation(fields: [volumeId], references: [id])
+
+  @@map("view_history")
+}
+
+model Subscription {
+  id        BigInt    @id
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  name        String  @db.VarChar(50)
+  price       Decimal @db.Decimal(10, 2)
+  priceAnnual Decimal @map("price_annual") @db.Decimal(10, 2)
+  accessDays  Int     @map("access_days") @db.SmallInt
+
+  clients    Viewer[]
+  promotions Promotion[]
+  orderItems OrderItem[]
+
+  @@map("subscriptions")
+}
+
+enum DiscountType {
+  PERCENT     @map("percent")
+  FIXED_VALUE @map("fixed_value")
+
+  @@map("discount_types")
+}
+
+model Promotion {
+  id        BigInt    @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  code         String       @unique @db.VarChar(50)
+  description  String?      @db.VarChar(255)
+  discount     Decimal      @db.Decimal(10, 2)
+  discountType DiscountType @default(FIXED_VALUE) @map("discount_type")
+  startDate    DateTime     @map("start_date") @db.Timestamptz
+  endDate      DateTime?    @map("end_date") @db.Timestamptz
+  maxUses      Int?         @map("max_uses")
+  perUser      Boolean      @default(true) @map("per_user")
+
+  clients       PromotionUsage[]
+  subscriptions Subscription[]
+  orders        Order[]
+  orderItems    OrderItem[]
+
+  @@map("promotions")
+}
+
+model PromotionUsage {
+  id     BigInt   @id @default(autoincrement())
+  usedAt DateTime @default(now()) @db.Timestamptz
+
+  clientId    BigInt    @map("client_id")
+  client      Viewer    @relation(fields: [clientId], references: [id])
+  promotionId BigInt    @map("promotion_id")
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+
+  @@unique([clientId, promotionId])
+  @@map("promotion_usages")
+}
+
+enum GatewayStatus {
+  PENDING        @map("pending")
+  WAITING        @map("waiting")
+  GENERATED      @map("generated")
+  CANCELED       @map("canceled")
+  PAID           @map("paid")
+  REFUND         @map("refund")
+  PARTIAL_REFUND @map("partial_refund")
+  WITH_ERROR     @map("with_error")
+
+  @@map("gateway_status")
+}
+
+model Order {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  paymentGateway String        @map("payment_gateway") @db.VarChar(50)
+  status         GatewayStatus @default(PENDING)
+  subtotal       Decimal       @db.Decimal(10, 2)
+  total          Decimal       @db.Decimal(10, 2)
+
+  clientId     BigInt        @map("client_id")
+  client       Viewer        @relation(fields: [clientId], references: [id])
+  orderItems   OrderItem[]
+  orderRefunds OrderRefund[]
+  promotionId  BigInt?       @map("promotion_id")
+  promotion    Promotion?    @relation(fields: [promotionId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id BigInt @id @default(autoincrement())
+
+  subtotal Decimal @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  subscriptionId BigInt       @map("subscription_id")
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  orderId        BigInt       @map("order_id")
+  order          Order        @relation(fields: [orderId], references: [id])
+  promotionId    BigInt?      @map("promotion_id")
+  promotion      Promotion?   @relation(fields: [promotionId], references: [id])
+}
+
+model OrderRefund {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  amount Decimal @db.Decimal(10, 2)
+  reason String?
+
+  orderId BigInt @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id])
+}
