@@ -16,7 +16,7 @@ describe('TokenService', () => {
     jwtServiceMock = {
       signAsync: jest.fn(),
       verifyAsync: jest.fn(),
-    };
+    } as unknown as JwtService;
 
     prismaMock = {
       token: {
@@ -29,7 +29,7 @@ describe('TokenService', () => {
       user: {
         findUnique: jest.fn(),
       },
-    };
+    } as unknown as PrismaService;
 
     configServiceMock = {
       get: jest.fn((key: string) => {
@@ -40,7 +40,7 @@ describe('TokenService', () => {
         };
         return config[key];
       }),
-    };
+    } as unknown as ConfigService;
 
     tokenService = new TokenService(
       configServiceMock as unknown as ConfigService,

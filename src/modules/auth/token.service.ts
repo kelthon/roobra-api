@@ -19,8 +19,9 @@ export class TokenService {
     private readonly jwtService: JwtService,
   ) {}
 
-  private createRefreshToken(length: number = 64) {
+  private createRefreshToken() {
     // Each byte is represented by 2 hex characters
+    const length = Number(this.config.get<number>('refreshToken.length'));
     const bytes = Math.ceil(length / 2);
 
     return crypto.randomBytes(bytes).toString('hex');
@@ -42,9 +43,7 @@ export class TokenService {
       { expiresIn: this.config.get<number>('jwt.expiresIn') },
     );
 
-    const refreshToken = this.createRefreshToken(
-      this.config.get<number>('refreshToken.length'),
-    );
+    const refreshToken = this.createRefreshToken();
 
     await this.prisma.token.create({
       data: {
