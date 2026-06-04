@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { HashService } from './hash.service';
 
 describe('HashService', () => {
@@ -16,14 +17,8 @@ describe('HashService', () => {
     });
 
     it('should throw an error when hashing an empty string', async () => {
-      await expect(hashService.hash('')).rejects.toThrow();
+      await expect(hashService.hash('')).rejects.toThrow(BadRequestException);
     });
-  });
-
-  it('should throw an error when verifying with an invalid hash', async () => {
-    await expect(
-      hashService.verify('my_secret_password', 'invalid_hash'),
-    ).rejects.toThrow();
   });
 
   describe('verify', () => {
@@ -39,6 +34,19 @@ describe('HashService', () => {
       const hashed = await hashService.hash(raw);
       const isValid = await hashService.verify('wrong_password', hashed);
       expect(isValid).toBe(false);
+    });
+
+    it('should throw an error when verifying with an invalid argument', async () => {
+      await expect(
+        hashService.verify(
+          'my_secret_password',
+          undefined as unknown as string,
+        ),
+      ).rejects.toThrow(BadRequestException);
+
+      await expect(
+        hashService.verify(undefined as unknown as string, 'some-hash'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
