@@ -1,3 +1,5 @@
+[root]
+# Project-wide EditorConfig
 root = true
 
 [*]
@@ -8,5 +10,30 @@ indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.ts]
+# TypeScript specifics (kept minimal; Prettier governs most formatting)
+indent_size = 2
+
+[*.json]
+indent_size = 2
+trim_trailing_whitespace = false
+
 [*.md]
 trim_trailing_whitespace = false
+
+[*.yml]
+indent_size = 2
+
+[*.yaml]
+indent_size = 2
+
+[*.prisma]
+charset = utf-8
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+[src/generated/**]
+# Generated files (Prisma client) - avoid trimming or forcing final newline
+trim_trailing_whitespace = false
+insert_final_newline = false
