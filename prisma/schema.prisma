@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -247,8 +247,8 @@ model UserHistory {
 }
 
 model Subscription {
-  id BigInt @id @default(autoincrement())
-
+  id          BigInt  @id @default(autoincrement())
+  
   name        String  @db.VarChar(50)
   price       Decimal @db.Decimal(10, 2)
   priceAnnual Decimal @map("price_annual") @db.Decimal(10, 2)
