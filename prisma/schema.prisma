@@ -20,7 +20,7 @@ model User {
   email           String    @unique @db.VarChar(255)
   photoUrl        String?   @map("photo_url") @db.VarChar(255)
   googleId        String?   @unique @map("google_id") @db.VarChar(255)
-  hashedPassword  String?   @map("hashed_password") @db.VarChar(64)
+  hashedPassword  String?   @map("hashed_password") @db.VarChar(255)
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
   birthdate       DateTime? @db.Date
 
@@ -234,8 +234,8 @@ model UserHistory {
 }
 
 model Subscription {
-  id          BigInt  @id @default(autoincrement())
-  
+  id BigInt @id @default(autoincrement())
+
   name        String  @db.VarChar(50)
   price       Decimal @db.Decimal(10, 2)
   priceAnnual Decimal @map("price_annual") @db.Decimal(10, 2)
