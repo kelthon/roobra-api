@@ -6,7 +6,12 @@ import prettierPlugin from 'eslint-plugin-prettier';
 
 export default defineConfig([
   {
-    ignores: ['**/build/**', '**/dist/**', 'node_modules/**', '**/generated/prisma/**'],
+    ignores: [
+      '**/build/**',
+      '**/dist/**',
+      'node_modules/**',
+      '**/generated/prisma/**',
+    ],
     extends: [
       ...tseslint.configs.recommendedTypeChecked,
       jestPlugin.configs['flat/recommended'],
@@ -20,7 +25,8 @@ export default defineConfig([
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        projectService: true,
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
@@ -29,7 +35,7 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
