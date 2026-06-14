@@ -19,7 +19,7 @@ describe('TokenService', () => {
     } as unknown as JwtService;
 
     prismaMock = {
-      token: {
+      refreshToken: {
         create: jest.fn(),
         update: jest.fn(),
         updateMany: jest.fn(),
@@ -82,11 +82,11 @@ describe('TokenService', () => {
           'valid-refresh-token-for-general-purpose-and-user-access-only-use',
         );
 
-      tokenService['hashRefreshToken'] = jest
+      tokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
-      (prisma.token.create as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.create as jest.Mock).mockResolvedValue({
         accessToken: 'valid-access-token',
         refreshToken: 'hashed-refresh-token',
         expiresIn: configService.get<number>('jwt.expiresIn'),
@@ -103,7 +103,7 @@ describe('TokenService', () => {
         expect.objectContaining({ expiresIn: expect.any(Number) }),
       );
 
-      expect(prisma.token.create).toHaveBeenCalledWith(
+      expect(prisma.refreshToken.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             user: { connect: { id: user.id } },
@@ -130,11 +130,11 @@ describe('TokenService', () => {
       const jwtService = jwtServiceMock as unknown as JwtService;
       const configService = configServiceMock as unknown as ConfigService;
 
-      tokenService['hashRefreshToken'] = jest
+      tokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
-      (prisma.token.findFirst as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue({
         id: BigInt(1),
         hashedToken: 'hashed-refresh-token',
         revoked: false,
@@ -171,7 +171,7 @@ describe('TokenService', () => {
         'valid-refresh-token-for-general-purpose-and-user-access-only-use',
       );
 
-      expect(prisma.token.findFirst).toHaveBeenCalledWith(
+      expect(prisma.refreshToken.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             userId: 'user-id',
@@ -215,11 +215,11 @@ describe('TokenService', () => {
     it('should throw BadRequestException for invalid or revoked refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashRefreshToken'] = jest
+      tokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
-      (prisma.token.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
         tokenService.refreshAccessToken(
@@ -232,7 +232,7 @@ describe('TokenService', () => {
     it('should throw BadRequestException for refresh token that does not belong to the specified user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
         tokenService.refreshAccessToken(
@@ -245,7 +245,7 @@ describe('TokenService', () => {
     it('should throw BadRequestException for expired refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.findFirst as jest.Mock).mockResolvedValue(null);
+      (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
         tokenService.refreshAccessToken(
@@ -258,7 +258,7 @@ describe('TokenService', () => {
     it('should throw NotFoundException if no user found for the provided refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.findFirst as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue({
         id: BigInt(1),
         hashedToken: 'hashed-refresh-token',
         revoked: false,
@@ -284,11 +284,11 @@ describe('TokenService', () => {
     it('should revoke a specific refresh token for a user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashRefreshToken'] = jest
+      tokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
-      (prisma.token.findFirstOrThrow as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.findFirstOrThrow as jest.Mock).mockResolvedValue({
         id: BigInt(1),
         hashedToken: 'hashed-refresh-token',
         revoked: false,
@@ -299,7 +299,7 @@ describe('TokenService', () => {
         userId: 'user-id',
       });
 
-      (prisma.token.update as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.update as jest.Mock).mockResolvedValue({
         id: BigInt(1),
         hashedToken: 'hashed-refresh-token',
         revoked: true,
@@ -315,24 +315,26 @@ describe('TokenService', () => {
         'valid-refresh-token-for-general-purpose-and-user-access-only-use',
       );
 
-      expect(prisma.token.update).toHaveBeenCalledWith(
+      expect(prisma.refreshToken.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: BigInt(1) },
           data: expect.objectContaining({ revoked: true }),
         }),
       );
 
-      expect(result).toBeUndefined();
+      expect(result).toEqual({
+        message: 'Refresh token revoked successfully',
+      });
     });
 
     it('should throw NotFoundException for invalid or already revoked refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashRefreshToken'] = jest
+      tokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
-      (prisma.token.findFirstOrThrow as jest.Mock).mockRejectedValue({
+      (prisma.refreshToken.findFirstOrThrow as jest.Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -347,7 +349,7 @@ describe('TokenService', () => {
     it('should throw NotFoundException for refresh token that does not belong to the specified user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.findFirstOrThrow as jest.Mock).mockRejectedValue({
+      (prisma.refreshToken.findFirstOrThrow as jest.Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -364,13 +366,13 @@ describe('TokenService', () => {
     it('should revoke all refresh tokens for a user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.updateMany as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.updateMany as jest.Mock).mockResolvedValue({
         count: 3,
       });
 
       const result = await tokenService.revokeAllRefreshTokens('user-id');
 
-      expect(prisma.token.updateMany).toHaveBeenCalledWith(
+      expect(prisma.refreshToken.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             userId: 'user-id',
@@ -381,13 +383,15 @@ describe('TokenService', () => {
         }),
       );
 
-      expect(result).toBeUndefined();
+      expect(result).toEqual({
+        message: 'All refresh tokens revoked successfully',
+      });
     });
 
     it('should throw NotFoundException if no valid refresh tokens found for the user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.updateMany as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.updateMany as jest.Mock).mockResolvedValue({
         count: 0,
       });
       await expect(
@@ -398,7 +402,7 @@ describe('TokenService', () => {
     it('should throw NotFoundException if user has no refresh tokens', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      (prisma.token.updateMany as jest.Mock).mockResolvedValue({
+      (prisma.refreshToken.updateMany as jest.Mock).mockResolvedValue({
         count: 0,
       });
       await expect(
