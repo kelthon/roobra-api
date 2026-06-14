@@ -13,6 +13,11 @@ export enum DatabaseErrorCode {
 
 export type DatabaseErrorCandidate = {
   code: DatabaseErrorCode;
+  meta?: {
+    target?: string[];
+    modelName?: string;
+    [key: string]: unknown;
+  };
 };
 
 export function isDatabaseError(
