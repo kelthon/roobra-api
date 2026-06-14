@@ -15,6 +15,7 @@
     "outDir": "./dist",
     "rootDir": "./",
     "incremental": true,
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
