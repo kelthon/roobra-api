@@ -5,11 +5,11 @@ title: "[Bug] <short description>"
 labels: [bug]
 ---
 
-## Description
+## Describe the Bug
 
 A clear and concise description of what the bug is.
 
-## How to Reproduce
+## To Reproduce
 
 Steps to reproduce the behavior:
 
