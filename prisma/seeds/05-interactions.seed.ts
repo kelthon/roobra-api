@@ -4,6 +4,7 @@ import type {
   MediaPage,
   Subscriber,
 } from '../../src/generated/prisma/client';
+import { ReadingProgressStatus } from '../../src/generated/prisma/client';
 
 export async function seedInteractions(
   prisma: PrismaClient,
@@ -24,9 +25,9 @@ export async function seedInteractions(
   // Pages 0 and 1 are marked COMPLETED to simulate reading progress;
   // page 2 stays IN_PROGRESS to represent the reader's current position.
   const historyEntries = [
-    { page: pages[0], status: 'COMPLETED' as const },
-    { page: pages[1], status: 'COMPLETED' as const },
-    { page: pages[2], status: 'IN_PROGRESS' as const },
+    { page: pages[0], status: ReadingProgressStatus.COMPLETED },
+    { page: pages[1], status: ReadingProgressStatus.COMPLETED },
+    { page: pages[2], status: ReadingProgressStatus.IN_PROGRESS },
   ];
 
   for (const { page, status } of historyEntries) {
