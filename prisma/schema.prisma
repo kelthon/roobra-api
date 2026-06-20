@@ -118,8 +118,12 @@ model Media {
   isPrivate                 Boolean  @default(false) @map("is_private")
   isFree                    Boolean  @default(false) @map("is_free")
 
-  volumes       MediaVolume[]
-  genres        MediaGenre[]
+  volumes MediaVolume[]
+  genres  MediaGenres[] @relation(name: "media_to_media_genres")
+
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt     DateTime?      @map("deleted_at") @db.Timestamptz
   userReadLists UserReadList[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
@@ -199,7 +203,7 @@ model MediaGenre {
   name String @db.VarChar(50)
   slug String @unique @db.VarChar(50)
 
-  medias Media[]
+  medias Media[] @relation(name: "media_to_media_genres")
 
   @@map("media_genres")
 }
@@ -223,7 +227,6 @@ model UserReadList {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz
 
-  @@unique([subscriberId, mediaId])
   @@map("user_read_lists")
 }
 
@@ -252,9 +255,9 @@ model Subscription {
   priceAnnual Decimal @map("price_annual") @db.Decimal(10, 2)
   accessDays  Int     @map("access_days") @db.SmallInt
 
-  subscribers Subscriber[]
-  promotions  Promotion[]
-  orderItems  OrderItem[]
+  clients    Subscriber[]
+  promotions Promotion[]  @relation(name: "promotion_to_subscription")
+  orderItems OrderItem[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -282,10 +285,10 @@ model Promotion {
   maxUses      Int?         @map("max_uses")
   perUser      Boolean      @default(true) @map("per_user")
 
-  promotionUsages PromotionUsage[]
-  subscriptions   Subscription[]
-  orders          Order[]
-  orderItems      OrderItem[]
+  clients       PromotionUsage[]
+  subscriptions Subscription[]   @relation(name: "promotion_to_subscription")
+  orders        Order[]
+  orderItems    OrderItem[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -317,6 +320,8 @@ enum GatewayStatus {
   REFUND         @map("refund")
   PARTIAL_REFUND @map("partial_refund")
   WITH_ERROR     @map("with_error")
+  UNDERPAID      @map("underpaid")
+  OVERPAID       @map("overpaid")
 
   @@map("gateway_status")
 }
