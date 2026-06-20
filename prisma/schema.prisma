@@ -121,7 +121,7 @@ model Media {
   isFree                    Boolean  @default(false) @map("is_free")
 
   volumes MediaVolume[]
-  genres  MediaGenres[]
+  genres  MediaGenres[] @relation(name: "media_to_media_genres")
 
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
   updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz
@@ -193,7 +193,7 @@ model MediaGenres {
   name String @db.VarChar(50)
   slug String @unique @db.VarChar(50)
 
-  medias Media[]
+  medias Media[] @relation(name: "media_to_media_genres")
 
   @@map("media_genres")
 }
@@ -216,6 +216,8 @@ model UserReadList {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("user_read_lists")
 }
 
 model UserHistory {
@@ -244,7 +246,7 @@ model Subscription {
   accessDays  Int     @map("access_days") @db.SmallInt
 
   clients    Subscriber[]
-  promotions Promotion[]
+  promotions Promotion[]  @relation(name: "promotion_to_subscription")
   orderItems OrderItem[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
@@ -274,7 +276,7 @@ model Promotion {
   perUser      Boolean      @default(true) @map("per_user")
 
   clients       PromotionUsage[]
-  subscriptions Subscription[]
+  subscriptions Subscription[]   @relation(name: "promotion_to_subscription")
   orders        Order[]
   orderItems    OrderItem[]
 
@@ -308,6 +310,8 @@ enum GatewayStatus {
   REFUND         @map("refund")
   PARTIAL_REFUND @map("partial_refund")
   WITH_ERROR     @map("with_error")
+  UNDERPAID      @map("underpaid")
+  OVERPAID       @map("overpaid")
 
   @@map("gateway_status")
 }
@@ -355,6 +359,8 @@ model OrderItem {
   order          Order        @relation(fields: [orderId], references: [id])
   promotionId    BigInt?      @map("promotion_id")
   promotion      Promotion?   @relation(fields: [promotionId], references: [id])
+
+  @@map("order_items")
 }
 
 model OrderRefund {
@@ -367,6 +373,8 @@ model OrderRefund {
   order   Order  @relation(fields: [orderId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("order_refunds")
 }
 
 model AuditLog {
