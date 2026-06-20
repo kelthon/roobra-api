@@ -1,27 +1,28 @@
+import {
+  User,
+  PaymentMethod,
+  GatewayStatus,
+} from 'src/generated/prisma/browser';
 import type {
   PrismaClient,
   Subscriber,
   Subscription,
-  User,
 } from '../../src/generated/prisma/client';
 import { DateTime } from 'luxon';
 
 export async function seedSubscribers(
   prisma: PrismaClient,
-  viewer: User,
+  user: User,
   premium: Subscription,
 ): Promise<Subscriber> {
   // Fetch the current viewer state in case a previous run already set subscriberId.
-  const freshViewer = await prisma.user.findUniqueOrThrow({
-    where: { id: viewer.id },
-    select: { subscriberId: true },
+  const freshSubscriber = await prisma.subscriber.findFirst({
+    where: { userId: user.id },
   });
 
-  if (freshViewer.subscriberId) {
+  if (freshSubscriber) {
     console.log('- Subscriber: already exists, skipping');
-    return prisma.subscriber.findUniqueOrThrow({
-      where: { id: freshViewer.subscriberId },
-    });
+    return freshSubscriber;
   }
 
   const expirationDate = DateTime.now()
@@ -33,20 +34,16 @@ export async function seedSubscribers(
       subscriptionId: premium.id,
       accessExpirationDate: expirationDate,
       renovationDate: expirationDate,
+      userId: user.id,
     },
-  });
-
-  await prisma.user.update({
-    where: { id: viewer.id },
-    data: { subscriberId: subscriber.id },
   });
 
   // Order + item created together to represent a completed purchase transaction.
   await prisma.order.create({
     data: {
       paymentGateway: 'stripe',
-      paymentMethod: 'CREDIT_CARD',
-      status: 'PAID',
+      paymentMethod: PaymentMethod.CREDIT_CARD,
+      status: GatewayStatus.PAID,
       subtotal: Number(premium.price),
       total: Number(premium.price),
       clientId: subscriber.id,

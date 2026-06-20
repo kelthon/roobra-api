@@ -38,8 +38,8 @@ model User {
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
   logs                AuditLog[]
-  subscribers         Subscriber[]
-  staffMembers        StaffMember[]
+  subscriber          Subscriber?
+  staffMember         StaffMember?
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -56,7 +56,7 @@ model Subscriber {
 
   subscriptionId  BigInt           @map("subscription_id")
   subscription    Subscription     @relation(fields: [subscriptionId], references: [id])
-  userId          String           @map("user_id")
+  userId          String           @unique @map("user_id")
   user            User             @relation(fields: [userId], references: [id])
   viewHistory     UserHistory[]
   promotionUsages PromotionUsage[]
@@ -71,7 +71,7 @@ model StaffMember {
 
   isActive Boolean @default(true) @map("is_active")
 
-  userId String @map("user_id")
+  userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
 
   @@map("staff_members")
