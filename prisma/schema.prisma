@@ -11,6 +11,16 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  SUBSCRIBER    @map("subscriber")
+  ADMIN         @map("admin")
+  CONTENT_STAFF @map("content_manager")
+  SUPPORT_AGENT @map("support_agent")
+  STAFF         @map("staff")
+
+  @@map("user_roles")
+}
+
 model User {
   id String @id @default(nanoid()) @db.Char(21)
 
@@ -21,14 +31,13 @@ model User {
   hashedPassword  String?   @map("hashed_password") @db.VarChar(255)
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
   birthdate       DateTime? @db.Date
+  role            UserRole  @default(SUBSCRIBER)
 
-  subscriberId        BigInt?              @unique @map("subscriber_id")
-  subscriber          Subscriber?          @relation(fields: [subscriberId], references: [id])
-  staffMemberId       Int?                 @unique @map("staffMember_id")
-  staffMember         StaffMember?         @relation(fields: [staffMemberId], references: [id])
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
   logs                AuditLog[]
+  subscribers         Subscriber[]
+  staffMembers        StaffMember[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -45,34 +54,23 @@ model Subscriber {
 
   subscriptionId  BigInt           @map("subscription_id")
   subscription    Subscription     @relation(fields: [subscriptionId], references: [id])
+  userId          String           @map("user_id")
+  user            User             @relation(fields: [userId], references: [id])
   viewHistory     UserHistory[]
   promotionUsages PromotionUsage[]
   orders          Order[]
-  users           User[]
   userReadLists   UserReadList[]
 
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
-  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
-
   @@map("subscribers")
-}
-
-enum StaffRole {
-  ADMIN           @map("admin")
-  CONTENT_MANAGER @map("content_manager")
-  SUPPORT_AGENT   @map("support_agent")
-  STAFF           @map("staff")
-
-  @@map("staff_roles")
 }
 
 model StaffMember {
   id Int @id @default(autoincrement())
 
-  isActive Boolean   @default(true) @map("is_active")
-  role     StaffRole @default(STAFF)
-  users    User[]
+  isActive Boolean @default(true) @map("is_active")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
 
   @@map("staff_members")
 }
