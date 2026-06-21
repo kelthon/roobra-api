@@ -59,8 +59,7 @@ describe('TokenService', () => {
         id: 'user-id',
         email: 'jonh.doe@example.com',
         username: 'john.doe',
-        subscriberId: BigInt(123),
-        staffMemberId: null,
+        role: 'SUBSCRIBER',
       } as unknown as User;
 
       (jwtService.signAsync as jest.Mock).mockResolvedValue(
@@ -149,8 +148,7 @@ describe('TokenService', () => {
         id: 'user-id',
         email: 'jonh.doe@example.com',
         username: 'john.doe',
-        subscriberId: BigInt(123),
-        staffMemberId: null,
+        role: 'SUBSCRIBER',
       } as unknown as User);
 
       (configService.get as jest.Mock).mockImplementation((key: string) => {
@@ -187,8 +185,7 @@ describe('TokenService', () => {
           id: true,
           email: true,
           username: true,
-          subscriberId: true,
-          staffMemberId: true,
+          role: true,
         },
         where: { id: 'user-id' },
       });
@@ -198,6 +195,7 @@ describe('TokenService', () => {
           sub: 'user-id',
           email: 'jonh.doe@example.com',
           username: 'john.doe',
+          role: 'SUBSCRIBER',
         }),
         expect.objectContaining({ expiresIn: expect.any(Number) }),
       );

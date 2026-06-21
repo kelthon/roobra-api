@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { TokenService } from './token.service';
 import { PrismaService } from '../database/prisma.service';
 import { LocalStrategy } from './strategies/local.strategy';
+import { RolesGuard } from './guards/roles/roles.guard';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     JwtStrategy,
     LocalStrategy,
     PrismaService,
+    RolesGuard,
   ],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],
