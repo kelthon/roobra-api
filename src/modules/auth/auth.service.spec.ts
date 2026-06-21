@@ -4,8 +4,6 @@ import { HashService } from './hash.service';
 import { TokenService } from './token.service';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { access } from 'fs';
 
 describe('AuthService', () => {
   // Mocking PrismaService and HashService for testing
@@ -105,7 +103,6 @@ describe('AuthService', () => {
         id: 'user-id',
         email: 'john.doe@example.com',
         hashedPassword: 'hashed-password',
-        subscriberId: BigInt(123),
         createdAt: new Date(),
       });
 
@@ -127,7 +124,6 @@ describe('AuthService', () => {
         id: 'user-id',
         email: 'john.doe@example.com',
         hashedPassword: 'hashed-password',
-        subscriberId: BigInt(123),
         createdAt: new Date(),
       });
 
@@ -267,7 +263,6 @@ describe('AuthService', () => {
         email: 'john.doe@example.com',
         username: 'john.doe',
         hashedPassword: 'hashed-password',
-        subscriberId: BigInt(123),
         emailVerifiedAt: null,
         createdAt: new Date(),
       });
@@ -356,7 +351,6 @@ describe('AuthService', () => {
           email: 'john.doe@example.com',
           username: 'john.doe',
           hashedPassword: 'hashed-password',
-          subscriberId: BigInt(123),
           emailVerifiedAt: null,
           createdAt: new Date(),
         },
@@ -373,7 +367,6 @@ describe('AuthService', () => {
           email: 'john.doe@example.com',
           username: 'john.doe',
           hashedPassword: 'hashed-password',
-          subscriberId: BigInt(123),
           emailVerifiedAt: null,
           createdAt: expect.any(Date),
         },

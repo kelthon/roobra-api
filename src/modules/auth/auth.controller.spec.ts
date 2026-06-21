@@ -27,6 +27,8 @@ const mockAuthService = {
 const mockUser: AuthPayload = {
   sub: 'user-id',
   email: 'user@test.com',
+  username: 'username',
+  role: 'SUBSCRIBER',
 };
 
 describe('AuthController', () => {

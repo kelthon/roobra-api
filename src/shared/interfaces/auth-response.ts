@@ -4,14 +4,15 @@ export default interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  user?: Omit<
-    User,
-    | 'id'
-    | 'hashedPassword'
-    | 'emailVerifiedAt'
-    | 'googleId'
-    | 'subscriberId'
-    | 'staffMemberId'
-    | 'deletedAt'
+  user?: Partial<
+    Omit<
+      User,
+      | 'id'
+      | 'hashedPassword'
+      | 'emailVerifiedAt'
+      | 'googleId'
+      | 'role'
+      | 'deletedAt'
+    >
   >;
 }

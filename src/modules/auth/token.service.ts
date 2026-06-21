@@ -41,8 +41,6 @@ export class TokenService {
         sub: user.id,
         email: user.email,
         username: user.username,
-        subscriberId: user?.subscriberId ?? null,
-        staffMemberId: user?.staffMemberId ?? null,
       },
       { expiresIn: this.config.get<number>('jwt.expiresIn') },
     );
@@ -90,8 +88,7 @@ export class TokenService {
         id: true,
         email: true,
         username: true,
-        subscriberId: true,
-        staffMemberId: true,
+        role: true,
       },
       where: { id: token.userId },
     });
@@ -107,8 +104,7 @@ export class TokenService {
         sub: user.id,
         email: user.email,
         username: user.username,
-        subscriberId: user?.subscriberId ?? null,
-        staffMemberId: user?.staffMemberId ?? null,
+        role: user.role,
       },
       { expiresIn: this.config.get<number>('jwt.expiresIn') },
     );
