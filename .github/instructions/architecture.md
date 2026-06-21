@@ -4,12 +4,11 @@ This document provides a high-level overview of the system architecture, folder 
 
 ## High-Level Architecture
 
-
 This repository implements the **Backend API** for Project PH:
+
 - **Backend API (NestJS, Prisma, PostgreSQL, Redis)**: Core business logic, authentication, REST API, background jobs, and integrations.
 
 Other components (web app, dashboard, mobile app) are out of scope for this repository and are handled in separate projects.
-
 
 ### Data Flow Example (Backend API)
 

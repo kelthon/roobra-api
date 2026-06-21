@@ -19,10 +19,12 @@ This API is part of a digital comics reader platform for adults, with a focus on
 Before contributing, you must complete the following reading requirements:
 
 **In this repository (`ph-api`):**
+
 - Read all instruction files in the `.github/instructions` directory, especially `instructions.md` (this file), to understand all standards, rules, and workflows.
 - Read the local architecture summary in `ph-docs/architecture/architecture.md` for technical context specific to this API.
 
 **If you need additional context (e.g., business rules, flows, personas, or detailed architecture):**
+
 - Consult the global documentation repository (`ph-docs`). Start with the `README.md` for navigation, then explore sections such as `architecture/`, `business/`, `management/`, and `guidelines/` as needed.
 
 Reading the local instruction and architecture files is mandatory. Reading the global documentation is strongly recommended whenever you need more information or clarification.
