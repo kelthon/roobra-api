@@ -10,9 +10,8 @@ export const User = createParamDecorator(
     const user = userPayload
       ? ({
           id: userPayload.sub ?? null,
+          username: userPayload.username ?? null,
           email: userPayload.email ?? null,
-          subscriberId: userPayload.subscriberId ?? undefined,
-          staffMemberId: userPayload.staffMemberId ?? undefined,
         } as UserDto)
       : undefined;
     return user;
