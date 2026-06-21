@@ -1,13 +1,10 @@
-import {
-  User,
-  PaymentMethod,
-  GatewayStatus,
-} from 'src/generated/prisma/browser';
 import type {
+  User,
   PrismaClient,
   Subscriber,
   Subscription,
 } from '../../src/generated/prisma/client';
+import { PaymentMethod, GatewayStatus } from 'src/generated/prisma/enums';
 import { DateTime } from 'luxon';
 
 export async function seedSubscribers(
