@@ -1,0 +1,45 @@
+name: "Deployment pipeline"
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Setup node dependencies"
+        uses: ./.github/actions/setup-node-deps
+
+      - name: "Build project"
+        run: npm run build
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Setup node dependencies"
+        uses: ./.github/actions/setup-node-deps
+
+      - name: "Checkout code linting"
+        run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Setup node dependencies"
+        uses: ./.github/actions/setup-node-deps
+
+      - name: "Run api tests"
+        run: npm run test
+
+      - name: "Run endo-to-end api tests"
+        run: npm run test:e2e
+
+
+
