@@ -1,3 +1,9 @@
+---
+name: 'System Architecture'
+description: 'High-level overview of the system architecture, folder structure, data flows, and key design decisions for this repository.'
+applyTo: '**'
+---
+
 # System Architecture
 
 This document provides a high-level overview of the system architecture, folder structure, data flows, and key design decisions for this repository.
@@ -35,7 +41,7 @@ flowchart
   - Unit and integration tests may be co-located with source files.
 - `test/`: (Optional) Additional automated tests (e.g., e2e, integration) if not co-located.
 - `docs/`: API-specific and specialized documentation for this backend (e.g., API usage, module details, implementation notes).
-  - Note: There is also a shared `ph-docs/` folder at the parent repository level for ecosystem-wide and cross-service documentation.
+  - Note: There is also a shared `roobra-docs` repository ([github.com/kelthon/ph-docs](https://github.com/kelthon/ph-docs)) for ecosystem-wide and cross-service documentation. Locally it may be checked out as a sibling folder (`../roobra-docs`), but do not assume that path exists — it depends on the workspace setup.
 
 ## Key Dependencies and Frameworks
 
@@ -65,4 +71,4 @@ flowchart
 - Use of Redis for caching and background jobs.
 - Use of Docker Compose for local development and orchestration.
 
-For detailed flows and diagrams, see the `ph-docs/architecture/` folder in the root repository.
+For detailed flows and diagrams, see the [architecture/](https://github.com/kelthon/ph-docs/tree/main/architecture) folder in the `roobra-docs` repository.
