@@ -1,77 +1,84 @@
-# PH-API
+# Roobra API
 
-## Description
+Backend API for the Roobra platform — manages users, subscriptions, payments, orders, and
+permissions for the Roobra website.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech stack
 
-## Project setup
+- Node.js 24 (see `Dockerfile` for the exact pinned version)
+- [NestJS](https://nestjs.com/)
+- PostgreSQL via [Prisma](https://www.prisma.io/)
+- Redis, BullMQ — planned, not yet wired into the codebase
+- Docker / Docker Compose
 
-```bash
-npm install
-```
+## Prerequisites
 
-## Compile and run the project
+- Docker with the Compose plugin
+- Node.js 24+ and npm — only needed if running outside Docker
 
-```bash
-# development
-$ npm run start
+## Getting started (local development)
 
-# watch mode
-$ npm run start:dev
+1. Clone the repository:
 
-# production mode
-$ npm run start:prod
-```
+   ```sh
+   git clone git@github.com:kelthon/ph-api.git
+   cd ph-api
+   ```
 
-## Run tests
+2. Create your local environment file:
 
-```bash
-# unit tests
-$ npm run test
+   ```sh
+   cp .env.example .env
+   ```
 
-# e2e tests
-$ npm run test:e2e
+   Fill in at least `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `DATABASE_URL`
+   (`DATABASE_HOST` should be `db`, the Compose service name). Do not leave `DATABASE_USER` empty
+   on the first run — see [docs/docker.md](docs/docker.md#postgres_user--database_user) for why.
 
-# test coverage
-$ npm run test:cov
-```
+3. Start the stack:
+
+   ```sh
+   docker compose up -d --build
+   ```
+
+   This builds the app image, starts PostgreSQL, and runs the API in watch mode with auto-reload.
+   See [docs/docker.md](docs/docker.md) for what each Compose file does and why.
+
+4. Call the API with your HTTP client of choice (Postman, Insomnia, curl, ...) at
+   `http://localhost:3000` (or whichever `PORT` you set in `.env`).
+
+The database is intentionally not exposed to the host (`expose`, not `ports`, in `compose.yaml`) —
+reach it via `docker compose exec db psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run start:dev` | Start the API in watch mode (what the dev container runs) |
+| `npm run build` | Compile to `dist/` |
+| `npm run start:prod` | Run the compiled build (`dist/main.js`) |
+| `npm run lint` | Lint and auto-fix |
+| `npm run test` | Unit tests |
+| `npm run test:e2e` | End-to-end tests |
+| `npm run test:cov` | Test coverage |
+| `npx prisma generate` | Regenerate the Prisma client after a schema change |
+| `npx prisma db seed` | Seed the database |
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Production runs the same containers via `compose.prod.yaml` and `scripts/deploy.sh`. See
+[docs/deployment.md](docs/deployment.md) for the full process, prerequisites, the current CI
+pipeline status, and how to recover a misconfigured database role without losing data.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Documentation
 
-```bash
-npm install -g @nestjs/mau
-mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [docs/docker.md](docs/docker.md) — Dockerfile stages, the three Compose files, and the reasoning
+  behind non-obvious infra decisions.
+- [docs/deployment.md](docs/deployment.md) — deployment process and troubleshooting.
+- [AGENTS.md](AGENTS.md) and [.github/instructions/](.github/instructions/) — contribution
+  guidelines, coding standards, and architecture, including team culture and values.
+- Cross-service and business documentation: the `roobra-docs` repository.
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED — private project.
