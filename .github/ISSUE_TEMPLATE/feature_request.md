@@ -5,11 +5,14 @@ title: "[Feature] <short description>"
 labels: [enhancement]
 ---
 
-## Is your feature request related to a problem? Please describe.
-A clear and concise description of what the problem is.
+## Feature description
 
-## Describe the Solution You'd Like
+A clear and concise description of what the problem is
+
+## Proposed solution
+
 A clear and concise description of what you want to happen.
 
-## Additional Context
+## Additional context
+
 Add any other context or screenshots about the feature request here.

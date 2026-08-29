@@ -7,8 +7,8 @@ This document is the single source of truth for all standards, rules, and workfl
 - Always read all instruction files in `.github/instructions` before starting any contribution or using automation.
 - Follow the existing documentation structure and formatting for consistency.
 - Use clear and concise English in all code, comments, and documentation.
-- Refer to the [documentation-formatting-guidelines.md](../../../docs/documentation-formatting-guidelines.md) for markdown and formatting standards.
-- Adhere to the team [culture and values](../../../docs/guidelines/culture.md) in all interactions.
+- Refer to the [documentation-formatting-guidelines.md](https://github.com/kelthon/ph-docs/blob/main/documentation-formatting-guidelines.md) for markdown and formatting standards.
+- Adhere to the team [culture and values](https://github.com/kelthon/ph-docs/blob/main/guidelines/culture.md) in all interactions.
 - Documentation must explain "why" decisions are made, not just "how" to use or implement features.
 
 ## Project Context
@@ -18,18 +18,18 @@ This API is part of a digital comics reader platform for adults, with a focus on
 **Important:**
 Before contributing, you must complete the following reading requirements:
 
-**In this repository (`ph-api`):**
+**In this repository (`roobra-api`):**
 
 - Read all instruction files in the `.github/instructions` directory, especially `instructions.md` (this file), to understand all standards, rules, and workflows.
-- Read the local architecture summary in `ph-docs/architecture/architecture.md` for technical context specific to this API.
+- Read the local architecture summary in [architecture.instructions.md](./architecture.instructions.md) for technical context specific to this API.
 
 **If you need additional context (e.g., business rules, flows, personas, or detailed architecture):**
 
-- Consult the global documentation repository (`ph-docs`). Start with the `README.md` for navigation, then explore sections such as `architecture/`, `business/`, `management/`, and `guidelines/` as needed.
+- Consult the global documentation repository: [github.com/kelthon/ph-docs](https://github.com/kelthon/ph-docs) (locally checked out as `roobra-docs`; if you have it cloned as a sibling folder, it is available at `../roobra-docs`, but do not assume that path exists — it depends on how each contributor or agent has the workspace set up). Start with the `README.md` for navigation, then explore sections such as `architecture/`, `business/`, `management/`, and `guidelines/` as needed.
 
 Reading the local instruction and architecture files is mandatory. Reading the global documentation is strongly recommended whenever you need more information or clarification.
 
-For additional local documentation, refer to the `docs` folder in this repository.
+For additional local documentation, see the other files in `.github/instructions/`.
   
 ## Language Standard
 
@@ -38,8 +38,8 @@ For additional local documentation, refer to the `docs` folder in this repositor
   
 ## Agents and Skills
 
-- This repository uses custom agents and skills to automate and enhance development workflows. Agents are defined in `.github/agents` and skills in `.github/skills`.
-- Agents include TestAgent (testing), DocAgent (documentation), and RefactorAgent (refactoring), each with their own set of skills. Refer to the respective markdown files for details on their responsibilities and usage.
+- This repository uses custom agents and skills to automate and enhance development workflows. Agents are defined in `.github/agents` and skills in `.agents/skills` (the cross-tool location read by both GitHub Copilot and Gemini CLI).
+- Agents include TestAgent (testing), DocAgent (documentation), RefactorAgent (refactoring), PlanningAgent (planning and task tracking), and HelpAgent (Q&A and onboarding). Refer to the respective markdown files for details on their responsibilities and usage.
 
 ## Commit Message Conventions
 
