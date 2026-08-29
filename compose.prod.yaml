@@ -1,0 +1,10 @@
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+name: roobra-api
+services:
+  server:
+    restart: unless-stopped
+  db:
+    volumes:
+      - /var/lib/repositories/roobra-api/postgresql:/var/lib/postgresql
