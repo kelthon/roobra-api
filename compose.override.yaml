@@ -1,0 +1,20 @@
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+name: roobra-api
+services:
+  server:
+    build:
+      target: build
+    user: node
+    environment:
+      NODE_ENV: development
+    # The bind mount below replaces /usr/src/app with the host repo at container start,
+    # hiding the Prisma client generated into the image at build time (src/generated/prisma
+    # is gitignored, so it's normally absent on the host). Regenerating it here makes dev
+    # self-healing instead of depending on a developer having run `prisma generate` on the
+    # host beforehand.
+    command: sh -c "npx prisma generate && npm run start:dev"
+    volumes:
+      - ".:/usr/src/app"
+      - "/usr/src/app/node_modules"
