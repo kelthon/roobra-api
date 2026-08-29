@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { hash } from 'argon2';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
 
@@ -9,8 +10,9 @@ const prisma = new PrismaClient({ adapter });
 async function main(): Promise<void> {
   const user = await prisma.user.create({
     data: {
-      name: 'Alice',
+      username: 'Alice',
       email: 'alice@example.com',
+      hashedPassword: await hash('password!123'),
     },
   });
 
