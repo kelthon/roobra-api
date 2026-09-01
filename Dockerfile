@@ -4,8 +4,6 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/go/dockerfile-reference/
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
 ARG NODE_VERSION=24.14.0
 
 ################################################################################
@@ -26,8 +24,9 @@ FROM base as deps
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=bind,source=prisma,target=prisma \
     --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
+    npm ci --omit=dev && npx prisma generate
 
 ################################################################################
 # Create a stage for building the application.

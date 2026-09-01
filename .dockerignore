@@ -4,10 +4,12 @@
 # For more help, visit the .dockerignore file reference guide at
 # https://docs.docker.com/go/build-context-dockerignore/
 
+**/.agents
 **/.classpath
 **/.dockerignore
 **/.env
 **/.git
+**/.github
 **/.gitignore
 **/.project
 **/.settings
@@ -22,6 +24,7 @@
 **/charts
 **/docker-compose*
 **/compose.y*ml
+**/compose.*.y*ml
 **/Dockerfile*
 **/node_modules
 **/npm-debug.log
@@ -30,5 +33,8 @@
 **/values.dev.yaml
 **/build
 **/dist
+**/*.tsbuildinfo
+AGENTS.md
 LICENSE
 README.md
+scripts
