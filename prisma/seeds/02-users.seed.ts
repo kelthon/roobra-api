@@ -2,7 +2,7 @@ import type { PrismaClient, User } from '../../src/generated/prisma/client';
 import { UserRole } from '../../src/generated/prisma/enums';
 
 interface UserSeeds {
-  viewer: User;
+  subscriber: User;
   guest: User;
   staff: User;
   admin: User;
@@ -12,21 +12,21 @@ export async function seedUsers(
   prisma: PrismaClient,
   hashedPassword: string,
 ): Promise<UserSeeds> {
-  const [viewer, guest] = await Promise.all([
+  const [subscriber, guest] = await Promise.all([
     prisma.user.upsert({
-      where: { email: 'viewer@ph.test' },
+      where: { email: 'subscriber@roobra.test' },
       create: {
-        email: 'viewer@ph.test',
-        username: 'viewer',
+        email: 'subscriber@roobra.test',
+        username: 'subscriber',
         hashedPassword,
         role: UserRole.SUBSCRIBER,
       },
-      update: { username: 'viewer', hashedPassword },
+      update: { username: 'subscriber', hashedPassword },
     }),
     prisma.user.upsert({
-      where: { email: 'guest@ph.test' },
+      where: { email: 'guest@roobra.test' },
       create: {
-        email: 'guest@ph.test',
+        email: 'guest@roobra.test',
         username: 'guest',
         hashedPassword,
         role: UserRole.SUBSCRIBER,
@@ -38,21 +38,21 @@ export async function seedUsers(
   // Staff users use nested create on first run to set up the StaffMember relation.
   // On subsequent runs the update path leaves staffMember unchanged.
   const staff = await prisma.user.upsert({
-    where: { email: 'staff@ph.test' },
+    where: { email: 'staff@roobra.test' },
     create: {
-      email: 'staff@ph.test',
+      email: 'staff@roobra.test',
       username: 'staff',
       hashedPassword,
-      role: UserRole.CONTENT_STAFF,
+      role: UserRole.CONTENT_MANAGER,
       staffMember: { create: { isActive: true } },
     },
     update: { username: 'staff', hashedPassword },
   });
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@ph.test' },
+    where: { email: 'admin@roobra.test' },
     create: {
-      email: 'admin@ph.test',
+      email: 'admin@roobra.test',
       username: 'admin',
       hashedPassword,
       role: UserRole.ADMIN,
@@ -61,6 +61,8 @@ export async function seedUsers(
     update: { username: 'admin', hashedPassword },
   });
 
-  console.log('- Users: viewer, guest, staff (CONTENT_STAFF), admin (ADMIN)');
-  return { viewer, guest, staff, admin };
+  console.log(
+    '- Users: subscriber, guest, staff (CONTENT_MANAGER), admin (ADMIN)',
+  );
+  return { subscriber, guest, staff, admin };
 }

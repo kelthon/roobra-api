@@ -2,13 +2,13 @@
 CREATE TYPE "user_roles" AS ENUM ('subscriber', 'admin', 'content_manager', 'support_agent', 'staff');
 
 -- CreateEnum
-CREATE TYPE "reading_progress_status" AS ENUM ('in_progress', 'completed');
+CREATE TYPE "reading_progress_statuses" AS ENUM ('in_progress', 'completed');
 
 -- CreateEnum
 CREATE TYPE "discount_types" AS ENUM ('percent', 'fixed_value');
 
 -- CreateEnum
-CREATE TYPE "gateway_status" AS ENUM ('pending', 'waiting', 'generated', 'canceled', 'paid', 'refund', 'partial_refund', 'with_error', 'underpaid', 'overpaid');
+CREATE TYPE "gateway_statuses" AS ENUM ('pending', 'waiting', 'generated', 'canceled', 'paid', 'refund', 'partial_refund', 'with_error', 'underpaid', 'overpaid');
 
 -- CreateEnum
 CREATE TYPE "payment_methods" AS ENUM ('boleto', 'credit_card', 'debit_card', 'pix');
@@ -20,7 +20,7 @@ CREATE TABLE "users" (
     "email" VARCHAR(255) NOT NULL,
     "photo_url" VARCHAR(255),
     "google_id" VARCHAR(255),
-    "hashed_password" VARCHAR(255),
+    "hashed_password" VARCHAR(128),
     "email_verified_at" TIMESTAMPTZ,
     "birthdate" DATE,
     "role" "user_roles" NOT NULL DEFAULT 'subscriber',
@@ -38,6 +38,9 @@ CREATE TABLE "subscribers" (
     "renovation_date" DATE NOT NULL,
     "subscription_id" BIGINT NOT NULL,
     "user_id" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL,
+    "deleted_at" TIMESTAMPTZ,
 
     CONSTRAINT "subscribers_pkey" PRIMARY KEY ("id")
 );
@@ -47,6 +50,9 @@ CREATE TABLE "staff_members" (
     "id" SERIAL NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "user_id" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL,
+    "deleted_at" TIMESTAMPTZ,
 
     CONSTRAINT "staff_members_pkey" PRIMARY KEY ("id")
 );
@@ -122,6 +128,9 @@ CREATE TABLE "media_chapters" (
     "is_private" BOOLEAN NOT NULL DEFAULT false,
     "is_free" BOOLEAN NOT NULL DEFAULT false,
     "volume_id" BIGINT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL,
+    "deleted_at" TIMESTAMPTZ,
 
     CONSTRAINT "media_chapters_pkey" PRIMARY KEY ("id")
 );
@@ -131,10 +140,13 @@ CREATE TABLE "media_pages" (
     "id" BIGSERIAL NOT NULL,
     "number" SMALLINT NOT NULL,
     "image_url" VARCHAR(255) NOT NULL,
-    "has_sensible_content" BOOLEAN NOT NULL DEFAULT false,
+    "has_sensitive_content" BOOLEAN NOT NULL DEFAULT false,
     "is_private" BOOLEAN NOT NULL DEFAULT false,
     "is_free" BOOLEAN NOT NULL DEFAULT false,
     "chapter_id" BIGINT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL,
+    "deleted_at" TIMESTAMPTZ,
 
     CONSTRAINT "media_pages_pkey" PRIMARY KEY ("id")
 );
@@ -150,8 +162,8 @@ CREATE TABLE "media_genres" (
 
 -- CreateTable
 CREATE TABLE "user_read_lists" (
-    "id" SERIAL NOT NULL,
-    "client_id" BIGINT NOT NULL,
+    "id" BIGSERIAL NOT NULL,
+    "subscriber_id" BIGINT NOT NULL,
     "media_id" BIGINT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMPTZ,
@@ -160,16 +172,16 @@ CREATE TABLE "user_read_lists" (
 );
 
 -- CreateTable
-CREATE TABLE "user_history" (
+CREATE TABLE "user_histories" (
     "id" BIGSERIAL NOT NULL,
-    "status" "reading_progress_status" NOT NULL DEFAULT 'in_progress',
+    "status" "reading_progress_statuses" NOT NULL DEFAULT 'in_progress',
     "last_read_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "client_id" BIGINT NOT NULL,
+    "subscriber_id" BIGINT NOT NULL,
     "page_id" BIGINT NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL,
 
-    CONSTRAINT "user_history_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "user_histories_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -207,8 +219,8 @@ CREATE TABLE "promotions" (
 -- CreateTable
 CREATE TABLE "promotion_usages" (
     "id" BIGSERIAL NOT NULL,
-    "usedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "client_id" BIGINT NOT NULL,
+    "used_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "subscriber_id" BIGINT NOT NULL,
     "promotion_id" BIGINT NOT NULL,
 
     CONSTRAINT "promotion_usages_pkey" PRIMARY KEY ("id")
@@ -219,10 +231,10 @@ CREATE TABLE "orders" (
     "id" BIGSERIAL NOT NULL,
     "payment_gateway" VARCHAR(50) NOT NULL,
     "payment_method" "payment_methods" NOT NULL,
-    "status" "gateway_status" NOT NULL DEFAULT 'pending',
+    "status" "gateway_statuses" NOT NULL DEFAULT 'pending',
     "subtotal" DECIMAL(10,2) NOT NULL,
     "total" DECIMAL(10,2) NOT NULL,
-    "client_id" BIGINT NOT NULL,
+    "subscriber_id" BIGINT NOT NULL,
     "promotion_id" BIGINT,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL,
@@ -254,14 +266,25 @@ CREATE TABLE "order_refunds" (
 );
 
 -- CreateTable
+CREATE TABLE "order_refund_items" (
+    "id" BIGSERIAL NOT NULL,
+    "amount" DECIMAL(10,2) NOT NULL,
+    "order_refund_id" BIGINT NOT NULL,
+    "order_item_id" BIGINT NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "order_refund_items_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "audit_logs" (
     "id" BIGSERIAL NOT NULL,
-    "action" TEXT NOT NULL,
+    "action" VARCHAR(128) NOT NULL,
     "metadata" JSONB NOT NULL,
-    "entity" TEXT,
-    "entity_id" TEXT,
+    "entity" VARCHAR(64),
+    "entity_id" VARCHAR(32),
     "user_id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
@@ -331,10 +354,16 @@ CREATE UNIQUE INDEX "media_pages_chapter_id_number_key" ON "media_pages"("chapte
 CREATE UNIQUE INDEX "media_genres_slug_key" ON "media_genres"("slug");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "user_read_lists_subscriber_id_media_id_key" ON "user_read_lists"("subscriber_id", "media_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "promotions_code_key" ON "promotions"("code");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "promotion_usages_client_id_promotion_id_key" ON "promotion_usages"("client_id", "promotion_id");
+CREATE UNIQUE INDEX "promotion_usages_subscriber_id_promotion_id_key" ON "promotion_usages"("subscriber_id", "promotion_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "order_refund_items_order_refund_id_order_item_id_key" ON "order_refund_items"("order_refund_id", "order_item_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "keys_hashed_key_key" ON "keys"("hashed_key");
@@ -370,25 +399,25 @@ ALTER TABLE "media_chapters" ADD CONSTRAINT "media_chapters_volume_id_fkey" FORE
 ALTER TABLE "media_pages" ADD CONSTRAINT "media_pages_chapter_id_fkey" FOREIGN KEY ("chapter_id") REFERENCES "media_chapters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_read_lists" ADD CONSTRAINT "user_read_lists_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_read_lists" ADD CONSTRAINT "user_read_lists_subscriber_id_fkey" FOREIGN KEY ("subscriber_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_read_lists" ADD CONSTRAINT "user_read_lists_media_id_fkey" FOREIGN KEY ("media_id") REFERENCES "medias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_history" ADD CONSTRAINT "user_history_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_histories" ADD CONSTRAINT "user_histories_subscriber_id_fkey" FOREIGN KEY ("subscriber_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_history" ADD CONSTRAINT "user_history_page_id_fkey" FOREIGN KEY ("page_id") REFERENCES "media_pages"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_histories" ADD CONSTRAINT "user_histories_page_id_fkey" FOREIGN KEY ("page_id") REFERENCES "media_pages"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "promotion_usages" ADD CONSTRAINT "promotion_usages_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "promotion_usages" ADD CONSTRAINT "promotion_usages_subscriber_id_fkey" FOREIGN KEY ("subscriber_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "promotion_usages" ADD CONSTRAINT "promotion_usages_promotion_id_fkey" FOREIGN KEY ("promotion_id") REFERENCES "promotions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "orders" ADD CONSTRAINT "orders_subscriber_id_fkey" FOREIGN KEY ("subscriber_id") REFERENCES "subscribers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_promotion_id_fkey" FOREIGN KEY ("promotion_id") REFERENCES "promotions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -404,6 +433,12 @@ ALTER TABLE "order_items" ADD CONSTRAINT "order_items_promotion_id_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "order_refunds" ADD CONSTRAINT "order_refunds_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "order_refund_items" ADD CONSTRAINT "order_refund_items_order_refund_id_fkey" FOREIGN KEY ("order_refund_id") REFERENCES "order_refunds"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "order_refund_items" ADD CONSTRAINT "order_refund_items_order_item_id_fkey" FOREIGN KEY ("order_item_id") REFERENCES "order_items"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

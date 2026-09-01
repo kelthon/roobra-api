@@ -13,12 +13,12 @@ export async function seedInteractions(
   pages: MediaPage[],
 ): Promise<void> {
   const existingReadList = await prisma.userReadList.findFirst({
-    where: { clientId: subscriber.id, mediaId: media.id, deletedAt: null },
+    where: { subscriberId: subscriber.id, mediaId: media.id, deletedAt: null },
   });
 
   if (!existingReadList) {
     await prisma.userReadList.create({
-      data: { clientId: subscriber.id, mediaId: media.id },
+      data: { subscriberId: subscriber.id, mediaId: media.id },
     });
   }
 
@@ -32,12 +32,12 @@ export async function seedInteractions(
 
   for (const { page, status } of historyEntries) {
     const exists = await prisma.userHistory.findFirst({
-      where: { clientId: subscriber.id, pageId: page.id },
+      where: { subscriberId: subscriber.id, pageId: page.id },
     });
 
     if (!exists) {
       await prisma.userHistory.create({
-        data: { clientId: subscriber.id, pageId: page.id, status },
+        data: { subscriberId: subscriber.id, pageId: page.id, status },
       });
     }
   }

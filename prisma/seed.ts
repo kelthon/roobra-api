@@ -23,13 +23,17 @@ async function main(): Promise<void> {
   // The password is hashed once and reused across all users so the seed
   // doesn't call argon2 N times with different salts for no reason.
   const hashedPassword = await hash(DEFAULT_PASSWORD);
-  const { viewer } = await seedUsers(prisma, hashedPassword);
+  const { subscriber: subscriberUser } = await seedUsers(
+    prisma,
+    hashedPassword,
+  );
 
   const { media, pages } = await seedContent(prisma);
 
-  // Subscriber is created after the user because it requires a valid plan,
-  // and after content because its order item references the subscription plan.
-  const subscriber = await seedSubscribers(prisma, viewer, premium);
+  // Subscriber (billing record) is created after the user because it requires
+  // a valid plan, and after content because its order item references the
+  // subscription plan.
+  const subscriber = await seedSubscribers(prisma, subscriberUser, premium);
 
   // Interactions depend on both the subscriber identity and the specific page
   // IDs from the content hierarchy, so they come last.

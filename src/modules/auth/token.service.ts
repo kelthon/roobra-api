@@ -72,7 +72,7 @@ export class TokenService {
       where: {
         userId,
         hashedToken: this.hashToken(refreshToken),
-        revoked: false,
+        isRevoked: false,
         expiresAt: { gt: DateTime.now().toJSDate() },
       },
     });
@@ -123,7 +123,7 @@ export class TokenService {
     try {
       const token = await this.prisma.refreshToken.findFirstOrThrow({
         where: {
-          revoked: false,
+          isRevoked: false,
           hashedToken: this.hashToken(refreshToken),
           expiresAt: { gt: DateTime.now().toJSDate() },
           userId,
@@ -132,7 +132,7 @@ export class TokenService {
 
       await this.prisma.refreshToken.update({
         where: { id: token.id },
-        data: { revoked: true },
+        data: { isRevoked: true },
       });
 
       return { message: 'Refresh token revoked successfully' };
@@ -151,10 +151,10 @@ export class TokenService {
     const count = await this.prisma.refreshToken.updateMany({
       where: {
         userId,
-        revoked: false,
+        isRevoked: false,
         expiresAt: { gt: DateTime.now().toJSDate() },
       },
-      data: { revoked: true },
+      data: { isRevoked: true },
     });
 
     if (count.count === 0) {

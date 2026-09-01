@@ -12,7 +12,7 @@ export async function seedSubscribers(
   user: User,
   premium: Subscription,
 ): Promise<Subscriber> {
-  // Fetch the current viewer state in case a previous run already set subscriberId.
+  // Fetch the current subscriber state in case a previous run already set subscriberId.
   const freshSubscriber = await prisma.subscriber.findFirst({
     where: { userId: user.id },
   });
@@ -43,7 +43,7 @@ export async function seedSubscribers(
       status: GatewayStatus.PAID,
       subtotal: Number(premium.price),
       total: Number(premium.price),
-      clientId: subscriber.id,
+      subscriberId: subscriber.id,
       orderItems: {
         create: {
           subscriptionId: premium.id,
@@ -55,7 +55,7 @@ export async function seedSubscribers(
   });
 
   console.log(
-    '- Subscriber: viewer subscribed to Premium, order PAID via Stripe',
+    '- Subscriber: subscriber user subscribed to Premium, order PAID via Stripe',
   );
   return subscriber;
 }
