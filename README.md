@@ -1,4 +1,9 @@
-# PH API
+# Roobra API
+
+Backend API for the Roobra platform — manages users, subscriptions, payments, orders, and
+permissions for the Roobra website.
+
+## Tech stack
 
 - Node.js 24 (see `Dockerfile` for the exact pinned version)
 - [NestJS](https://nestjs.com/)
@@ -6,93 +11,73 @@
 - Redis, BullMQ — planned, not yet wired into the codebase
 - Docker / Docker Compose
 
-This project is a RESTful API built using the [NestJS framework](https://github.com/nestjs/nest). It provides endpoints for managing and retrieving data related to a specific domain. The API is designed to be scalable, maintainable, and easy to use, following best practices in software development.
+## Prerequisites
 
 - Docker with the Compose plugin
 - Node.js 24+ and npm — only needed if running outside Docker
 
-First of all you need to clone the repository and navigate to the project directory:
+## Getting started (local development)
 
-```bash
-# Clone repository
-git clone git@github.com:Kelthon/ph-api.git
+1. Clone the repository:
 
-# Change to project directory
-cd ph-api
-```
+   ```sh
+   git clone git@github.com:kelthon/ph-api.git
+   cd ph-api
+   ```
 
-Then, install the dependencies:
+2. Create your local environment file:
 
-```bash
-npm install
-```
-
-Copy environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Now you can edit the `.env` file to set up your environment variables, such as database connection strings, API keys, and other configuration settings.
-
-## Compile and run the project
-
-### Running the app with npm
-
-```bash
-# development
-npm run start
-
-# watch mode
-npm run start:dev
-
-# production mode
-npm run start:prod
-```
-
-### Running the app with Docker
-
-Make sure you have Docker installed and running on your machine. Then, you can build and run the Docker container using the following commands:
-
-```bash
-# Build the Docker image
-docker build -t ph-api .
-
-# Run the Docker container
-docker run -p 3000:3000 ph-api
-```
+   ```sh
+   cp .env.example .env
+   ```
 
    Fill in at least `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `DATABASE_URL`
    (`DATABASE_HOST` should be `db`, the Compose service name). Do not leave `DATABASE_USER` empty
    on the first run — see [docs/docker.md](docs/docker.md#postgres_user--database_user) for why.
 
-To run the tests for this project, you can use the following commands:
+3. Start the stack:
 
-```bash
-# unit tests
-npm run test
+   ```sh
+   docker compose up -d --build
+   ```
 
-# e2e tests
-npm run test:e2e
+   This builds the app image, starts PostgreSQL, and runs the API in watch mode with auto-reload.
+   See [docs/docker.md](docs/docker.md) for what each Compose file does and why.
 
-# test coverage
-npm run test:cov
-```
+4. Call the API with your HTTP client of choice (Postman, Insomnia, curl, ...) at
+   `http://localhost:3000` (or whichever `PORT` you set in `.env`).
 
-## Linting and formatting
+The database is intentionally not exposed to the host (`expose`, not `ports`, in `compose.yaml`) —
+reach it via `docker compose exec db psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
 
-To maintain code quality and consistency, you can use the following commands for linting and formatting:
+## Scripts
 
-```bash
-# Lint the code
-npm run lint
-```
+| Command | Description |
+| --- | --- |
+| `npm run start:dev` | Start the API in watch mode (what the dev container runs) |
+| `npm run build` | Compile to `dist/` |
+| `npm run start:prod` | Run the compiled build (`dist/main.js`) |
+| `npm run lint` | Lint and auto-fix |
+| `npm run test` | Unit tests |
+| `npm run test:e2e` | End-to-end tests |
+| `npm run test:cov` | Test coverage |
+| `npx prisma generate` | Regenerate the Prisma client after a schema change |
+| `npx prisma db seed` | Seed the database |
 
 ## Deployment
 
 Production runs the same containers via `compose.prod.yaml` and `scripts/deploy.sh`. See
 [docs/deployment.md](docs/deployment.md) for the full process, prerequisites, the current CI
 pipeline status, and how to recover a misconfigured database role without losing data.
+
+## Documentation
+
+- [docs/docker.md](docs/docker.md) — Dockerfile stages, the three Compose files, and the reasoning
+  behind non-obvious infra decisions.
+- [docs/deployment.md](docs/deployment.md) — deployment process and troubleshooting.
+- [AGENTS.md](AGENTS.md) and [.github/instructions/](.github/instructions/) — contribution
+  guidelines, coding standards, and architecture, including team culture and values.
+- Cross-service and business documentation: the `roobra-docs` repository.
 
 ## License
 
