@@ -18,3 +18,9 @@ services:
     volumes:
       - ".:/usr/src/app"
       - "/usr/src/app/node_modules"
+  # Published to the host only in dev (this file is never loaded in prod), so tools like
+  # DBeaver/psql can connect via DATABASE_HOST/DATABASE_PORT from .env. The app itself keeps
+  # using DATABASE_URL's `db:5432` (the Compose service name) from compose.yaml.
+  db:
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"

@@ -47,8 +47,11 @@ permissions for the Roobra website.
 4. Call the API with your HTTP client of choice (Postman, Insomnia, curl, ...) at
    `http://localhost:3000` (or whichever `PORT` you set in `.env`).
 
-The database is intentionally not exposed to the host (`expose`, not `ports`, in `compose.yaml`) —
-reach it via `docker compose exec db psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
+The database is not exposed to the host in production (`expose`, not `ports`, in `compose.yaml`).
+In dev, `compose.override.yaml` publishes it at `DATABASE_HOST`:`DATABASE_PORT` from `.env` (default
+`localhost:5432`), so GUI clients like DBeaver or `psql` can connect directly; the app itself
+still talks to `db:5432` via `DATABASE_URL`, the Compose service name. You can also reach it with
+`docker compose exec db psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
 
 ## Scripts
 
