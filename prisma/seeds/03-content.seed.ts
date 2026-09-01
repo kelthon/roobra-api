@@ -14,12 +14,12 @@ interface ContentSeeds {
 
 export async function seedContent(prisma: PrismaClient): Promise<ContentSeeds> {
   const [actionGenre] = await Promise.all([
-    prisma.mediaGenres.upsert({
+    prisma.mediaGenre.upsert({
       where: { slug: 'action' },
       create: { name: 'Action', slug: 'action' },
       update: { name: 'Action' },
     }),
-    prisma.mediaGenres.upsert({
+    prisma.mediaGenre.upsert({
       where: { slug: 'fantasy' },
       create: { name: 'Fantasy', slug: 'fantasy' },
       update: { name: 'Fantasy' },

@@ -12,11 +12,11 @@ datasource db {
 }
 
 enum UserRole {
-  SUBSCRIBER    @map("subscriber")
-  ADMIN         @map("admin")
-  CONTENT_STAFF @map("content_manager")
-  SUPPORT_AGENT @map("support_agent")
-  STAFF         @map("staff")
+  SUBSCRIBER      @map("subscriber")
+  ADMIN           @map("admin")
+  CONTENT_MANAGER @map("content_manager")
+  SUPPORT_AGENT   @map("support_agent")
+  STAFF           @map("staff")
 
   @@map("user_roles")
 }
@@ -61,6 +61,10 @@ model Subscriber {
   orders          Order[]
   userReadLists   UserReadList[]
 
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
   @@map("subscribers")
 }
 
@@ -71,6 +75,10 @@ model StaffMember {
 
   userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
 
   @@map("staff_members")
 }
@@ -119,7 +127,7 @@ model Media {
   isFree                    Boolean  @default(false) @map("is_free")
 
   volumes       MediaVolume[]
-  genres        MediaGenre[] @relation("media_to_media_genres")
+  genres        MediaGenre[]   @relation("media_to_media_genres")
   userReadLists UserReadList[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
@@ -175,11 +183,11 @@ model MediaChapter {
 model MediaPage {
   id BigInt @id @default(autoincrement())
 
-  number             Int     @db.SmallInt
-  imageUrl           String  @map("image_url") @db.VarChar(255)
-  hasSensibleContent Boolean @default(false) @map("has_sensible_content")
-  isPrivate          Boolean @default(false) @map("is_private")
-  isFree             Boolean @default(false) @map("is_free")
+  number              Int     @db.SmallInt
+  imageUrl            String  @map("image_url") @db.VarChar(255)
+  hasSensitiveContent Boolean @default(false) @map("has_sensitive_content")
+  isPrivate           Boolean @default(false) @map("is_private")
+  isFree              Boolean @default(false) @map("is_free")
 
   chapterId     BigInt        @map("chapter_id")
   chapter       MediaChapter  @relation(fields: [chapterId], references: [id])
@@ -208,11 +216,11 @@ enum ReadingProgressStatus {
   IN_PROGRESS @map("in_progress")
   COMPLETED   @map("completed")
 
-  @@map("reading_progress_status")
+  @@map("reading_progress_statuses")
 }
 
 model UserReadList {
-  id Int @id @default(autoincrement())
+  id BigInt @id @default(autoincrement())
 
   subscriberId BigInt     @map("subscriber_id")
   subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
@@ -241,7 +249,7 @@ model UserHistory {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  @@map("user_history")
+  @@map("user_histories")
 }
 
 model Subscription {
@@ -253,7 +261,7 @@ model Subscription {
   accessDays  Int     @map("access_days") @db.SmallInt
 
   subscribers Subscriber[]
-  promotions  Promotion[]
+  promotions  Promotion[]  @relation("promotion_to_subscription")
   orderItems  OrderItem[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
@@ -283,7 +291,7 @@ model Promotion {
   perUser      Boolean      @default(true) @map("per_user")
 
   promotionUsages PromotionUsage[]
-  subscriptions   Subscription[]
+  subscriptions   Subscription[]   @relation("promotion_to_subscription")
   orders          Order[]
   orderItems      OrderItem[]
 
@@ -297,7 +305,7 @@ model Promotion {
 model PromotionUsage {
   id BigInt @id @default(autoincrement())
 
-  usedAt DateTime @default(now()) @db.Timestamptz
+  usedAt DateTime @default(now()) @map("used_at") @db.Timestamptz
 
   subscriberId BigInt     @map("subscriber_id")
   subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
@@ -320,7 +328,7 @@ enum GatewayStatus {
   UNDERPAID      @map("underpaid")
   OVERPAID       @map("overpaid")
 
-  @@map("gateway_status")
+  @@map("gateway_statuses")
 }
 
 enum PaymentMethod {
@@ -360,12 +368,13 @@ model OrderItem {
   subtotal Decimal @db.Decimal(10, 2)
   total    Decimal @db.Decimal(10, 2)
 
-  subscriptionId BigInt       @map("subscription_id")
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  orderId        BigInt       @map("order_id")
-  order          Order        @relation(fields: [orderId], references: [id])
-  promotionId    BigInt?      @map("promotion_id")
-  promotion      Promotion?   @relation(fields: [promotionId], references: [id])
+  subscriptionId   BigInt            @map("subscription_id")
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  orderId          BigInt            @map("order_id")
+  order            Order             @relation(fields: [orderId], references: [id])
+  promotionId      BigInt?           @map("promotion_id")
+  promotion        Promotion?        @relation(fields: [promotionId], references: [id])
+  orderRefundItems OrderRefundItem[]
 
   @@map("order_items")
 }
@@ -376,20 +385,37 @@ model OrderRefund {
   amount Decimal @db.Decimal(10, 2)
   reason String? @db.Text
 
-  orderId BigInt @map("order_id")
-  order   Order  @relation(fields: [orderId], references: [id])
+  orderId          BigInt            @map("order_id")
+  order            Order             @relation(fields: [orderId], references: [id])
+  orderRefundItems OrderRefundItem[]
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("order_refunds")
 }
 
+model OrderRefundItem {
+  id BigInt @id @default(autoincrement())
+
+  amount Decimal @db.Decimal(10, 2)
+
+  orderRefundId BigInt      @map("order_refund_id")
+  orderRefund   OrderRefund @relation(fields: [orderRefundId], references: [id])
+  orderItemId   BigInt      @map("order_item_id")
+  orderItem     OrderItem   @relation(fields: [orderItemId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([orderRefundId, orderItemId])
+  @@map("order_refund_items")
+}
+
 model AuditLog {
   id       BigInt  @id @default(autoincrement())
-  action   String  @db.VarChar
+  action   String  @db.VarChar(128)
   metadata Json
-  entity   String? @map("entity") @db.VarChar
-  entityId String? @map("entity_id") @db.VarChar
+  entity   String? @db.VarChar(64)
+  entityId String? @map("entity_id") @db.VarChar(32)
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id])
