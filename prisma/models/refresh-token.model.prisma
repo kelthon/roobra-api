@@ -1,0 +1,15 @@
+model RefreshToken {
+  id              BigInt   @id @default(autoincrement())
+  hashedToken     String   @unique @map("hashed_token") @db.VarChar(255)
+  isRevoked       Boolean  @default(false) @map("is_revoked")
+  userAgent       String?  @default("unspecified") @map("user_agent") @db.VarChar(35)
+  operatingSystem String?  @default("unspecified") @map("operating_system") @db.VarChar(35)
+  expiresAt       DateTime @map("expires_at") @db.Timestamptz
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("refresh_tokens")
+}

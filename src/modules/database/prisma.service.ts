@@ -8,7 +8,27 @@ export class PrismaService extends PrismaClient {
   constructor(config: ConfigService) {
     const connectionString = `${config.get<string>('database.url')}`;
     const adapter = new PrismaPg({ connectionString });
-    super({ adapter });
+    super({
+      adapter,
+      log:
+        config.get('env') === 'production'
+          ? [
+              { level: 'warn', emit: 'stdout' },
+              { level: 'error', emit: 'stdout' },
+            ]
+          : [
+              { level: 'query', emit: 'stdout' },
+              { level: 'warn', emit: 'stdout' },
+              { level: 'error', emit: 'stdout' },
+            ],
+
+      omit: {
+        user: { hashedPassword: true },
+        refreshToken: { hashedToken: true },
+        passwordResetToken: { hashedToken: true },
+        key: { hashedKey: true },
+      },
+    });
   }
 
   async onModuleDestroy() {

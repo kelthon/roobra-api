@@ -1,12 +1,12 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
-import { TokenService } from './token.service';
+import { AccessTokenService } from './access-token.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/generated/prisma/client';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('TokenService', () => {
-  let tokenService: TokenService;
+  let tokenService: AccessTokenService;
   let prismaMock: PrismaService;
   let configServiceMock: ConfigService;
   let jwtServiceMock: JwtService;
@@ -42,7 +42,7 @@ describe('TokenService', () => {
       }),
     } as unknown as ConfigService;
 
-    tokenService = new TokenService(
+    tokenService = new AccessTokenService(
       configServiceMock as unknown as ConfigService,
       prismaMock as unknown as PrismaService,
       jwtServiceMock as unknown as JwtService,

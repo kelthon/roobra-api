@@ -1,0 +1,23 @@
+enum ReadingProgressStatus {
+  IN_PROGRESS @map("in_progress")
+  COMPLETED   @map("completed")
+
+  @@map("reading_progress_statuses")
+}
+
+model UserHistory {
+  id BigInt @id @default(autoincrement())
+
+  status     ReadingProgressStatus @default(IN_PROGRESS)
+  lastReadAt DateTime              @default(now()) @map("last_read_at") @db.Timestamptz
+
+  subscriberId BigInt     @map("subscriber_id")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+  pageId       BigInt     @map("page_id")
+  page         MediaPage  @relation(fields: [pageId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("user_histories")
+}

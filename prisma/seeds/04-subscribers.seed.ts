@@ -38,6 +38,7 @@ export async function seedSubscribers(
   // Order + item created together to represent a completed purchase transaction.
   await prisma.order.create({
     data: {
+      orderExternalId: 'oi_testNdfsFgN9g3',
       paymentGateway: 'stripe',
       paymentMethod: PaymentMethod.CREDIT_CARD,
       status: GatewayStatus.PAID,

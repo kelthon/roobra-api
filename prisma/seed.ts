@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { hash } from 'argon2';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
 import { DEFAULT_PASSWORD } from './seeds/constants';
@@ -8,6 +7,7 @@ import { seedUsers } from './seeds/02-users.seed';
 import { seedContent } from './seeds/03-content.seed';
 import { seedSubscribers } from './seeds/04-subscribers.seed';
 import { seedInteractions } from './seeds/05-interactions.seed';
+import { PasswordHashService } from 'src/modules/auth/password-hash.service';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
@@ -19,10 +19,11 @@ async function main(): Promise<void> {
   console.log('Seeding database...\n');
 
   const { premium } = await seedSubscriptions(prisma);
+  const passwordHashService = new PasswordHashService();
 
   // The password is hashed once and reused across all users so the seed
   // doesn't call argon2 N times with different salts for no reason.
-  const hashedPassword = await hash(DEFAULT_PASSWORD);
+  const hashedPassword = await passwordHashService.hash(DEFAULT_PASSWORD);
   const { subscriber: subscriberUser } = await seedUsers(
     prisma,
     hashedPassword,
