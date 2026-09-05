@@ -1,0 +1,16 @@
+model OrderItem {
+  id BigInt @id @default(autoincrement())
+
+  subtotal Decimal @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  subscriptionId   BigInt            @map("subscription_id")
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  orderId          BigInt            @map("order_id")
+  order            Order             @relation(fields: [orderId], references: [id])
+  promotionId      BigInt?           @map("promotion_id")
+  promotion        Promotion?        @relation(fields: [promotionId], references: [id])
+  orderRefundItems OrderRefundItem[]
+
+  @@map("order_items")
+}

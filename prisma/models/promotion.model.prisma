@@ -1,0 +1,30 @@
+enum DiscountType {
+  PERCENT     @map("percent")
+  FIXED_VALUE @map("fixed_value")
+
+  @@map("discount_types")
+}
+
+model Promotion {
+  id BigInt @id @default(autoincrement())
+
+  code         String       @unique @db.VarChar(50)
+  description  String?      @db.VarChar(255)
+  discount     Decimal      @db.Decimal(10, 2)
+  discountType DiscountType @default(FIXED_VALUE) @map("discount_type")
+  startDate    DateTime     @map("start_date") @db.Timestamptz
+  endDate      DateTime?    @map("end_date") @db.Timestamptz
+  maxUses      Int?         @map("max_uses")
+  perUser      Boolean      @default(true) @map("per_user")
+
+  promotionUsages PromotionUsage[]
+  subscriptions   Subscription[]   @relation("promotion_to_subscription")
+  orders          Order[]
+  orderItems      OrderItem[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("promotions")
+}

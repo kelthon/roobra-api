@@ -1,0 +1,19 @@
+model MediaChapter {
+  id BigInt @id @default(autoincrement())
+
+  number    Int?    @db.SmallInt
+  title     String  @db.VarChar(100)
+  isPrivate Boolean @default(false) @map("is_private")
+  isFree    Boolean @default(false) @map("is_free")
+
+  volumeId   BigInt      @map("volume_id")
+  volume     MediaVolume @relation(fields: [volumeId], references: [id])
+  mediaPages MediaPage[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([volumeId, number])
+  @@map("media_chapters")
+}

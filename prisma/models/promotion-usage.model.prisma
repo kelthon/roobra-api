@@ -1,0 +1,13 @@
+model PromotionUsage {
+  id BigInt @id @default(autoincrement())
+
+  usedAt DateTime @default(now()) @map("used_at") @db.Timestamptz
+
+  subscriberId BigInt     @map("subscriber_id")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+  promotionId  BigInt     @map("promotion_id")
+  promotion    Promotion  @relation(fields: [promotionId], references: [id])
+
+  @@unique([subscriberId, promotionId])
+  @@map("promotion_usages")
+}

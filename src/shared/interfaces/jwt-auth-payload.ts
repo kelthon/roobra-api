@@ -1,6 +1,6 @@
 import { UserRole } from 'src/generated/prisma/enums';
 
-export interface AuthPayload {
+export interface JWTAuthPayload {
   sub: string;
   email: string;
   username: string;

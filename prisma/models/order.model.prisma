@@ -1,0 +1,46 @@
+enum GatewayStatus {
+  PENDING        @map("pending")
+  WAITING        @map("waiting")
+  GENERATED      @map("generated")
+  CANCELED       @map("canceled")
+  PAID           @map("paid")
+  REFUND         @map("refund")
+  PARTIAL_REFUND @map("partial_refund")
+  WITH_ERROR     @map("with_error")
+  UNDERPAID      @map("underpaid")
+  OVERPAID       @map("overpaid")
+
+  @@map("gateway_statuses")
+}
+
+enum PaymentMethod {
+  BOLETO      @map("boleto")
+  CREDIT_CARD @map("credit_card")
+  DEBIT_CARD  @map("debit_card")
+  PIX         @map("pix")
+
+  @@map("payment_methods")
+}
+
+model Order {
+  id BigInt @id @default(autoincrement())
+
+  orderExternalId String        @unique @map("order_external_id") @db.VarChar(255)
+  paymentGateway  String        @map("payment_gateway") @db.VarChar(50)
+  paymentMethod   PaymentMethod @map("payment_method")
+  status          GatewayStatus @default(PENDING)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+
+  subscriberId BigInt        @map("subscriber_id")
+  subscriber   Subscriber    @relation(fields: [subscriberId], references: [id])
+  orderItems   OrderItem[]
+  orderRefunds OrderRefund[]
+  promotionId  BigInt?       @map("promotion_id")
+  promotion    Promotion?    @relation(fields: [promotionId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("orders")
+}

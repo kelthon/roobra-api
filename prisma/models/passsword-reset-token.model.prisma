@@ -1,0 +1,13 @@
+model PasswordResetToken {
+  id          BigInt    @id @default(autoincrement())
+  hashedToken String    @unique @map("hashed_token") @db.VarChar(255)
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz
+  usedAt      DateTime? @map("used_at") @db.Timestamptz
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("password_reset_tokens")
+}
