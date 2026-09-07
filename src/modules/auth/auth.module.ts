@@ -4,13 +4,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { DatabaseModule } from '../database/database.module';
-import { HashService } from './hash.service';
+import { PasswordHashService } from './password-hash.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { TokenService } from './token.service';
+import { AccessTokenService } from './access-token.service';
 import { PrismaService } from '../database/prisma.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RolesGuard } from './guards/roles/roles.guard';
+import { SimpleHashService } from './simple-hash.service';
+import { SimpleTokenService } from './simple-token.service';
 
 @Module({
   imports: [
@@ -29,8 +31,10 @@ import { RolesGuard } from './guards/roles/roles.guard';
   ],
   providers: [
     AuthService,
-    HashService,
-    TokenService,
+    PasswordHashService,
+    AccessTokenService,
+    SimpleHashService,
+    SimpleTokenService,
     JwtStrategy,
     LocalStrategy,
     PrismaService,
