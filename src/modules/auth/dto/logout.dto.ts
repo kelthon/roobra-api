@@ -1,7 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { RefreshTokenDto } from './refresh-token.dto';
+import { PickType } from '@nestjs/mapped-types';
 
-export class LogoutDto {
-  @IsString()
-  @IsNotEmpty()
-  refreshToken!: string;
-}
+export class LogoutDto extends PickType(RefreshTokenDto, ['refreshToken']) {}
