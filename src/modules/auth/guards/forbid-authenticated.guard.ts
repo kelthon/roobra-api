@@ -5,15 +5,15 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthPayload } from 'src/shared/interfaces/auth-payload';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 
 @Injectable()
 export class ForbidAuthenticatedGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const user = request.user as AuthPayload | undefined;
+    const user = request.user as JWTAuthPayload | undefined;
 
-    if (user?.sub) {
+    if (user && user.sub) {
       throw new ForbiddenException('Already authenticated');
     }
     return true;

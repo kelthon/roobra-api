@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { AuthPayload } from 'src/shared/interfaces/auth-payload';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,7 +20,7 @@ export class RolesGuard implements CanActivate {
 
     const rolesList = Array.isArray(roles) ? roles : [roles];
     const request = context.switchToHttp().getRequest<Request>();
-    const user = (request?.user as unknown as AuthPayload) ?? null;
+    const user = (request?.user as unknown as JWTAuthPayload) ?? null;
 
     return user && rolesList.includes(user.role);
   }
