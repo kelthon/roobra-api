@@ -1,18 +1,16 @@
 import { User } from 'src/generated/prisma/client';
 
-export default interface AuthResponse {
+export interface AuthTokensResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface SuccessAuthenticationResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
   user?: Partial<
-    Omit<
-      User,
-      | 'id'
-      | 'hashedPassword'
-      | 'emailVerifiedAt'
-      | 'googleId'
-      | 'role'
-      | 'deletedAt'
-    >
+    Omit<User, 'hashedPassword' | 'googleId' | 'role' | 'deletedAt'>
   >;
 }
