@@ -2,7 +2,7 @@ import { Duration } from 'luxon';
 
 export default () => ({
   jwt: {
-    secret: process.env.JWT_SECRET || '',
+    secret: process.env.JWT_SECRET,
     expiresIn: Duration.fromObject({ minutes: 15 }).as('seconds') || 900,
   },
   refreshToken: {
