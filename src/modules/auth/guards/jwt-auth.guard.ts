@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthPayload } from 'src/shared/interfaces/auth-payload';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -12,12 +12,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest<T = AuthPayload>(err: Error | null, payload: T | false): T {
+  handleRequest<T = JWTAuthPayload>(err: Error | null, payload: T | false): T {
     if (err || !payload) {
       throw err || new UnauthorizedException();
     }
 
-    const authPayload = payload as unknown as AuthPayload;
+    const authPayload = payload as unknown as JWTAuthPayload;
 
     if (!authPayload.sub) {
       throw new UnauthorizedException(

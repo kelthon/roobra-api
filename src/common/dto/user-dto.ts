@@ -1,7 +1,5 @@
-import { AuthPayload } from 'src/shared/interfaces/auth-payload';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 
-export type UserDto = Omit<AuthPayload, 'sub'> & {
+export type UserDto = Omit<JWTAuthPayload, 'sub'> & {
   id: string;
-  username: string;
-  email: string;
 };
