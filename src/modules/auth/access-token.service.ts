@@ -7,8 +7,12 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/generated/prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import AuthResponse from 'src/shared/interfaces/auth-response';
-import { RefreshTokenService } from './refresh-tokens.service';
+import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses';
+import { SimpleHashService } from './simple-hash.service';
+import { InfoResponse } from 'src/shared/interfaces/info-response';
+import { DateTime } from 'luxon';
+import { isRecordNotFoundError } from 'src/common/utils/database.util';
+import { SimpleTokenService } from './simple-token.service';
 
 @Injectable()
 export class AccessTokenService {
@@ -16,10 +20,13 @@ export class AccessTokenService {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly refreshTokenService: RefreshTokenService,
+    private readonly simpleHashService: SimpleHashService,
+    private readonly simpleTokenService: SimpleTokenService,
   ) {}
 
-  async generate(user: User): Promise<{ accessToken: string }> {
+  async generate(
+    user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
+  ): Promise<AuthTokensResponse> {
     const accessToken = await this.jwtService.signAsync(
       {
         sub: user.id,
@@ -30,11 +37,41 @@ export class AccessTokenService {
       { expiresIn: this.config.get<number>('jwt.expiresIn') },
     );
 
-    return { accessToken };
+    const refreshToken = await this.generateRefreshToken(user.id);
+
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.config.get<number>('jwt.expiresIn')!,
+    };
   }
 
-  async refresh(userId: string, refreshToken: string): Promise<AuthResponse> {
-    const token = await this.refreshTokenService.refresh(userId, refreshToken);
+  private async generateRefreshToken(userId: string) {
+    const refreshToken = this.simpleTokenService.generate(
+      this.config.get<number>('refreshToken.length'),
+    );
+
+    await this.prisma.refreshToken.create({
+      data: {
+        user: { connect: { id: userId } },
+        hashedToken: this.simpleHashService.hash(refreshToken),
+        expiresAt: DateTime.now()
+          .plus({ seconds: this.config.get<number>('refreshToken.expiresIn') })
+          .toJSDate(),
+      },
+    });
+
+    return refreshToken;
+  }
+
+  async refresh(refreshToken: string): Promise<AuthTokensResponse> {
+    const token = await this.prisma.refreshToken.findFirst({
+      where: {
+        hashedToken: this.simpleHashService.hash(refreshToken),
+        isRevoked: false,
+        expiresAt: { gt: DateTime.now().toJSDate() },
+      },
+    });
 
     if (!token) {
       throw new BadRequestException(
@@ -58,11 +95,60 @@ export class AccessTokenService {
       );
     }
 
-    const accessToken = await this.generate(user);
+    await this.prisma.refreshToken.update({
+      where: { id: token.id },
+      data: {
+        isRevoked: true,
+      },
+    });
+
+    return await this.generate(user);
+  }
+
+  async revoke(userId: string, refreshToken: string): Promise<InfoResponse> {
+    try {
+      const token = await this.prisma.refreshToken.findFirstOrThrow({
+        where: {
+          isRevoked: false,
+          hashedToken: this.simpleHashService.hash(refreshToken),
+          expiresAt: { gt: DateTime.now().toJSDate() },
+          userId,
+        },
+      });
+
+      await this.prisma.refreshToken.update({
+        where: { id: token.id },
+        data: { isRevoked: true },
+      });
+
+      return { message: 'Refresh token revoked successfully' };
+    } catch (error: unknown) {
+      if (isRecordNotFoundError(error)) {
+        throw new NotFoundException(
+          'No valid refresh token found for the provided token',
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  async revokeAll(userId: string): Promise<InfoResponse> {
+    const count = await this.prisma.refreshToken.updateMany({
+      where: {
+        userId,
+        isRevoked: false,
+        expiresAt: { gt: DateTime.now().toJSDate() },
+      },
+      data: { isRevoked: true },
+    });
+
+    if (count.count === 0) {
+      throw new NotFoundException('No valid refresh tokens found for the user');
+    }
+
     return {
-      accessToken,
-      refreshToken,
-      expiresIn: this.config.get<number>('jwt.expiresIn')!,
+      message: 'All refresh tokens revoked successfully',
     };
   }
 }
