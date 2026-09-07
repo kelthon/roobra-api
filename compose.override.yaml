@@ -6,6 +6,7 @@ services:
   server:
     build:
       target: build
+    restart: unless-stopped
     user: node
     environment:
       NODE_ENV: development
