@@ -4,23 +4,22 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { User } from 'src/common/decorators/user.decorator';
-import { AuthUsersOnly } from 'src/common/decorators/auth-users-only.decorator';
+import { UserOnly } from 'src/common/decorators/auth-users-only.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GuestOnly } from 'src/common/decorators/guest-only.decorator';
-import { type AuthPayload } from 'src/shared/interfaces/auth-payload';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { type UserDto } from 'src/common/dto/user-dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @AuthUsersOnly()
+  @UserOnly()
   @Get('me')
-  async getMe(@User() user: AuthPayload) {
-    const userId = user.sub;
-    return await this.authService.getMe(userId);
+  async getMe(@User() user: UserDto) {
+    return await this.authService.getMe(user.id);
   }
 
   @GuestOnly()
@@ -35,49 +34,39 @@ export class AuthController {
     return await this.authService.login(loginDto);
   }
 
-  @AuthUsersOnly()
+  @UserOnly()
   @Post('logout')
-  async logout(@User() user: AuthPayload, @Body() logoutDto: LogoutDto) {
-    const userId = user.sub;
-    return await this.authService.logout(userId, logoutDto);
+  async logout(@User() user: UserDto, @Body() logoutDto: LogoutDto) {
+    return await this.authService.logout(user.id, logoutDto);
   }
 
-  @AuthUsersOnly()
-  @Post('logout-all-sessions')
-  async logoutAllSessions(@User() user: AuthPayload) {
-    const userId = user.sub;
-    return await this.authService.logoutAllSessions(userId);
+  @UserOnly()
+  @Post('logout/all')
+  async logoutAllSessions(@User() user: UserDto) {
+    return await this.authService.logoutAllSessions(user.id);
   }
 
-  @AuthUsersOnly()
   @Post('refresh-token')
-  async refreshToken(
-    @User() user: AuthPayload,
-    @Body() refreshTokenDto: RefreshTokenDto,
-  ) {
-    const userId = user.sub;
-    return await this.authService.refreshToken(userId, refreshTokenDto);
+  async refreshSession(@Body() refreshTokenDto: RefreshTokenDto) {
+    return await this.authService.refreshSession(refreshTokenDto);
   }
 
-  @AuthUsersOnly()
   @Post('forgot-password')
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
-  @GuestOnly()
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  @AuthUsersOnly()
+  @UserOnly()
   @Post('change-password')
   changePassword(
-    @User() user: AuthPayload,
+    @User() user: UserDto,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    const userId = user.sub;
-    return this.authService.changePassword(userId, changePasswordDto);
+    return this.authService.changePassword(user.id, changePasswordDto);
   }
 }
