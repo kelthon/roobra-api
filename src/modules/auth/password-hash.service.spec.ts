@@ -1,12 +1,12 @@
 import { BadRequestException } from '@nestjs/common';
-import { HashService } from './hash.service';
+import { PasswordHashService } from './password-hash.service';
 
 describe('HashService', () => {
-  let hashService: HashService;
+  let hashService: PasswordHashService;
 
   beforeAll(() => {
     // Initialize the HashService instance before all tests
-    hashService = new HashService();
+    hashService = new PasswordHashService();
   });
 
   describe('hash', () => {
