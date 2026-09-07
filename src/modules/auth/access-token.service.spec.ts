@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/generated/prisma/client';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-describe('TokenService', () => {
-  let tokenService: AccessTokenService;
+describe('AccessTokenService', () => {
+  let accessTokenService: AccessTokenService;
   let prismaMock: PrismaService;
   let configServiceMock: ConfigService;
   let jwtServiceMock: JwtService;
@@ -42,7 +42,7 @@ describe('TokenService', () => {
       }),
     } as unknown as ConfigService;
 
-    tokenService = new AccessTokenService(
+    accessTokenService = new AccessTokenService(
       configServiceMock as unknown as ConfigService,
       prismaMock as unknown as PrismaService,
       jwtServiceMock as unknown as JwtService,
@@ -75,13 +75,13 @@ describe('TokenService', () => {
         return config[key];
       });
 
-      tokenService['createRefreshToken'] = jest
+      accessTokenService['createRefreshToken'] = jest
         .fn()
         .mockReturnValue(
           'valid-refresh-token-for-general-purpose-and-user-access-only-use',
         );
 
-      tokenService['hashToken'] = jest
+      accessTokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
@@ -91,7 +91,7 @@ describe('TokenService', () => {
         expiresIn: configService.get<number>('jwt.expiresIn'),
       });
 
-      const result = await tokenService.createAccessToken(user);
+      const result = await accessTokenService.createAccessToken(user);
 
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -129,7 +129,7 @@ describe('TokenService', () => {
       const jwtService = jwtServiceMock as unknown as JwtService;
       const configService = configServiceMock as unknown as ConfigService;
 
-      tokenService['hashToken'] = jest
+      accessTokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
@@ -164,7 +164,7 @@ describe('TokenService', () => {
         'new-valid-access-token',
       );
 
-      const result = await tokenService.refreshAccessToken(
+      const result = await accessTokenService.refreshAccessToken(
         'user-id',
         'valid-refresh-token-for-general-purpose-and-user-access-only-use',
       );
@@ -213,14 +213,14 @@ describe('TokenService', () => {
     it('should throw BadRequestException for invalid or revoked refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashToken'] = jest
+      accessTokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
       (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        tokenService.refreshAccessToken(
+        accessTokenService.refreshAccessToken(
           'user-id',
           'invalid-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -233,7 +233,7 @@ describe('TokenService', () => {
       (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        tokenService.refreshAccessToken(
+        accessTokenService.refreshAccessToken(
           'jane-user-id',
           'valid-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -246,7 +246,7 @@ describe('TokenService', () => {
       (prisma.refreshToken.findFirst as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        tokenService.refreshAccessToken(
+        accessTokenService.refreshAccessToken(
           'user-id',
           'expired-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -270,7 +270,7 @@ describe('TokenService', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(
-        tokenService.refreshAccessToken(
+        accessTokenService.refreshAccessToken(
           'user-id',
           'valid-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -282,7 +282,7 @@ describe('TokenService', () => {
     it('should revoke a specific refresh token for a user', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashToken'] = jest
+      accessTokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
@@ -308,7 +308,7 @@ describe('TokenService', () => {
         userId: 'user-id',
       });
 
-      const result = await tokenService.revokeRefreshToken(
+      const result = await accessTokenService.revokeRefreshToken(
         'user-id',
         'valid-refresh-token-for-general-purpose-and-user-access-only-use',
       );
@@ -328,7 +328,7 @@ describe('TokenService', () => {
     it('should throw NotFoundException for invalid or already revoked refresh token', async () => {
       const prisma = prismaMock as unknown as PrismaService;
 
-      tokenService['hashToken'] = jest
+      accessTokenService['hashToken'] = jest
         .fn()
         .mockReturnValue('hashed-refresh-token');
 
@@ -337,7 +337,7 @@ describe('TokenService', () => {
       });
 
       await expect(
-        tokenService.revokeRefreshToken(
+        accessTokenService.revokeRefreshToken(
           'user-id',
           'invalid-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -352,7 +352,7 @@ describe('TokenService', () => {
       });
 
       await expect(
-        tokenService.revokeRefreshToken(
+        accessTokenService.revokeRefreshToken(
           'jane-user-id',
           'valid-refresh-token-for-general-purpose-and-user-access-only-use',
         ),
@@ -368,7 +368,7 @@ describe('TokenService', () => {
         count: 3,
       });
 
-      const result = await tokenService.revokeAllRefreshTokens('user-id');
+      const result = await accessTokenService.revokeAllRefreshTokens('user-id');
 
       expect(prisma.refreshToken.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -393,7 +393,7 @@ describe('TokenService', () => {
         count: 0,
       });
       await expect(
-        tokenService.revokeAllRefreshTokens('user-id'),
+        accessTokenService.revokeAllRefreshTokens('user-id'),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -404,7 +404,7 @@ describe('TokenService', () => {
         count: 0,
       });
       await expect(
-        tokenService.revokeAllRefreshTokens('user-id'),
+        accessTokenService.revokeAllRefreshTokens('user-id'),
       ).rejects.toThrow(NotFoundException);
     });
   });
