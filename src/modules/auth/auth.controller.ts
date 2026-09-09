@@ -11,6 +11,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { type UserDto } from 'src/common/dto/user-dto';
+import { LoginWith } from 'src/common/decorators/login-with.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -29,9 +30,10 @@ export class AuthController {
   }
 
   @GuestOnly()
+  @LoginWith('local')
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto);
+  async login(@User() user: UserDto, @Body() _loginDto: LoginDto) {
+    return await this.authService.login(user.id);
   }
 
   @UserOnly()

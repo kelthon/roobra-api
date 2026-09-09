@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/database/prisma.service';
-import { LoginDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { PasswordHashService } from './password-hash.service';
 import {
@@ -15,12 +14,20 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { InfoResponse } from 'src/shared/interfaces/info-response';
 import { DateTime } from 'luxon';
-import { User } from 'src/generated/prisma/client';
 import { SimpleHashService } from './simple-hash.service';
 import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 
 @Injectable()
 export class AuthService {
+  private readonly AUTH_USER_SELECT = {
+    id: true,
+    email: true,
+    username: true,
+    role: true,
+    photoUrl: true,
+  } as const;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashService: PasswordHashService,
@@ -28,6 +35,11 @@ export class AuthService {
     private readonly simpleHashService: SimpleHashService,
   ) {}
 
+  /**
+   * Gets user profile information
+   *
+   * @param userId The user nano id
+   */
   async getMe(userId: string) {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
@@ -35,10 +47,13 @@ export class AuthService {
           id: true,
           email: true,
           username: true,
+          birthdate: true,
+          photoUrl: true,
           emailVerifiedAt: true,
           createdAt: true,
+          updatedAt: true,
         },
-        where: { id: userId },
+        where: { id: userId, deletedAt: null },
       });
 
       return user;
@@ -58,9 +73,12 @@ export class AuthService {
    * @param email the user email
    * @param password the user password
    */
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<JWTAuthPayload | null> {
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { email, deletedAt: null },
       omit: { hashedPassword: false },
     });
 
@@ -77,9 +95,23 @@ export class AuthService {
       return null;
     }
 
-    return user;
+    return {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
   }
 
+  /**
+   * Register a new user account
+   *
+   * @param registerDto The account data
+   * @param registerDto.email The user email
+   * @param registerDto.username The user username
+   * @param registerDto.password The plain password
+   * @param registerDto.confirmPassword The password confirmation
+   */
   async register(
     registerDto: RegisterUserDto,
   ): Promise<SuccessAuthenticationResponse> {
@@ -89,6 +121,7 @@ export class AuthService {
       const hashedPassword = await this.hashService.hash(password);
 
       const user = await this.prisma.user.create({
+        select: this.AUTH_USER_SELECT,
         data: {
           email,
           username,
@@ -97,19 +130,11 @@ export class AuthService {
       });
 
       const tokens = await this.accessTokenService.generate(user);
+      const { role: _role, ...safeUser } = user;
 
       return {
         ...tokens,
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          birthdate: user.birthdate,
-          photoUrl: user.photoUrl,
-          emailVerifiedAt: user.emailVerifiedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
+        user: safeUser,
       };
     } catch (error: unknown) {
       if (isUniqueConstraintViolationError(error)) {
@@ -129,36 +154,22 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto): Promise<SuccessAuthenticationResponse> {
-    const { email, password } = loginDto;
+  async login(userId: string): Promise<SuccessAuthenticationResponse> {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
-        where: { email },
-        omit: { hashedPassword: false },
+        select: this.AUTH_USER_SELECT,
+        where: {
+          id: userId,
+          deletedAt: null,
+        },
       });
 
-      const isPasswordValid =
-        user?.hashedPassword &&
-        (await this.hashService.verify(password, user.hashedPassword));
-
-      if (!isPasswordValid) {
-        throw new BadRequestException('Password is incorrect');
-      }
-
       const tokens = await this.accessTokenService.generate(user);
+      const { role: _role, ...safeUser } = user;
 
       return {
         ...tokens,
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          birthdate: user.birthdate,
-          photoUrl: user.photoUrl,
-          emailVerifiedAt: user.emailVerifiedAt,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
+        user: safeUser,
       };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
