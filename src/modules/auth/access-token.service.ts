@@ -27,17 +27,18 @@ export class AccessTokenService {
   async generate(
     user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
   ): Promise<AuthTokensResponse> {
-    const accessToken = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-      },
-      { expiresIn: this.config.get<number>('jwt.expiresIn') },
-    );
-
-    const refreshToken = await this.generateRefreshToken(user.id);
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        },
+        { expiresIn: this.config.get<number>('jwt.expiresIn') },
+      ),
+      this.generateRefreshToken(user.id),
+    ]);
 
     return {
       accessToken,
@@ -68,7 +69,6 @@ export class AccessTokenService {
     const token = await this.prisma.refreshToken.findFirst({
       where: {
         hashedToken: this.simpleHashService.hash(refreshToken),
-        isRevoked: false,
         expiresAt: { gt: DateTime.now().toJSDate() },
       },
     });
@@ -79,28 +79,36 @@ export class AccessTokenService {
       );
     }
 
-    const user = await this.prisma.user.findUnique({
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-      },
-      where: { id: token.userId },
-    });
+    if (token.isRevoked) {
+      await this.revokeAll(token.userId);
+      throw new BadRequestException(
+        'Refresh token rotation with reuse detected, all sessions revoked',
+      );
+    }
+
+    const [user] = await Promise.all([
+      this.prisma.user.findUnique({
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          role: true,
+        },
+        where: { id: token.userId },
+      }),
+      this.prisma.refreshToken.update({
+        where: { id: token.id },
+        data: {
+          isRevoked: true,
+        },
+      }),
+    ]);
 
     if (!user) {
       throw new NotFoundException(
         'No user found for the provided refresh token',
       );
     }
-
-    await this.prisma.refreshToken.update({
-      where: { id: token.id },
-      data: {
-        isRevoked: true,
-      },
-    });
 
     return await this.generate(user);
   }
