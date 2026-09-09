@@ -6,11 +6,6 @@ export interface AuthTokensResponse {
   expiresIn: number;
 }
 
-export interface SuccessAuthenticationResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-  user?: Partial<
-    Omit<User, 'hashedPassword' | 'googleId' | 'role' | 'deletedAt'>
-  >;
+export interface SuccessAuthenticationResponse extends AuthTokensResponse {
+  user?: Partial<Pick<User, 'id' | 'username' | 'email' | 'photoUrl'>>;
 }
