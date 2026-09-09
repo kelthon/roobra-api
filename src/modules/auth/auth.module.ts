@@ -8,7 +8,6 @@ import { PasswordHashService } from './password-hash.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AccessTokenService } from './access-token.service';
-import { PrismaService } from '../database/prisma.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RolesGuard } from './guards/roles/roles.guard';
 import { SimpleHashService } from './simple-hash.service';
@@ -37,7 +36,6 @@ import { SimpleTokenService } from './simple-token.service';
     SimpleTokenService,
     JwtStrategy,
     LocalStrategy,
-    PrismaService,
     RolesGuard,
   ],
   controllers: [AuthController],
