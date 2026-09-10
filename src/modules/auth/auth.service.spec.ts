@@ -1,28 +1,33 @@
 import { PrismaService } from '../database/prisma.service';
 import { AuthService } from './auth.service';
-import { HashService } from './hash.service';
-import { TokenService } from './token.service';
-import { ConfigService } from '@nestjs/config';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { PasswordHashService } from './password-hash.service';
+import { AccessTokenService } from './access-token.service';
+import { SimpleHashService } from './simple-hash.service';
+import { BadRequestException } from '@nestjs/common';
 
 describe('AuthService', () => {
-  // Mocking PrismaService and HashService for testing
-  let prismaMock: unknown;
-  let hashServiceMock: unknown;
-  let tokenServiceMock: unknown;
+  let prismaMock: PrismaService;
+  let hashServiceMock: PasswordHashService;
+  let accessTokenServiceMock: AccessTokenService;
+  let simpleHashServiceMock: SimpleHashService;
   let authService: AuthService;
-  let configServiceMock: ConfigService;
+
+  const tokens = {
+    accessToken: 'access-token',
+    refreshToken: 'refresh-token',
+    expiresIn: 3600,
+  };
 
   beforeEach(() => {
-    // Setup code before each test runs, e.g., reset database state
-
     prismaMock = {
       user: {
         create: jest.fn(),
         findUnique: jest.fn(),
         findUniqueOrThrow: jest.fn(),
-        findFirst: jest.fn(),
-        findFirstOrThrow: jest.fn(),
+        update: jest.fn(),
+      },
+      passwordResetToken: {
+        findUniqueOrThrow: jest.fn(),
         update: jest.fn(),
       },
     } as unknown as PrismaService;
@@ -30,190 +35,158 @@ describe('AuthService', () => {
     hashServiceMock = {
       hash: jest.fn(),
       verify: jest.fn(),
-    } as unknown as HashService;
+    } as unknown as PasswordHashService;
 
-    tokenServiceMock = {
-      createAccessToken: jest.fn(),
-      refreshAccessToken: jest.fn(),
-      revokeRefreshToken: jest.fn(),
-      revokeUserRefreshTokens: jest.fn(),
-    } as unknown as TokenService;
+    accessTokenServiceMock = {
+      generate: jest.fn().mockResolvedValue(tokens),
+      refresh: jest.fn(),
+      revoke: jest.fn(),
+      revokeAll: jest.fn(),
+    } as unknown as AccessTokenService;
 
-    configServiceMock = {
-      get: jest.fn((key: string) => {
-        const config = {
-          'jwt.expiresIn': 3600,
-          'refreshToken.length': 64,
-          'refreshToken.expiresIn': 604800,
-        };
-        return config[key];
-      }),
-    } as unknown as ConfigService;
+    simpleHashServiceMock = {
+      hash: jest.fn((raw: string) => `hashed(${raw})`),
+      verify: jest.fn(),
+    } as unknown as SimpleHashService;
 
-    // Initialize AuthService with mocked dependencies
     authService = new AuthService(
-      prismaMock as unknown as PrismaService,
-      hashServiceMock as unknown as HashService,
-      tokenServiceMock as unknown as TokenService,
+      prismaMock,
+      hashServiceMock,
+      accessTokenServiceMock,
+      simpleHashServiceMock,
     );
   });
 
   describe('getMe', () => {
-    it('should return current authed user data', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-
-      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+    it('should return the user profile for a given id', async () => {
+      const profile = {
         id: 'user-id',
         email: 'john.doe@example.com',
-        username: 'jonh.doe',
-        emailVerifiedAt: new Date('2026-10-18'),
-        createdAt: new Date('2026-10-15'),
-      });
+        username: 'john.doe',
+      };
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(
+        profile,
+      );
 
-      const user = await authService.getMe('user-id');
+      const result = await authService.getMe('user-id');
 
-      expect(user).toMatchObject({
-        id: 'user-id',
-        email: 'john.doe@example.com',
-        username: 'jonh.doe',
-        emailVerifiedAt: new Date('2026-10-18'),
-        createdAt: new Date('2026-10-15'),
-      });
+      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id', deletedAt: null },
+        }),
+      );
+      expect(result).toBe(profile);
     });
 
-    it('should throw a BadRequestException for invalid user id', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-
-      (prisma.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+    it('should throw BadRequestException if no user is found', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
         code: 'P2025',
       });
 
-      await expect(authService.getMe('invalid-user-id')).rejects.toThrow(
+      await expect(authService.getMe('missing-id')).rejects.toThrow(
         BadRequestException,
       );
     });
   });
 
   describe('validateUser', () => {
-    it('should return a user for valid credentials', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+    it('should return the auth payload for valid credentials', async () => {
+      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
+        username: 'john.doe',
+        role: 'SUBSCRIBER',
         hashedPassword: 'hashed-password',
-        createdAt: new Date(),
       });
+      (hashServiceMock.verify as jest.Mock).mockResolvedValue(true);
 
-      (hashService.verify as jest.Mock).mockResolvedValue(true);
-
-      const user = await authService.validateUser(
+      const result = await authService.validateUser(
         'john.doe@example.com',
-        'user-password',
+        'Password123!',
       );
 
-      expect(user).not.toBeNull();
-    });
-
-    it('should return null for invalid password', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hash = hashServiceMock as unknown as HashService;
-
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-        id: 'user-id',
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { email: 'john.doe@example.com', deletedAt: null },
+        }),
+      );
+      expect(result).toEqual({
+        sub: 'user-id',
         email: 'john.doe@example.com',
-        hashedPassword: 'hashed-password',
-        createdAt: new Date(),
+        username: 'john.doe',
+        role: 'SUBSCRIBER',
       });
-
-      (hash.verify as jest.Mock).mockResolvedValue(false);
-
-      const user = await authService.validateUser(
-        'valid-email@example.com',
-        'wrong-password',
-      );
-
-      expect(user).toBeNull();
     });
 
-    it('should return null for invalid email', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
+    it('should return null when no user is found for the email', async () => {
+      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(null);
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-
-      const user = await authService.validateUser(
-        'invalid-email@example.com',
-        'some-password',
+      const result = await authService.validateUser(
+        'missing@example.com',
+        'Password123!',
       );
 
-      expect(user).toBeNull();
+      expect(result).toBeNull();
+      expect(hashServiceMock.verify).not.toHaveBeenCalled();
+    });
+
+    it('should return null for an invalid password', async () => {
+      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+        hashedPassword: 'hashed-password',
+      });
+      (hashServiceMock.verify as jest.Mock).mockResolvedValue(false);
+
+      const result = await authService.validateUser(
+        'john.doe@example.com',
+        'WrongPassword123!',
+      );
+
+      expect(result).toBeNull();
     });
   });
 
   describe('register', () => {
-    it('should register a user with valid data', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-      const tokenService = tokenServiceMock as unknown as TokenService;
+    const dto = {
+      username: 'john.doe',
+      email: 'john.doe@example.com',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
+    };
 
-      const dto = {
-        username: 'john.doe',
-        email: 'johndoe@example.com',
-        password: 'StrongPassword123!',
-        confirmPassword: 'StrongPassword123!',
-      };
-
-      (hashService.hash as jest.Mock).mockResolvedValue('hashed-password');
-
-      (prisma.user.create as jest.Mock).mockResolvedValue({
+    it('should create the user, issue tokens and return the public profile', async () => {
+      const createdUser = {
         id: 'user-id',
-        username: 'john.doe',
-        email: 'johndoe@example.com',
-        emailVerifiedAt: null,
-        createdAt: new Date(),
-      });
+        email: dto.email,
+        username: dto.username,
+        role: 'SUBSCRIBER',
+        photoUrl: null,
+      };
+      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as jest.Mock).mockResolvedValue(createdUser);
 
-      (tokenService.createAccessToken as jest.Mock).mockResolvedValue({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-      });
+      const result = await authService.register(dto);
 
-      const auth = await authService.register(dto);
-
-      expect(auth).toMatchObject({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-        user: {
-          id: 'user-id',
-          username: 'john.doe',
-          email: 'johndoe@example.com',
-          emailVerifiedAt: null,
-          createdAt: expect.any(Date),
-        },
-      });
+      expect(prismaMock.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            email: dto.email,
+            username: dto.username,
+            hashedPassword: 'hashed-password',
+          }),
+        }),
+      );
+      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(createdUser);
+      // role is fetched for token generation but stripped from the public response
+      const { role: _role, ...publicUser } = createdUser;
+      expect(result).toEqual({ ...tokens, user: publicUser });
     });
 
-    it('should throw BadRequestException case email already in use', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-
-      const dto = {
-        username: 'john.doe',
-        email: 'already-in-use@example.com',
-        password: 'StrongPassword123!',
-        confirmPassword: 'StrongPassword123!',
-      };
-
-      (hashService.hash as jest.Mock).mockResolvedValue('hashed-password');
-
-      (prisma.user.create as jest.Mock).mockRejectedValue({
+    it('should throw BadRequestException when the email is already in use', async () => {
+      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as jest.Mock).mockRejectedValue({
         code: 'P2002',
-        meta: {
-          target: 'email',
-        },
+        meta: { target: ['email'] },
       });
 
       await expect(authService.register(dto)).rejects.toThrow(
@@ -221,24 +194,11 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw BadRequestException case username already in use', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-
-      const dto = {
-        username: 'already-in-use',
-        email: 'john.doe@example.com',
-        password: 'StrongPassword123!',
-        confirmPassword: 'StrongPassword123!',
-      };
-
-      (hashService.hash as jest.Mock).mockResolvedValue('hashed-password');
-
-      (prisma.user.create as jest.Mock).mockRejectedValue({
+    it('should throw BadRequestException when the username is already in use', async () => {
+      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as jest.Mock).mockRejectedValue({
         code: 'P2002',
-        meta: {
-          target: 'username',
-        },
+        meta: { target: ['username'] },
       });
 
       await expect(authService.register(dto)).rejects.toThrow(
@@ -248,129 +208,236 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should return access token for valid credentials', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-      const tokenService = tokenServiceMock as unknown as TokenService;
-
-      const dto = {
-        email: 'john.doe@example.com',
-        password: 'user-password',
-      };
-
-      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+    it('should issue tokens for the already-authenticated user id', async () => {
+      const user = {
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
-        hashedPassword: 'hashed-password',
-        emailVerifiedAt: null,
-        createdAt: new Date(),
-      });
+        role: 'SUBSCRIBER',
+        photoUrl: null,
+      };
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
 
-      (hashService.verify as jest.Mock).mockResolvedValue(true);
+      const result = await authService.login('user-id');
 
-      (tokenService.createAccessToken as jest.Mock).mockResolvedValue({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-      });
-
-      const auth = await authService.login(dto);
-
-      expect(auth).toMatchObject({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-        user: {
-          id: 'user-id',
-          email: 'john.doe@example.com',
-          username: 'john.doe',
-          emailVerifiedAt: null,
-          createdAt: expect.any(Date),
-        },
-      });
+      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id', deletedAt: null },
+        }),
+      );
+      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(user);
+      // role is fetched for token generation but stripped from the public response
+      const { role: _role, ...publicUser } = user;
+      expect(result).toEqual({ ...tokens, user: publicUser });
     });
 
-    it('should throw BadRequestException for invalid email', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-
-      const dto = {
-        email: 'invalid-email@example.com',
-        password: 'user-password',
-      };
-
-      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+    it('should throw BadRequestException if the user no longer exists', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
         code: 'P2025',
       });
 
-      await expect(authService.login(dto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException for invalid password', async () => {
-      const prisma = prismaMock as unknown as PrismaService;
-      const hashService = hashServiceMock as unknown as HashService;
-
-      const dto = {
-        email: 'john.doe@example.com',
-        password: 'invalid-password',
-      };
-
-      (prisma.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-        user: {
-          id: 'user-id',
-          email: 'johndoe@example.com',
-          username: 'john.doe',
-          emailVerifiedAt: null,
-          createdAt: expect.any(Date),
-        },
-      });
-
-      (hashService.verify as jest.Mock).mockResolvedValue(false);
-
-      await expect(authService.login(dto)).rejects.toThrow(BadRequestException);
+      await expect(authService.login('missing-id')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
-  describe('refreshToken', () => {
-    it('should refresh access token for a user', async () => {
-      const tokenService = tokenServiceMock as unknown as TokenService;
-      const userId = 'user-id';
-      const dto = {
-        refreshToken: 'refresh-token',
-      };
+  describe('logout', () => {
+    it('should revoke the given refresh token for the user', async () => {
+      (accessTokenServiceMock.revoke as jest.Mock).mockResolvedValue({
+        message: 'Refresh token revoked successfully',
+      });
 
-      (tokenService.refreshAccessToken as jest.Mock).mockResolvedValue({
-        accessToken: 'access-token',
+      const result = await authService.logout('user-id', {
         refreshToken: 'refresh-token',
-        expiresIn: 54000,
-        user: {
-          id: 'user-id',
-          email: 'john.doe@example.com',
-          username: 'john.doe',
-          hashedPassword: 'hashed-password',
-          emailVerifiedAt: null,
-          createdAt: new Date(),
-        },
+      });
+
+      expect(accessTokenServiceMock.revoke).toHaveBeenCalledWith(
+        'user-id',
+        'refresh-token',
+      );
+      expect(result).toEqual({
+        message: 'Refresh token revoked successfully',
+      });
+    });
+  });
+
+  describe('logoutAllSessions', () => {
+    it('should revoke every refresh token for the user', async () => {
+      (accessTokenServiceMock.revokeAll as jest.Mock).mockResolvedValue({
+        message: 'All refresh tokens revoked successfully',
+      });
+
+      const result = await authService.logoutAllSessions('user-id');
+
+      expect(accessTokenServiceMock.revokeAll).toHaveBeenCalledWith('user-id');
+      expect(result).toEqual({
+        message: 'All refresh tokens revoked successfully',
+      });
+    });
+  });
+
+  describe('refreshSession', () => {
+    it('should delegate straight to accessTokenService.refresh using the raw token', async () => {
+      (accessTokenServiceMock.refresh as jest.Mock).mockResolvedValue(tokens);
+
+      const result = await authService.refreshSession({
+        refreshToken: 'refresh-token',
+      });
+
+      expect(accessTokenServiceMock.refresh).toHaveBeenCalledWith(
+        'refresh-token',
+      );
+      expect(result).toBe(tokens);
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should return a generic confirmation message when the user exists', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+      });
+
+      const result = await authService.forgotPassword({
+        email: 'john.doe@example.com',
+      });
+
+      expect(result).toEqual(
+        expect.objectContaining({ message: expect.any(String) }),
+      );
+    });
+
+    it('should throw BadRequestException when no user is found for the email', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+        code: 'P2025',
       });
 
       await expect(
-        authService.refreshToken(userId, dto),
-      ).resolves.toMatchObject({
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        expiresIn: 54000,
-        user: {
-          id: 'user-id',
-          email: 'john.doe@example.com',
-          username: 'john.doe',
-          hashedPassword: 'hashed-password',
-          emailVerifiedAt: null,
-          createdAt: expect.any(Date),
-        },
+        authService.forgotPassword({ email: 'missing@example.com' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should hash the reset token before looking it up, mark it used and update the password', async () => {
+      (
+        prismaMock.passwordResetToken.findUniqueOrThrow as jest.Mock
+      ).mockResolvedValue({
+        id: 'reset-token-id',
+        userId: 'user-id',
       });
+      (hashServiceMock.hash as jest.Mock).mockResolvedValue(
+        'new-hashed-password',
+      );
+      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+      });
+
+      await authService.resetPassword({
+        resetToken: 'raw-reset-token',
+        newPassword: 'NewPassword123!',
+        confirmNewPassword: 'NewPassword123!',
+      });
+
+      expect(simpleHashServiceMock.hash).toHaveBeenCalledWith(
+        'raw-reset-token',
+      );
+      expect(
+        prismaMock.passwordResetToken.findUniqueOrThrow,
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            hashedToken: 'hashed(raw-reset-token)',
+            usedAt: null,
+          }),
+        }),
+      );
+      expect(prismaMock.passwordResetToken.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'reset-token-id' },
+          data: expect.objectContaining({ usedAt: expect.any(Date) }),
+        }),
+      );
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id' },
+          data: { hashedPassword: 'new-hashed-password' },
+        }),
+      );
+    });
+
+    it('should throw BadRequestException for an invalid, used or expired reset token', async () => {
+      (
+        prismaMock.passwordResetToken.findUniqueOrThrow as jest.Mock
+      ).mockRejectedValue({ code: 'P2025' });
+
+      await expect(
+        authService.resetPassword({
+          resetToken: 'invalid-token',
+          newPassword: 'NewPassword123!',
+          confirmNewPassword: 'NewPassword123!',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should update the password when the current password is correct', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        hashedPassword: 'old-hashed-password',
+      });
+      (hashServiceMock.verify as jest.Mock).mockResolvedValue(true);
+      (hashServiceMock.hash as jest.Mock).mockResolvedValue(
+        'new-hashed-password',
+      );
+      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+      });
+
+      await authService.changePassword('user-id', {
+        currentPassword: 'OldPassword123!',
+        newPassword: 'NewPassword123!',
+      });
+
+      expect(hashServiceMock.verify).toHaveBeenCalledWith(
+        'OldPassword123!',
+        'old-hashed-password',
+      );
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id' },
+          data: { hashedPassword: 'new-hashed-password' },
+        }),
+      );
+    });
+
+    it('should throw BadRequestException when the current password is wrong', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        hashedPassword: 'old-hashed-password',
+      });
+      (hashServiceMock.verify as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        authService.changePassword('user-id', {
+          currentPassword: 'WrongPassword123!',
+          newPassword: 'NewPassword123!',
+        }),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException if the user no longer exists', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+        code: 'P2025',
+      });
+
+      await expect(
+        authService.changePassword('missing-id', {
+          currentPassword: 'OldPassword123!',
+          newPassword: 'NewPassword123!',
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
