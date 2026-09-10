@@ -1,0 +1,94 @@
+// Auth & Identity — see management/mvp-summary.md in the roobra-docs repo
+
+enum UserRole {
+  SUBSCRIBER      @map("subscriber")
+  ADMIN           @map("admin")
+  CONTENT_MANAGER @map("content_manager")
+  SUPPORT_AGENT   @map("support_agent")
+  STAFF           @map("staff")
+
+  @@map("user_roles")
+}
+
+model User {
+  id String @id @default(nanoid()) @db.Char(21)
+
+  username        String    @unique @db.VarChar(75)
+  email           String    @unique @db.VarChar(255)
+  photoUrl        String?   @map("photo_url") @db.VarChar(255)
+  googleId        String?   @unique @map("google_id") @db.VarChar(255)
+  hashedPassword  String?   @map("hashed_password") @db.VarChar(128)
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
+  birthdate       DateTime? @db.Date
+  role            UserRole  @default(SUBSCRIBER)
+
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  logs                AuditLog[]
+  subscriber          Subscriber?
+  staffMember         StaffMember?
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@index([username(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_username_trgm_idx")
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "users_email_trgm_idx")
+  @@map("users")
+}
+
+model RefreshToken {
+  id              BigInt   @id @default(autoincrement())
+  hashedToken     String   @unique @map("hashed_token") @db.VarChar(255)
+  isRevoked       Boolean  @default(false) @map("is_revoked")
+  userAgent       String?  @default("unspecified") @map("user_agent") @db.VarChar(35)
+  operatingSystem String?  @default("unspecified") @map("operating_system") @db.VarChar(35)
+  expiresAt       DateTime @map("expires_at") @db.Timestamptz
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id          BigInt    @id @default(autoincrement())
+  hashedToken String    @unique @map("hashed_token") @db.VarChar(255)
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz
+  usedAt      DateTime? @map("used_at") @db.Timestamptz
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("password_reset_tokens")
+}
+
+model Key {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(35)
+  hashedKey String    @unique @map("hashed_key") @db.VarChar(255)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("keys")
+}
+
+model StaffMember {
+  id Int @id @default(autoincrement())
+
+  isActive Boolean @default(true) @map("is_active")
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("staff_members")
+}
