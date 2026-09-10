@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ForbidAuthenticatedGuard } from './guards/forbid-authenticated.guard';
-import { type AuthPayload } from 'src/shared/interfaces/auth-payload';
+import { type UserDto } from 'src/common/dto/user-dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LogoutDto } from './dto/logout.dto';
@@ -18,14 +19,14 @@ const mockAuthService = {
   login: jest.fn(),
   logout: jest.fn(),
   logoutAllSessions: jest.fn(),
-  refreshToken: jest.fn(),
+  refreshSession: jest.fn(),
   forgotPassword: jest.fn(),
   resetPassword: jest.fn(),
   changePassword: jest.fn(),
 };
 
-const mockUser: AuthPayload = {
-  sub: 'user-id',
+const mockUser: UserDto = {
+  id: 'user-id',
   email: 'user@test.com',
   username: 'username',
   role: 'SUBSCRIBER',
@@ -45,25 +46,21 @@ describe('AuthController', () => {
   });
 
   describe('Guards', () => {
-    describe('@AuthUsersOnly() routes', () => {
-      it.each([
-        'getMe',
-        'logout',
-        'logoutAllSessions',
-        'refreshToken',
-        'forgotPassword',
-        'changePassword',
-      ])('should apply JwtAuthGuard to %s', (methodName) => {
-        const guards = Reflect.getMetadata(
-          '__guards__',
-          AuthController.prototype[methodName as keyof AuthController],
-        );
-        expect(guards).toContain(JwtAuthGuard);
-      });
+    describe('@UserOnly() routes', () => {
+      it.each(['getMe', 'logout', 'logoutAllSessions', 'changePassword'])(
+        'should apply JwtAuthGuard to %s',
+        (methodName) => {
+          const guards = Reflect.getMetadata(
+            '__guards__',
+            AuthController.prototype[methodName as keyof AuthController],
+          );
+          expect(guards).toContain(JwtAuthGuard);
+        },
+      );
     });
 
     describe('@GuestOnly() routes', () => {
-      it.each(['register', 'login', 'resetPassword'])(
+      it.each(['register', 'login'])(
         'should apply ForbidAuthenticatedGuard to %s',
         (methodName) => {
           const guards = Reflect.getMetadata(
@@ -74,16 +71,37 @@ describe('AuthController', () => {
         },
       );
     });
+
+    describe('public routes', () => {
+      it.each(['refreshSession', 'forgotPassword', 'resetPassword'])(
+        'should apply no guard to %s',
+        (methodName) => {
+          const guards = Reflect.getMetadata(
+            '__guards__',
+            AuthController.prototype[methodName as keyof AuthController],
+          );
+          expect(guards).toBeUndefined();
+        },
+      );
+    });
+
+    it('should apply the local passport strategy guard to login', () => {
+      const guards = Reflect.getMetadata(
+        '__guards__',
+        AuthController.prototype.login,
+      );
+      expect(guards).toContain(AuthGuard('local'));
+    });
   });
 
   describe('getMe', () => {
     it('should call authService.getMe with the user id and return the result', async () => {
-      const serviceResult = { id: mockUser.sub, email: mockUser.email };
+      const serviceResult = { id: mockUser.id, email: mockUser.email };
       mockAuthService.getMe.mockResolvedValue(serviceResult);
 
       const result = await controller.getMe(mockUser);
 
-      expect(mockAuthService.getMe).toHaveBeenCalledWith(mockUser.sub);
+      expect(mockAuthService.getMe).toHaveBeenCalledWith(mockUser.id);
       expect(result).toBe(serviceResult);
     });
   });
@@ -105,7 +123,9 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should call authService.login with the dto and return the result', async () => {
+    it('should call authService.login with the already-authenticated user id', async () => {
+      // credentials themselves are checked upstream by the local passport
+      // guard/LocalStrategy before this handler ever runs
       const dto = {
         email: 'user@test.com',
         password: 'Password123!',
@@ -113,9 +133,9 @@ describe('AuthController', () => {
       const serviceResult = { accessToken: 'token' };
       mockAuthService.login.mockResolvedValue(serviceResult);
 
-      const result = await controller.login(dto);
+      const result = await controller.login(mockUser, dto);
 
-      expect(mockAuthService.login).toHaveBeenCalledWith(dto);
+      expect(mockAuthService.login).toHaveBeenCalledWith(mockUser.id);
       expect(result).toBe(serviceResult);
     });
   });
@@ -128,7 +148,7 @@ describe('AuthController', () => {
 
       const result = await controller.logout(mockUser, dto);
 
-      expect(mockAuthService.logout).toHaveBeenCalledWith(mockUser.sub, dto);
+      expect(mockAuthService.logout).toHaveBeenCalledWith(mockUser.id, dto);
       expect(result).toBe(serviceResult);
     });
   });
@@ -141,24 +161,21 @@ describe('AuthController', () => {
       const result = await controller.logoutAllSessions(mockUser);
 
       expect(mockAuthService.logoutAllSessions).toHaveBeenCalledWith(
-        mockUser.sub,
+        mockUser.id,
       );
       expect(result).toBe(serviceResult);
     });
   });
 
-  describe('refreshToken', () => {
-    it('should call authService.refreshToken with the user id and dto, and return the result', async () => {
+  describe('refreshSession', () => {
+    it('should call authService.refreshSession with the dto and return the result (no user context)', async () => {
       const dto = { refreshToken: 'some-refresh-token' } as RefreshTokenDto;
       const serviceResult = { accessToken: 'new-access-token' };
-      mockAuthService.refreshToken.mockResolvedValue(serviceResult);
+      mockAuthService.refreshSession.mockResolvedValue(serviceResult);
 
-      const result = await controller.refreshToken(mockUser, dto);
+      const result = await controller.refreshSession(dto);
 
-      expect(mockAuthService.refreshToken).toHaveBeenCalledWith(
-        mockUser.sub,
-        dto,
-      );
+      expect(mockAuthService.refreshSession).toHaveBeenCalledWith(dto);
       expect(result).toBe(serviceResult);
     });
   });
@@ -205,7 +222,7 @@ describe('AuthController', () => {
       const result = await controller.changePassword(mockUser, dto);
 
       expect(mockAuthService.changePassword).toHaveBeenCalledWith(
-        mockUser.sub,
+        mockUser.id,
         dto,
       );
       expect(result).toBe(serviceResult);
