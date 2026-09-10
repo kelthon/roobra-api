@@ -36,6 +36,7 @@ import { SimpleTokenService } from './simple-token.service';
     SimpleTokenService,
     JwtStrategy,
     LocalStrategy,
+    // NOTE: RBAC guard — wired to content-mutation routes in Sprint 2 (backlog 1.2.1/1.2.3)
     RolesGuard,
   ],
   controllers: [AuthController],
