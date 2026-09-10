@@ -1,0 +1,182 @@
+// Subscriptions & Payments — see management/mvp-summary.md in the roobra-docs repo
+
+model Subscription {
+  id BigInt @id @default(autoincrement())
+
+  name        String  @db.VarChar(50)
+  price       Decimal @db.Decimal(10, 2)
+  priceAnnual Decimal @map("price_annual") @db.Decimal(10, 2)
+  accessDays  Int     @map("access_days") @db.SmallInt
+
+  subscribers Subscriber[]
+  promotions  Promotion[]  @relation("promotion_to_subscription")
+  orderItems  OrderItem[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("subscriptions")
+}
+
+model Subscriber {
+  id BigInt @id @default(autoincrement())
+
+  accessExpirationDate DateTime @map("access_expiration_date") @db.Date
+  renovationDate       DateTime @map("renovation_date") @db.Date
+
+  subscriptionId  BigInt           @map("subscription_id")
+  subscription    Subscription     @relation(fields: [subscriptionId], references: [id])
+  userId          String           @unique @map("user_id")
+  user            User             @relation(fields: [userId], references: [id])
+  viewHistory     UserHistory[]
+  promotionUsages PromotionUsage[]
+  orders          Order[]
+  userReadLists   UserReadList[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("subscribers")
+}
+
+enum DiscountType {
+  PERCENT     @map("percent")
+  FIXED_VALUE @map("fixed_value")
+
+  @@map("discount_types")
+}
+
+model Promotion {
+  id BigInt @id @default(autoincrement())
+
+  code         String       @unique @db.VarChar(50)
+  description  String?      @db.VarChar(255)
+  discount     Decimal      @db.Decimal(10, 2)
+  discountType DiscountType @default(FIXED_VALUE) @map("discount_type")
+  startDate    DateTime     @map("start_date") @db.Timestamptz
+  endDate      DateTime?    @map("end_date") @db.Timestamptz
+  maxUses      Int?         @map("max_uses")
+  perUser      Boolean      @default(true) @map("per_user")
+
+  promotionUsages PromotionUsage[]
+  subscriptions   Subscription[]   @relation("promotion_to_subscription")
+  orders          Order[]
+  orderItems      OrderItem[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@map("promotions")
+}
+
+model PromotionUsage {
+  id BigInt @id @default(autoincrement())
+
+  usedAt DateTime @default(now()) @map("used_at") @db.Timestamptz
+
+  subscriberId BigInt     @map("subscriber_id")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+  promotionId  BigInt     @map("promotion_id")
+  promotion    Promotion  @relation(fields: [promotionId], references: [id])
+
+  @@unique([subscriberId, promotionId])
+  @@map("promotion_usages")
+}
+
+enum GatewayStatus {
+  PENDING        @map("pending")
+  WAITING        @map("waiting")
+  GENERATED      @map("generated")
+  CANCELED       @map("canceled")
+  PAID           @map("paid")
+  REFUND         @map("refund")
+  PARTIAL_REFUND @map("partial_refund")
+  WITH_ERROR     @map("with_error")
+  UNDERPAID      @map("underpaid")
+  OVERPAID       @map("overpaid")
+
+  @@map("gateway_statuses")
+}
+
+enum PaymentMethod {
+  BOLETO      @map("boleto")
+  CREDIT_CARD @map("credit_card")
+  DEBIT_CARD  @map("debit_card")
+  PIX         @map("pix")
+
+  @@map("payment_methods")
+}
+
+model Order {
+  id BigInt @id @default(autoincrement())
+
+  orderExternalId String        @unique @map("order_external_id") @db.VarChar(255)
+  paymentGateway  String        @map("payment_gateway") @db.VarChar(50)
+  paymentMethod   PaymentMethod @map("payment_method")
+  status          GatewayStatus @default(PENDING)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+
+  subscriberId BigInt        @map("subscriber_id")
+  subscriber   Subscriber    @relation(fields: [subscriberId], references: [id])
+  orderItems   OrderItem[]
+  orderRefunds OrderRefund[]
+  promotionId  BigInt?       @map("promotion_id")
+  promotion    Promotion?    @relation(fields: [promotionId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id BigInt @id @default(autoincrement())
+
+  subtotal Decimal @db.Decimal(10, 2)
+  total    Decimal @db.Decimal(10, 2)
+
+  subscriptionId   BigInt            @map("subscription_id")
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  orderId          BigInt            @map("order_id")
+  order            Order             @relation(fields: [orderId], references: [id])
+  promotionId      BigInt?           @map("promotion_id")
+  promotion        Promotion?        @relation(fields: [promotionId], references: [id])
+  orderRefundItems OrderRefundItem[]
+
+  @@map("order_items")
+}
+
+model OrderRefund {
+  id BigInt @id @default(autoincrement())
+
+  amount Decimal @db.Decimal(10, 2)
+  reason String? @db.Text
+
+  orderId          BigInt            @map("order_id")
+  order            Order             @relation(fields: [orderId], references: [id])
+  orderRefundItems OrderRefundItem[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("order_refunds")
+}
+
+model OrderRefundItem {
+  id BigInt @id @default(autoincrement())
+
+  amount Decimal @db.Decimal(10, 2)
+
+  orderRefundId BigInt      @map("order_refund_id")
+  orderRefund   OrderRefund @relation(fields: [orderRefundId], references: [id])
+  orderItemId   BigInt      @map("order_item_id")
+  orderItem     OrderItem   @relation(fields: [orderItemId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([orderRefundId, orderItemId])
+  @@map("order_refund_items")
+}

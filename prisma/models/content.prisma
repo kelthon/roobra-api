@@ -1,0 +1,146 @@
+// Content & Discovery — see management/mvp-summary.md in the roobra-docs repo
+
+model Media {
+  id BigInt @id @default(autoincrement())
+
+  name                      String   @db.VarChar(100)
+  slug                      String   @unique @default(nanoid()) @db.VarChar(21)
+  description               String?  @db.Text
+  coverImageUrl             String?  @map("cover_image_url") @db.VarChar(255)
+  alternativeCoverImageUrls String[] @map("alternative_cover_image_urls")
+  pageSampleImageUrls       String[] @map("page_sample_image_urls")
+  authors                   String[]
+  isPrivate                 Boolean  @default(false) @map("is_private")
+  isFree                    Boolean  @default(false) @map("is_free")
+
+  volumes       MediaVolume[]
+  genres        MediaGenre[]   @relation("media_to_media_genres")
+  userReadLists UserReadList[]
+
+  searchableText Unsupported("tsvector")? @map("searchable_text")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@index([searchableText], type: Gin)
+  @@map("medias")
+}
+
+model MediaVolume {
+  id BigInt @id @default(autoincrement())
+
+  number        Int?     @db.SmallInt
+  title         String   @db.VarChar(100)
+  description   String?  @db.Text
+  coverImageUrl String?  @map("cover_image_url") @db.VarChar(255)
+  authors       String[]
+  isPrivate     Boolean  @default(false) @map("is_private")
+  isFree        Boolean  @default(false) @map("is_free")
+
+  mediaId  BigInt         @map("media_id")
+  media    Media          @relation(fields: [mediaId], references: [id])
+  chapters MediaChapter[]
+
+  searchableText Unsupported("tsvector")? @map("searchable_text")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([mediaId, number])
+  @@index([searchableText], type: Gin)
+  @@map("media_volumes")
+}
+
+model MediaChapter {
+  id BigInt @id @default(autoincrement())
+
+  number    Int?    @db.SmallInt
+  title     String  @db.VarChar(100)
+  isPrivate Boolean @default(false) @map("is_private")
+  isFree    Boolean @default(false) @map("is_free")
+
+  volumeId   BigInt      @map("volume_id")
+  volume     MediaVolume @relation(fields: [volumeId], references: [id])
+  mediaPages MediaPage[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([volumeId, number])
+  @@map("media_chapters")
+}
+
+model MediaPage {
+  id BigInt @id @default(autoincrement())
+
+  number              Int     @db.SmallInt
+  imageUrl            String  @map("image_url") @db.VarChar(255)
+  hasSensitiveContent Boolean @default(false) @map("has_sensitive_content")
+  isPrivate           Boolean @default(false) @map("is_private")
+  isFree              Boolean @default(false) @map("is_free")
+
+  chapterId     BigInt        @map("chapter_id")
+  chapter       MediaChapter  @relation(fields: [chapterId], references: [id])
+  userHistories UserHistory[]
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([chapterId, number])
+  @@map("media_pages")
+}
+
+model MediaGenre {
+  id Int @id @default(autoincrement())
+
+  name String @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  medias Media[] @relation(name: "media_to_media_genres")
+
+  @@map("media_genres")
+}
+
+enum ReadingProgressStatus {
+  IN_PROGRESS @map("in_progress")
+  COMPLETED   @map("completed")
+
+  @@map("reading_progress_statuses")
+}
+
+model UserHistory {
+  id BigInt @id @default(autoincrement())
+
+  status     ReadingProgressStatus @default(IN_PROGRESS)
+  lastReadAt DateTime              @default(now()) @map("last_read_at") @db.Timestamptz
+
+  subscriberId BigInt     @map("subscriber_id")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+  pageId       BigInt     @map("page_id")
+  page         MediaPage  @relation(fields: [pageId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("user_histories")
+}
+
+model UserReadList {
+  id BigInt @id @default(autoincrement())
+
+  subscriberId BigInt     @map("subscriber_id")
+  subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+
+  mediaId BigInt @map("media_id")
+  media   Media  @relation(fields: [mediaId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([subscriberId, mediaId])
+  @@map("user_read_lists")
+}
