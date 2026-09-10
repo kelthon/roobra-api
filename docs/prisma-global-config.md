@@ -6,6 +6,11 @@ This document expands on configuration that should live once, globally, on
 each call site. Each section explains the problem, why it belongs at the client level rather than
 per-query, and what already depends on the current (missing) behavior.
 
+> **Model file layout:** `prisma/models/` was reorganized from 20 one-model files into 4
+> domain-based schemas (`auth.prisma`, `content.prisma`, `commerce.prisma`, `audit.prisma`) —
+> see the `refactor(prisma): consolidate model files into domain-based schemas` commit. Links below
+> point at the current file names; no model, field, or relation changed, only where each one lives.
+
 ## 1. Global `omit` for credential hashes
 
 **Problem:** four fields across the schema exist only so the app can *compare* a secret, never so
