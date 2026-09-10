@@ -8,3 +8,7 @@ API-specific documentation for `roobra-api`. For ecosystem-wide and cross-servic
   output path).
 - [deployment.md](./deployment.md) — How the app is deployed today, what `scripts/deploy.sh` does,
   and what is still missing from the CI/CD pipeline.
+- [prisma-global-config.md](./prisma-global-config.md) — Configuration that should live once,
+  globally, on `PrismaService` (credential-hash omission, BigInt serialization, soft delete,
+  query logging, connection pooling, transaction isolation, audit logging) instead of being
+  repeated or forgotten at each call site.
