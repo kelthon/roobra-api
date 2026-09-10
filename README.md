@@ -21,8 +21,8 @@ permissions for the Roobra website.
 1. Clone the repository:
 
    ```sh
-   git clone git@github.com:kelthon/ph-api.git
-   cd ph-api
+   git clone git@github.com:kelthon/roobra-api.git
+   cd roobra-api
    ```
 
 2. Create your local environment file:
