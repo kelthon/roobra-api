@@ -9,6 +9,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import throttlerConfig from './config/throttler.config';
+import passwordResetTokenConfig from './config/password-reset-token.config';
 
 @Module({
   imports: [
@@ -17,7 +18,12 @@ import throttlerConfig from './config/throttler.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.development', '.env'],
-      load: [databaseConfig, jwtConfig, throttlerConfig],
+      load: [
+        databaseConfig,
+        jwtConfig,
+        throttlerConfig,
+        passwordResetTokenConfig,
+      ],
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],

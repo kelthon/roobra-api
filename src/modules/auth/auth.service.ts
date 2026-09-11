@@ -17,6 +17,8 @@ import { DateTime } from 'luxon';
 import { SimpleHashService } from 'src/common/services/simple-hash.service';
 import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses';
 import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
+import { ConfigService } from '@nestjs/config';
+import { SimpleTokenService } from 'src/common/services/simple-token.service';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +35,8 @@ export class AuthService {
     private readonly hashService: PasswordHashService,
     private readonly accessTokenService: AccessTokenService,
     private readonly simpleHashService: SimpleHashService,
+    private readonly simpleTokenService: SimpleTokenService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -200,8 +204,23 @@ export class AuthService {
     const { email } = forgotPasswordDto;
 
     try {
-      await this.prisma.user.findUniqueOrThrow({
+      const user = await this.prisma.user.findUniqueOrThrow({
         where: { email },
+      });
+
+      const token = this.simpleTokenService.generate(
+        this.configService.getOrThrow<number>('passwordResetToken.length'),
+      );
+      const hashedToken = this.simpleHashService.hash(token);
+
+      const passwordResetToken = await this.prisma.passwordResetToken.create({
+        data: {
+          hashedToken,
+          userId: user.id,
+          expiresAt: DateTime.now()
+            .plus(this.configService.getOrThrow<number>('resetToken.expiresIn'))
+            .toJSDate(),
+        },
       });
 
       // TODO: Implement forgot password logic (e.g., generate reset token, send email)
