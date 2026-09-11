@@ -1,5 +1,12 @@
 {
   "editor.defaultFormatter": "Prisma.prisma",
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.spec.ts, ${capture}.test.ts",
+    "compose.yaml": "compose.*.yml, compose.*.yaml",
+    "compose.yml": "compose.*.yml, compose.*.yaml"
+  },
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
