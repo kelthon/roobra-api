@@ -31,6 +31,7 @@ describe('AuthService', () => {
         update: jest.fn(),
       },
       passwordResetToken: {
+        create: jest.fn(),
         findUniqueOrThrow: jest.fn(),
         update: jest.fn(),
       },
@@ -58,9 +59,13 @@ describe('AuthService', () => {
     } as unknown as SimpleTokenService;
 
     configServiceMock = {
-      getOrThrow: jest.fn(
-        (_propertyPath: string, defaultValue: any) => defaultValue,
-      ),
+      getOrThrow: jest.fn((propertyPath: string) => {
+        const values: Record<string, unknown> = {
+          'passwordResetToken.length': 64,
+          'passwordResetToken.expiresIn': 300,
+        };
+        return values[propertyPath];
+      }),
     } as unknown as ConfigService;
 
     authService = new AuthService(
@@ -309,15 +314,29 @@ describe('AuthService', () => {
   });
 
   describe('forgotPassword', () => {
-    it('should return a generic confirmation message when the user exists', async () => {
+    it('should create a hashed reset token and return a generic confirmation message', async () => {
       (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
         id: 'user-id',
+      });
+      (prismaMock.passwordResetToken.create as jest.Mock).mockResolvedValue({
+        id: 'reset-token-id',
       });
 
       const result = await authService.forgotPassword({
         email: 'john.doe@example.com',
       });
 
+      expect(simpleTokenServiceMock.generate).toHaveBeenCalledWith(64);
+      expect(simpleHashServiceMock.hash).toHaveBeenCalledWith('64');
+      expect(prismaMock.passwordResetToken.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            hashedToken: 'hashed(64)',
+            userId: 'user-id',
+            expiresAt: expect.any(Date),
+          }),
+        }),
+      );
       expect(result).toEqual(
         expect.objectContaining({ message: expect.any(String) }),
       );
