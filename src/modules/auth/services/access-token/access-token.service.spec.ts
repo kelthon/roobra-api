@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService } from 'src/modules/database/prisma.service';
 import { AccessTokenService } from './access-token.service';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
