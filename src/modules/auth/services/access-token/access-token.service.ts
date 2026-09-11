@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/generated/prisma/client';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService } from 'src/modules/database/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';

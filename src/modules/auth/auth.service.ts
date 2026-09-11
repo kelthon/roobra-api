@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/database/prisma.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { PasswordHashService } from './password-hash.service';
+import { PasswordHashService } from './services/password-hash/password-hash.service';
 import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
 } from 'src/common/utils/database.util';
-import { AccessTokenService } from './access-token.service';
+import { AccessTokenService } from './services/access-token/access-token.service';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
