@@ -10,8 +10,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AccessTokenService } from './access-token.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RolesGuard } from './guards/roles/roles.guard';
-import { SimpleHashService } from './simple-hash.service';
-import { SimpleTokenService } from './simple-token.service';
 
 @Module({
   imports: [
@@ -32,8 +30,6 @@ import { SimpleTokenService } from './simple-token.service';
     AuthService,
     PasswordHashService,
     AccessTokenService,
-    SimpleHashService,
-    SimpleTokenService,
     JwtStrategy,
     LocalStrategy,
     // NOTE: RBAC guard — wired to content-mutation routes in Sprint 2 (backlog 1.2.1/1.2.3)

@@ -1,8 +1,8 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
 import { AccessTokenService } from './access-token.service';
-import { SimpleHashService } from './simple-hash.service';
-import { SimpleTokenService } from './simple-token.service';
+import { SimpleHashService } from 'src/common/services/simple-hash.service';
+import { SimpleTokenService } from 'src/common/services/simple-token.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/generated/prisma/client';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
