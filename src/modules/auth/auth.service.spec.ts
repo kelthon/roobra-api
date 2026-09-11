@@ -2,14 +2,18 @@ import { PrismaService } from '../database/prisma.service';
 import { AuthService } from './auth.service';
 import { PasswordHashService } from './password-hash.service';
 import { AccessTokenService } from './access-token.service';
-import { SimpleHashService } from 'src/common/services/simple-hash.service';
+import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';
 import { BadRequestException } from '@nestjs/common';
+import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let prismaMock: PrismaService;
   let hashServiceMock: PasswordHashService;
   let accessTokenServiceMock: AccessTokenService;
   let simpleHashServiceMock: SimpleHashService;
+  let simpleTokenServiceMock: SimpleTokenService;
+  let configServiceMock: ConfigService;
   let authService: AuthService;
 
   const tokens = {
@@ -49,11 +53,23 @@ describe('AuthService', () => {
       verify: jest.fn(),
     } as unknown as SimpleHashService;
 
+    simpleTokenServiceMock = {
+      generate: jest.fn((size?: number) => `${size}`),
+    } as unknown as SimpleTokenService;
+
+    configServiceMock = {
+      getOrThrow: jest.fn(
+        (_propertyPath: string, defaultValue: any) => defaultValue,
+      ),
+    } as unknown as ConfigService;
+
     authService = new AuthService(
       prismaMock,
       hashServiceMock,
       accessTokenServiceMock,
       simpleHashServiceMock,
+      simpleTokenServiceMock,
+      configServiceMock,
     );
   });
 
