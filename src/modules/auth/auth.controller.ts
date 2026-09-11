@@ -12,6 +12,10 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { type UserDto } from 'src/common/dto/user-dto';
 import { LoginWith } from 'src/common/decorators/login-with.decorator';
+import { Throttle } from '@nestjs/throttler';
+
+// Shared limit for auth endpoints sensitive to brute-forcing/enumeration
+const AUTH_THROTTLE = { default: { limit: 5, ttl: 60_000 } };
 
 @Controller('auth')
 export class AuthController {
@@ -23,12 +27,14 @@ export class AuthController {
     return await this.authService.getMe(user.id);
   }
 
+  @Throttle(AUTH_THROTTLE)
   @GuestOnly()
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto) {
     return await this.authService.register(registerDto);
   }
 
+  @Throttle(AUTH_THROTTLE)
   @GuestOnly()
   @LoginWith('local')
   @Post('login')
@@ -48,16 +54,19 @@ export class AuthController {
     return await this.authService.logoutAllSessions(user.id);
   }
 
+  @Throttle(AUTH_THROTTLE)
   @Post('refresh-token')
   async refreshSession(@Body() refreshTokenDto: RefreshTokenDto) {
     return await this.authService.refreshSession(refreshTokenDto);
   }
 
+  @Throttle(AUTH_THROTTLE)
   @Post('forgot-password')
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
+  @Throttle(AUTH_THROTTLE)
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
