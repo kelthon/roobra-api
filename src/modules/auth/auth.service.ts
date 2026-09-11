@@ -14,7 +14,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { InfoResponse } from 'src/shared/interfaces/info-response';
 import { DateTime } from 'luxon';
-import { SimpleHashService } from './simple-hash.service';
+import { SimpleHashService } from 'src/common/services/simple-hash.service';
 import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses';
 import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 

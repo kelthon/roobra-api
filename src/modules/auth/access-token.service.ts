@@ -8,11 +8,11 @@ import { User } from 'src/generated/prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses';
-import { SimpleHashService } from './simple-hash.service';
+import { SimpleHashService } from 'src/common/services/simple-hash.service';
 import { InfoResponse } from 'src/shared/interfaces/info-response';
 import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from 'src/common/utils/database.util';
-import { SimpleTokenService } from './simple-token.service';
+import { SimpleTokenService } from 'src/common/services/simple-token.service';
 
 @Injectable()
 export class AccessTokenService {

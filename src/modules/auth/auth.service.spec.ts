@@ -2,7 +2,7 @@ import { PrismaService } from '../database/prisma.service';
 import { AuthService } from './auth.service';
 import { PasswordHashService } from './password-hash.service';
 import { AccessTokenService } from './access-token.service';
-import { SimpleHashService } from './simple-hash.service';
+import { SimpleHashService } from 'src/common/services/simple-hash.service';
 import { BadRequestException } from '@nestjs/common';
 
 describe('AuthService', () => {
