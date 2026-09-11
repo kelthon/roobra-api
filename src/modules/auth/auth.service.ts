@@ -218,7 +218,11 @@ export class AuthService {
           hashedToken,
           userId: user.id,
           expiresAt: DateTime.now()
-            .plus(this.configService.getOrThrow<number>('resetToken.expiresIn'))
+            .plus({
+              seconds: this.configService.getOrThrow<number>(
+                'passwordResetToken.expiresIn',
+              ),
+            })
             .toJSDate(),
         },
       });
