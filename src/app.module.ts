@@ -10,6 +10,8 @@ import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import throttlerConfig from './config/throttler.config';
 import passwordResetTokenConfig from './config/password-reset-token.config';
+import mailConfig from './config/mail.config';
+import appConfig from './config/app.config';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import passwordResetTokenConfig from './config/password-reset-token.config';
         jwtConfig,
         throttlerConfig,
         passwordResetTokenConfig,
+        mailConfig,
+        appConfig,
       ],
     }),
     ThrottlerModule.forRootAsync({
