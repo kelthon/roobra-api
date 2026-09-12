@@ -7,7 +7,7 @@ import { seedUsers } from './seeds/02-users.seed';
 import { seedContent } from './seeds/03-content.seed';
 import { seedSubscribers } from './seeds/04-subscribers.seed';
 import { seedInteractions } from './seeds/05-interactions.seed';
-import { PasswordHashService } from 'src/modules/auth/password-hash.service';
+import { PasswordHashService } from 'src/modules/auth/services/password-hash/password-hash.service';
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
