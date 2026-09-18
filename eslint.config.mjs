@@ -63,4 +63,14 @@ export default defineConfig([
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
+  {
+    files: ['test/**/*.e2e-spec.ts'],
+    rules: {
+      // supertest asserts through `request(...).<verb>(...).expect(status)`
+      'jest/expect-expect': [
+        'warn',
+        { assertFunctionNames: ['expect', 'request.**.expect'] },
+      ],
+    },
+  },
 ]);
