@@ -10,6 +10,7 @@ import { GuestOnly } from 'src/common/decorators/guest-only.decorator';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import { type UserDto } from 'src/common/dto/user-dto';
 import { LoginWith } from 'src/common/decorators/login-with.decorator';
 import { Throttle } from '@nestjs/throttler';
@@ -79,5 +80,16 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     return this.authService.changePassword(user.id, changePasswordDto);
+  }
+
+  @UserOnly()
+  @Get('verify-email')
+  async sendVerificationEmail(@User() user: UserDto) {
+    return await this.authService.sendVerificationEmail(user.id);
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    return await this.authService.verifyEmail(verifyEmailDto.token);
   }
 }
