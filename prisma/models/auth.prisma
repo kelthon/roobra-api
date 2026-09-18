@@ -20,13 +20,15 @@ model User {
   hashedPassword  String?   @map("hashed_password") @db.VarChar(128)
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz
   birthdate       DateTime? @db.Date
+  preferredLang   String?   @map("preferred_lang") @db.VarChar(5)
   role            UserRole  @default(SUBSCRIBER)
 
-  refreshTokens       RefreshToken[]
-  passwordResetTokens PasswordResetToken[]
-  logs                AuditLog[]
-  subscriber          Subscriber?
-  staffMember         StaffMember?
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationToknes EmailVerificationToken[]
+  logs                    AuditLog[]
+  subscriber              Subscriber?
+  staffMember             StaffMember?
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -65,6 +67,20 @@ model PasswordResetToken {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id          BigInt    @id @default(autoincrement())
+  hashedToken String    @unique @map("hashed_token") @db.VarChar(255)
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz
+  usedAt      DateTime? @map("used_at") @db.Timestamptz
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("email_verification_token")
 }
 
 model Key {
