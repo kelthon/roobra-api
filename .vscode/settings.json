@@ -27,5 +27,8 @@
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
-  "jest.runMode": "on-demand"
+  "jest.runMode": "on-demand",
+  "[handlebars]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
