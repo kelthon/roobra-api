@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import request from 'supertest';
+import { App } from 'supertest/types';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
@@ -23,6 +26,8 @@ const mockAuthService = {
   forgotPassword: jest.fn(),
   resetPassword: jest.fn(),
   changePassword: jest.fn(),
+  sendVerificationEmail: jest.fn(),
+  verifyEmail: jest.fn(),
 };
 
 const mockUser: UserDto = {
@@ -47,16 +52,19 @@ describe('AuthController', () => {
 
   describe('Guards', () => {
     describe('@UserOnly() routes', () => {
-      it.each(['getMe', 'logout', 'logoutAllSessions', 'changePassword'])(
-        'should apply JwtAuthGuard to %s',
-        (methodName) => {
-          const guards = Reflect.getMetadata(
-            '__guards__',
-            AuthController.prototype[methodName as keyof AuthController],
-          );
-          expect(guards).toContain(JwtAuthGuard);
-        },
-      );
+      it.each([
+        'getMe',
+        'logout',
+        'logoutAllSessions',
+        'changePassword',
+        'sendVerificationEmail',
+      ])('should apply JwtAuthGuard to %s', (methodName) => {
+        const guards = Reflect.getMetadata(
+          '__guards__',
+          AuthController.prototype[methodName as keyof AuthController],
+        );
+        expect(guards).toContain(JwtAuthGuard);
+      });
     });
 
     describe('@GuestOnly() routes', () => {
@@ -226,6 +234,68 @@ describe('AuthController', () => {
         dto,
       );
       expect(result).toBe(serviceResult);
+    });
+  });
+
+  describe('sendVerificationEmail', () => {
+    it('should call authService.sendVerificationEmail with the user id and return the result', async () => {
+      const serviceResult = { message: 'Verification email sent' };
+      mockAuthService.sendVerificationEmail.mockResolvedValue(serviceResult);
+
+      const result = await controller.sendVerificationEmail(mockUser);
+
+      expect(mockAuthService.sendVerificationEmail).toHaveBeenCalledWith(
+        mockUser.id,
+      );
+      expect(result).toBe(serviceResult);
+    });
+  });
+
+  describe('verifyEmail (HTTP)', () => {
+    // Exercised through a real HTTP request (not a direct method call) so the
+    // @Body() binding and DTO validation pipeline are actually in play.
+    let app: INestApplication<App>;
+
+    beforeEach(async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [AuthController],
+        providers: [{ provide: AuthService, useValue: mockAuthService }],
+      }).compile();
+
+      app = module.createNestApplication();
+      app.useGlobalPipes(
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        }),
+      );
+      await app.init();
+    });
+
+    afterEach(async () => {
+      await app.close();
+    });
+
+    it('should call authService.verifyEmail with the token from the request body', async () => {
+      const serviceResult = { message: 'Email was verified successfully' };
+      mockAuthService.verifyEmail.mockResolvedValue(serviceResult);
+
+      await request(app.getHttpServer())
+        .post('/auth/verify-email')
+        .send({ token: 'a'.repeat(64) })
+        .expect(201);
+
+      expect(mockAuthService.verifyEmail).toHaveBeenCalledWith('a'.repeat(64));
+    });
+
+    it('should reject the request with 400 when no token is provided', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/verify-email')
+        .send({})
+        .expect(400);
+
+      expect(mockAuthService.verifyEmail).not.toHaveBeenCalled();
     });
   });
 });
