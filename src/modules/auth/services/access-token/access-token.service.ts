@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/generated/prisma/client';
+import { Prisma, User } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/modules/database/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses';
@@ -26,6 +26,7 @@ export class AccessTokenService {
 
   async generate(
     user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
+    tx?: Prisma.TransactionClient,
   ): Promise<AuthTokensResponse> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -37,7 +38,7 @@ export class AccessTokenService {
         },
         { expiresIn: this.config.get<number>('jwt.expiresIn') },
       ),
-      this.generateRefreshToken(user.id),
+      this.generateRefreshToken(user.id, tx),
     ]);
 
     return {
@@ -47,12 +48,17 @@ export class AccessTokenService {
     };
   }
 
-  private async generateRefreshToken(userId: string) {
+  private async generateRefreshToken(
+    userId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const prisma = tx ?? this.prisma;
+
     const refreshToken = this.simpleTokenService.generate(
       this.config.get<number>('refreshToken.length'),
     );
 
-    await this.prisma.refreshToken.create({
+    await prisma.refreshToken.create({
       data: {
         user: { connect: { id: userId } },
         hashedToken: this.simpleHashService.hash(refreshToken),

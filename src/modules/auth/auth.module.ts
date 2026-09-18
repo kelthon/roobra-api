@@ -10,11 +10,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AccessTokenService } from './services/access-token/access-token.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RolesGuard } from './guards/roles/roles.guard';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule,
+    NotificationsModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({

@@ -19,6 +19,9 @@ import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-respon
 import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
 import { ConfigService } from '@nestjs/config';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
+import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service';
+import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service';
+import { Prisma } from 'src/generated/prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +40,8 @@ export class AuthService {
     private readonly simpleHashService: SimpleHashService,
     private readonly simpleTokenService: SimpleTokenService,
     private readonly configService: ConfigService,
+    private readonly passwordResetMailService: PasswordResetMailService,
+    private readonly emailVerificationMailService: EmailVerificationMailService,
   ) {}
 
   /**
@@ -124,16 +129,21 @@ export class AuthService {
     try {
       const hashedPassword = await this.hashService.hash(password);
 
-      const user = await this.prisma.user.create({
-        select: this.AUTH_USER_SELECT,
-        data: {
-          email,
-          username,
-          hashedPassword,
-        },
+      const [user, tokens] = await this.prisma.$transaction(async (tx) => {
+        const newUser = await tx.user.create({
+          select: this.AUTH_USER_SELECT,
+          data: {
+            email,
+            username,
+            hashedPassword,
+          },
+        });
+
+        const tokens = await this.accessTokenService.generate(newUser, tx);
+
+        return [newUser, tokens];
       });
 
-      const tokens = await this.accessTokenService.generate(user);
       const { role: _role, ...safeUser } = user;
 
       return {
@@ -213,7 +223,7 @@ export class AuthService {
       );
       const hashedToken = this.simpleHashService.hash(token);
 
-      const _passwordResetToken = await this.prisma.passwordResetToken.create({
+      await this.prisma.passwordResetToken.create({
         data: {
           hashedToken,
           userId: user.id,
@@ -227,7 +237,11 @@ export class AuthService {
         },
       });
 
-      // TODO: send reset-token email once mail infra exists
+      await this.passwordResetMailService.send(
+        user.email,
+        user.username,
+        token,
+      );
 
       return {
         message:
@@ -255,12 +269,18 @@ export class AuthService {
           },
         });
 
-      await this.prisma.passwordResetToken.update({
-        where: { id: passwordResetToken.id },
-        data: { usedAt: DateTime.now().toJSDate() },
-      });
+      return await this.prisma.$transaction(async (tx) => {
+        await tx.passwordResetToken.update({
+          where: { id: passwordResetToken.id },
+          data: { usedAt: DateTime.now().toJSDate() },
+        });
 
-      return this.updatePassword(passwordResetToken.userId, newPassword);
+        return await this.updatePassword(
+          passwordResetToken.userId,
+          newPassword,
+          tx,
+        );
+      });
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
         throw new BadRequestException('No user found with the provided token');
@@ -293,9 +313,15 @@ export class AuthService {
     }
   }
 
-  async updatePassword(userId: string, newPassword: string) {
+  async updatePassword(
+    userId: string,
+    newPassword: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const prisma = tx ?? this.prisma;
+
     try {
-      const user = await this.prisma.user.update({
+      const user = await prisma.user.update({
         where: { id: userId },
         data: {
           hashedPassword: await this.hashService.hash(newPassword),
@@ -303,6 +329,77 @@ export class AuthService {
       });
 
       return user;
+    } catch (error: unknown) {
+      if (isRecordNotFoundError(error)) {
+        throw new BadRequestException('No user found');
+      }
+      throw error;
+    }
+  }
+
+  async sendVerificationEmail(userId: string) {
+    try {
+      const user = await this.prisma.user.findUniqueOrThrow({
+        where: { id: userId, deletedAt: null },
+      });
+      const token = this.simpleTokenService.generate(64);
+      const expiresIn = this.configService.getOrThrow<number>(
+        'emailVerificationToken.expiresIn',
+      );
+
+      await Promise.all([
+        this.prisma.emailVerificationToken.create({
+          data: {
+            userId: user.id,
+            hashedToken: this.simpleHashService.hash(token),
+            expiresAt: DateTime.now().plus({ seconds: expiresIn }).toJSDate(),
+          },
+        }),
+        this.emailVerificationMailService.send(
+          user.email,
+          user.username,
+          token,
+          expiresIn,
+        ),
+      ]);
+
+      return {
+        message:
+          'The link to verify your email was sent check your inbox and spam',
+      };
+    } catch (error: unknown) {
+      if (isRecordNotFoundError(error)) {
+        throw new BadRequestException('No user found');
+      }
+      throw error;
+    }
+  }
+
+  async verifyEmail(token: string) {
+    try {
+      const verificationEmailToken =
+        await this.prisma.emailVerificationToken.findUniqueOrThrow({
+          where: {
+            hashedToken: this.simpleHashService.hash(token),
+            expiresAt: { gt: DateTime.now().toJSDate() },
+            usedAt: null,
+          },
+        });
+
+      await this.prisma.$transaction([
+        this.prisma.user.update({
+          where: { id: verificationEmailToken.userId, deletedAt: null },
+          data: { emailVerifiedAt: DateTime.now().toJSDate() },
+        }),
+        this.prisma.emailVerificationToken.update({
+          where: { id: verificationEmailToken.id },
+          data: {
+            usedAt: DateTime.now().toJSDate(),
+          },
+        }),
+      ]);
+
+      return { message: 'Email was verified susscefully' };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
         throw new BadRequestException('No user found');
