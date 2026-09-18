@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{#if lang}}{{lang}}{{else}}en{{/if}}">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
+  <title>{{emailSubject}}</title>
+  <style type="text/css">
+    /* Client resets and typography normalizations */
+    body, table, td, a {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table, td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+      border-collapse: collapse !important;
+    }
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+    }
+    body {
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      background-color: #0d0e12;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Core layout styles targeted for Juice inlining */
+    .bg-body { background-color: #0d0e12; }
+    .bg-card {
+      background-color: #16181f;
+      border: 1px solid #232733;
+      border-radius: 12px;
+      padding: 40px 35px 35px 35px;
+    }
+    .badge-category {
+      background-color: #2b141e;
+      color: #e6194b;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .text-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f5f6f8;
+      line-height: 28px;
+    }
+    .text-body {
+      font-size: 15px;
+      line-height: 24px;
+      color: #c4c7d0;
+    }
+    .text-muted {
+      font-size: 13px;
+      line-height: 20px;
+      color: #8f94a6;
+    }
+    .btn-action {
+      background-color: #e6194b;
+      border-radius: 6px;
+      color: #ffffff;
+      display: inline-block;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 48px;
+      text-align: center;
+      text-decoration: none;
+      width: 240px;
+      -webkit-text-size-adjust: none;
+    }
+    .btn-secondary {
+      background-color: #232733;
+      border: 1px solid #3d4255;
+      border-radius: 6px;
+      color: #f5f6f8;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 42px;
+      text-align: center;
+      text-decoration: none;
+      width: 220px;
+    }
+    .code-box {
+      background-color: #0d0e12;
+      border: 1px dashed #e6194b;
+      border-radius: 8px;
+      padding: 14px 28px;
+    }
+    .device-box {
+      background-color: #1a1d26;
+      border-left: 4px solid #e6194b;
+      border-radius: 6px;
+      padding: 16px 20px;
+    }
+
+    /* Native Dark Mode support */
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      .bg-body { background-color: #0a0a0c !important; }
+      .bg-card { background-color: #16181f !important; border: 1px solid #232733 !important; }
+      .text-title { color: #f5f6f8 !important; }
+      .text-body { color: #c4c7d0 !important; }
+      .text-muted { color: #8f94a6 !important; }
+      .code-box { background-color: #0d0e12 !important; border: 1px dashed #e6194b !important; color: #ffffff !important; }
+      .device-box { background-color: #1a1d26 !important; border-left: 4px solid #e6194b !important; }
+    }
+
+    /* Mobile responsiveness overrides */
+    @media screen and (max-width: 600px) {
+      .email-container { width: 100% !important; max-width: 100% !important; }
+      .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+      .btn-responsive { width: 100% !important; display: block !important; text-align: center !important; }
+    }
+  </style>
+</head>
+<body class="bg-body">
+
+  <!-- Hidden preheader text for inbox preview -->
+  <div style="display: none; font-size: 1px; color: #0d0e12; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">
+    {{preheaderText}}
+  </div>
+
+  <!-- Full canvas table wrapper -->
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" class="bg-body">
+    <tr>
+      <td align="center" style="padding: 40px 10px 40px 10px;">
+
+        <!-- Main centered container (600px) -->
+        <table border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="max-width: 600px; width: 100%;">
+
+          <!-- Brand Logo Header -->
+          <tr>
+            <td align="center" style="padding: 0 0 25px 0;">
+              <a href="{{appUrl}}" target="_blank" style="text-decoration: none; font-size: 26px; font-weight: 800; color: #e6194b; letter-spacing: -0.5px;">
+                ROOBRA<span style="color: #f5f6f8;">.</span>
+              </a>
+            </td>
+          </tr>
+
+          <!-- Core content card wrapper -->
+          <tr>
+            <td class="bg-card mobile-padding">
+              {{{body}}}
+            </td>
+          </tr>
+
+          <!-- Modular footer partial -->
+          <tr>
+            <td>
+              {{> footer}}
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

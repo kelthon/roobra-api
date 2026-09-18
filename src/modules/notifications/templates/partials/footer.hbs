@@ -1,0 +1,18 @@
+<!-- Reusable footer partial with internationalization support -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="center" style="padding: 25px 20px 0 20px;">
+      <p class="text-muted" style="font-size: 12px; line-height: 18px; margin: 0;">
+        {{#if footerDisclaimer}}
+          {{footerDisclaimer}}
+        {{else}}
+          This is an automated transactional message issued by Roobra Inc.<br />
+          Support inquiries: <a href="mailto:support@roobra.com" style="color: #8f94a6; text-decoration: underline;">support@roobra.com</a>
+        {{/if}}
+      </p>
+      <p class="text-muted" style="font-size: 11px; color: #5a5f70; margin-top: 10px; margin-bottom: 0;">
+        © {{#if year}}{{year}}{{else}}2026{{/if}} Roobra. All rights reserved.
+      </p>
+    </td>
+  </tr>
+</table>
