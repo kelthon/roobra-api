@@ -6,6 +6,8 @@ import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.s
 import { BadRequestException } from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
 import { ConfigService } from '@nestjs/config';
+import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service';
+import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service';
 
 describe('AuthService', () => {
   let prismaMock: PrismaService;
@@ -14,6 +16,8 @@ describe('AuthService', () => {
   let simpleHashServiceMock: SimpleHashService;
   let simpleTokenServiceMock: SimpleTokenService;
   let configServiceMock: ConfigService;
+  let passwordResetMailServiceMock: PasswordResetMailService;
+  let emailVerificationMailServiceMock: EmailVerificationMailService;
   let authService: AuthService;
 
   const tokens = {
@@ -35,6 +39,21 @@ describe('AuthService', () => {
         findUniqueOrThrow: jest.fn(),
         update: jest.fn(),
       },
+      emailVerificationToken: {
+        create: jest.fn(),
+        findUniqueOrThrow: jest.fn(),
+        update: jest.fn(),
+      },
+      // Mirrors both Prisma `$transaction` call styles used by AuthService:
+      // an interactive callback (register/resetPassword) and a batch of
+      // promises (verifyEmail). The callback is handed `prismaMock` itself
+      // so `tx.user.create(...)` etc. hit the same jest mocks as the rest
+      // of the suite.
+      $transaction: jest.fn((arg: unknown) =>
+        typeof arg === 'function'
+          ? arg(prismaMock)
+          : Promise.all(arg as Promise<unknown>[]),
+      ),
     } as unknown as PrismaService;
 
     hashServiceMock = {
@@ -63,10 +82,19 @@ describe('AuthService', () => {
         const values: Record<string, unknown> = {
           'passwordResetToken.length': 64,
           'passwordResetToken.expiresIn': 300,
+          'emailVerificationToken.expiresIn': 900,
         };
         return values[propertyPath];
       }),
     } as unknown as ConfigService;
+
+    passwordResetMailServiceMock = {
+      send: jest.fn(),
+    } as unknown as PasswordResetMailService;
+
+    emailVerificationMailServiceMock = {
+      send: jest.fn(),
+    } as unknown as EmailVerificationMailService;
 
     authService = new AuthService(
       prismaMock,
@@ -75,6 +103,8 @@ describe('AuthService', () => {
       simpleHashServiceMock,
       simpleTokenServiceMock,
       configServiceMock,
+      passwordResetMailServiceMock,
+      emailVerificationMailServiceMock,
     );
   });
 
@@ -197,7 +227,11 @@ describe('AuthService', () => {
           }),
         }),
       );
-      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(createdUser);
+      // tokens must be generated inside the same transaction as user creation
+      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(
+        createdUser,
+        expect.anything(),
+      );
       // role is fetched for token generation but stripped from the public response
       const { role: _role, ...publicUser } = createdUser;
       expect(result).toEqual({ ...tokens, user: publicUser });
@@ -317,6 +351,8 @@ describe('AuthService', () => {
     it('should create a hashed reset token and return a generic confirmation message', async () => {
       (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
         id: 'user-id',
+        email: 'john.doe@example.com',
+        username: 'john.doe',
       });
       (prismaMock.passwordResetToken.create as jest.Mock).mockResolvedValue({
         id: 'reset-token-id',
@@ -336,6 +372,11 @@ describe('AuthService', () => {
             expiresAt: expect.any(Date),
           }),
         }),
+      );
+      expect(passwordResetMailServiceMock.send).toHaveBeenCalledWith(
+        'john.doe@example.com',
+        'john.doe',
+        '64',
       );
       expect(result).toEqual(
         expect.objectContaining({ message: expect.any(String) }),
@@ -473,6 +514,113 @@ describe('AuthService', () => {
           newPassword: 'NewPassword123!',
         }),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('sendVerificationEmail', () => {
+    it('should create a hashed verification token and email it to the user', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+        email: 'john.doe@example.com',
+        username: 'john.doe',
+      });
+      (prismaMock.emailVerificationToken.create as jest.Mock).mockResolvedValue(
+        { id: 'verification-token-id' },
+      );
+
+      const result = await authService.sendVerificationEmail('user-id');
+
+      expect(simpleTokenServiceMock.generate).toHaveBeenCalledWith(64);
+      expect(prismaMock.emailVerificationToken.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            userId: 'user-id',
+            hashedToken: 'hashed(64)',
+            expiresAt: expect.any(Date),
+          }),
+        }),
+      );
+      expect(emailVerificationMailServiceMock.send).toHaveBeenCalledWith(
+        'john.doe@example.com',
+        'john.doe',
+        '64',
+        900,
+      );
+      expect(result).toEqual(
+        expect.objectContaining({ message: expect.any(String) }),
+      );
+    });
+
+    it('should throw BadRequestException if the user no longer exists', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+        code: 'P2025',
+      });
+
+      await expect(
+        authService.sendVerificationEmail('missing-id'),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(emailVerificationMailServiceMock.send).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('verifyEmail', () => {
+    it('should hash the token, mark it used and mark the user as verified', async () => {
+      (
+        prismaMock.emailVerificationToken.findUniqueOrThrow as jest.Mock
+      ).mockResolvedValue({
+        id: 'verification-token-id',
+        userId: 'user-id',
+      });
+      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+      });
+      (prismaMock.emailVerificationToken.update as jest.Mock).mockResolvedValue(
+        { id: 'verification-token-id' },
+      );
+
+      const result = await authService.verifyEmail('raw-verification-token');
+
+      expect(simpleHashServiceMock.hash).toHaveBeenCalledWith(
+        'raw-verification-token',
+      );
+      expect(
+        prismaMock.emailVerificationToken.findUniqueOrThrow,
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            hashedToken: 'hashed(raw-verification-token)',
+            usedAt: null,
+          }),
+        }),
+      );
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id', deletedAt: null },
+          data: { emailVerifiedAt: expect.any(Date) },
+        }),
+      );
+      expect(prismaMock.emailVerificationToken.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'verification-token-id' },
+          data: { usedAt: expect.any(Date) },
+        }),
+      );
+      expect(result).toEqual(
+        expect.objectContaining({ message: expect.any(String) }),
+      );
+    });
+
+    it('should throw BadRequestException for an invalid, used or expired verification token', async () => {
+      (
+        prismaMock.emailVerificationToken.findUniqueOrThrow as jest.Mock
+      ).mockRejectedValue({ code: 'P2025' });
+
+      await expect(authService.verifyEmail('invalid-token')).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
     });
   });
 });
