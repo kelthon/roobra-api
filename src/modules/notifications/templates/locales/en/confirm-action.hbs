@@ -1,0 +1,51 @@
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <!-- Category badge -->
+  <tr>
+    <td align="left" style="padding-bottom: 14px;">
+      <span class="badge-category">{{#if categoryBadge}}{{categoryBadge}}{{else}}Security Confirmation{{/if}}</span>
+    </td>
+  </tr>
+
+  <!-- Email title -->
+  <tr>
+    <td class="text-title">{{#if title}}{{title}}{{else}}Confirm your request{{/if}}</td>
+  </tr>
+
+  <!-- Message body -->
+  <tr>
+    <td class="text-body">
+      Hi, <strong style="color: #ffffff;">{{username}}</strong>.<br /><br />
+      A sensitive action was requested on your account: <strong style="color: #ffffff;">{{actionDescription}}</strong>.<br />
+      To authorize it, enter the code below or click the confirmation button:
+    </td>
+  </tr>
+
+  <!-- Numeric OTP Token Box -->
+  <tr>
+    <td align="center" style="padding: 10px 0 20px 0;">
+      <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" class="code-box">
+            <span style="font-family: 'Courier New', Courier, monospace; font-size: 30px; font-weight: 800; letter-spacing: 8px;">
+              {{otpCode}}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Call to action button partial -->
+  <tr>
+    <td>
+      {{> action-button url=confirmActionUrl text=(#if buttonText buttonText "Confirm Action") isSecondary=false}}
+    </td>
+  </tr>
+
+  <!-- Security note -->
+  <tr>
+    <td class="text-muted" style="padding-top: 24px; border-top: 1px solid #232733;">
+      This code expires in <strong>{{#if expiresIn}}{{expiresIn}}{{else}}10{{/if}} minutes</strong>. Never share this code with anyone.
+    </td>
+  </tr>
+</table>

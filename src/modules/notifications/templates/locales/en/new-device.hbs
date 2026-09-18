@@ -1,0 +1,52 @@
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <!-- Category badge -->
+  <tr>
+    <td align="left" style="padding-bottom: 14px;">
+      <span class="badge-category">Security Alert</span>
+    </td>
+  </tr>
+
+  <!-- Email title -->
+  <tr>
+    <td class="text-title">New sign-in detected</td>
+  </tr>
+
+  <!-- Message body -->
+  <tr>
+    <td class="text-body">
+      Hi, <strong style="color: #ffffff;">{{username}}</strong>.<br /><br />
+      We detected a new active session signed in to your account. If this was you, you can safely disregard this email.
+    </td>
+  </tr>
+
+  <!-- Session metadata detail box -->
+  <tr>
+    <td style="padding-bottom: 12px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" class="device-box">
+        <tr>
+          <td style="font-size: 13px; color: #c4c7d0; line-height: 22px;">
+            📱 <strong style="color: #f5f6f8;">Device:</strong> {{deviceName}} ({{osName}})<br />
+            🌐 <strong style="color: #f5f6f8;">Browser / App:</strong> {{browserName}}<br />
+            📍 <strong style="color: #f5f6f8;">Approximate Location:</strong> {{locationCity}}, {{locationCountry}}<br />
+            🕒 <strong style="color: #f5f6f8;">Timestamp:</strong> {{loginTimestamp}}<br />
+            🔒 <strong style="color: #f5f6f8;">IP Address:</strong> {{ipAddress}}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Secondary revocation button partial -->
+  <tr>
+    <td>
+      {{> action-button url=revokeSessionUrl text="I don't recognize this activity" isSecondary=true}}
+    </td>
+  </tr>
+
+  <!-- Security note -->
+  <tr>
+    <td class="text-muted" style="padding-top: 24px; border-top: 1px solid #232733;">
+      If you suspect unauthorized access, click the button above to terminate this session and reset your credentials immediately[cite: 4, 7].
+    </td>
+  </tr>
+</table>
