@@ -48,10 +48,43 @@ removed from the schema after the discussion, so the idea would not sit as unmig
   adapter only reads templates from disk: fetch by `name` and `lang`, compile the string, wrap it in
   the shared layout and cache it so a campaign fanning out to many subscribers does not recompile per
   recipient.
-- The draft schema (`TemplateStatus` enum, `MarketingEmailTemplate` with `@@unique([name, lang])`,
-  nanoid primary key, `VarChar(5)` `lang`) is preserved in `docs/notifications-module-spec.md` §9.4
-  until the feature is built.
+- The draft schema is kept below so it survives the removal of the legacy spec.
 
 ## Implementation Status
 
 **Not built.** No `MarketingEmailTemplate` model exists in `prisma/models/`.
+
+## Appendix: Draft Schema (Last Reviewed 2026-09-12, Not Migrated)
+
+```prisma
+enum TemplateStatus {
+  DRAFT       @map("draft")
+  ACTIVE      @map("active")
+  DEACTIVATED @map("deactivated")
+
+  @@map("template_statuses")
+}
+
+model MarketingEmailTemplate {
+  id               String         @id @default(nanoid()) @db.Char(21)
+  name             String         @db.VarChar(255)
+  lang             String         @db.VarChar(5)
+  status           TemplateStatus @default(DRAFT)
+  subject          String         @db.VarChar(255)
+  content          String         @db.Text
+  layout           String         @default("main") @db.VarChar(50)
+  previewVariables Json?          @map("preview_variables")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+
+  @@unique([name, lang])
+  @@map("marketing_email_templates")
+}
+```
+
+- The primary key is a nanoid like `User`: this is an admin resource with no public or SEO URL.
+- `lang` is `VarChar(5)`, not `Char(5)`, because tags vary in length and `Char` would blank-pad them.
+- `@@unique([name, lang])` lets one logical template exist in several languages.
+- `layout` selects among code-owned layouts; it does not let dashboard users edit the layout.
