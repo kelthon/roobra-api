@@ -235,7 +235,7 @@ throughput cost and most reads in the app do not need it.
 ## 7. `AuditLog` is not populated by anything yet
 
 **Problem:** the `AuditLog` model
-([audit-log.model.prisma](../prisma/models/audit-log.model.prisma)) exists in the schema, but a
+([audit-log.model.prisma](../prisma/models/audit.prisma)) exists in the schema, but a
 grep of `src/` for anything writing to `prisma.auditLog` turns up nothing — it is modeled but
 unused. Left as-is, every service that should audit something (role changes, `Key` issuance,
 `Promotion` edits) has to remember to call `prisma.auditLog.create(...)` by hand, which is exactly
