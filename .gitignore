@@ -4,6 +4,12 @@
 /build
 *.tsbuildinfo
 
+# scripts/*.ts run in place via `tsx` (no build step); this only catches stray
+# output from an editor "Run" action invoking `tsc` directly on one of them
+scripts/*.js
+scripts/*.js.map
+scripts/*.d.ts
+
 # Logs
 logs
 *.log

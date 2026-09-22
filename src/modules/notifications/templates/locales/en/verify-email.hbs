@@ -26,14 +26,14 @@
   <!-- Call to action button partial -->
   <tr>
     <td>
-      {{> action-button url=verifyEmailUrl text=(if buttonText buttonText "Verify Email") isSecondary=false}}
+      {{> action-button url=verifyEmailUrl text=buttonText isSecondary=false}}
     </td>
   </tr>
 
   <!-- Security note -->
   <tr>
     <td class="text-muted" style="padding-top: 24px; border-top: 1px solid #232733;">
-      This verification link is valid for <strong>{{#if expiresIn}}{{expiresIn}}{{else}}48{{/if}} hours</strong>. If you didn't create an account with Roobra, no action is needed[cite: 1, 3].
+      This verification link is valid for <strong>{{expiresInLabel}}</strong>. If you didn't create an account with Roobra, no action is needed.
     </td>
   </tr>
 </table>
