@@ -69,8 +69,8 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 
 | Use case | Status |
 | --- | --- |
-| Password reset (BR-11) | Token creation, email and `POST /auth/reset-password` implemented |
-| Email verification (BR-12) | `EmailVerificationToken` model, email, `GET` and `POST /auth/verify-email` implemented |
+| Password reset (BR-011) | Token creation, email and `POST /auth/reset-password` implemented |
+| Email verification (BR-012) | `EmailVerificationToken` model, email, `GET` and `POST /auth/verify-email` implemented |
 | Welcome, receipt, subscription-expiring | Not started; the templates `confirm-action`, `create-password` and `new-device` exist but no service sends them |
 | Marketing templates in the database | Not built, see [the ADR](../adr/2026-09-12-marketing-email-templates-db-backed-marketing-only.md) |
 
