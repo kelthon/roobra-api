@@ -11,7 +11,7 @@ export class PrismaService extends PrismaClient {
     super({
       adapter,
       log:
-        config.get('env') === 'production'
+        config.get('app.mode') === 'production'
           ? [
               { level: 'warn', emit: 'stdout' },
               { level: 'error', emit: 'stdout' },
@@ -26,6 +26,7 @@ export class PrismaService extends PrismaClient {
         user: { hashedPassword: true },
         refreshToken: { hashedToken: true },
         passwordResetToken: { hashedToken: true },
+        emailVerificationToken: { hashedToken: true },
         key: { hashedKey: true },
       },
     });
