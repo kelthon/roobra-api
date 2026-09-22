@@ -45,8 +45,18 @@ describe('EmailVerificationMailService', () => {
           username: 'john.doe',
           verifyEmailUrl:
             'https://app.roobra.com/verify-email/raw-verification-token',
-          expiresIn: 2,
+          expiresInLabel: '2 hours',
         }),
+      }),
+    );
+  });
+
+  it('should singularize expiresInLabel for a one-hour expiry', async () => {
+    await service.send('john.doe@example.com', 'john.doe', 'token', 3600);
+
+    expect(mailerServiceMock.sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ expiresInLabel: '1 hour' }),
       }),
     );
   });
