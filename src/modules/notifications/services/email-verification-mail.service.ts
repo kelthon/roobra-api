@@ -4,13 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { Duration } from 'luxon';
 import { LocaleType } from 'src/shared/types/locale.type';
 
-/**
- * NOTE: not wired to any endpoint yet. Email verification (BR-12) still
- * needs its own token model + generate/consume flow on the auth side
- * (there is no `EmailVerificationToken`, unlike `PasswordResetToken`).
- * This service only covers the sending half so that work can plug straight
- * into it once the token flow exists.
- */
 @Injectable()
 export class EmailVerificationMailService {
   constructor(
@@ -32,6 +25,9 @@ export class EmailVerificationMailService {
     locale: LocaleType = 'en',
   ): Promise<void> {
     const appUrl = this.configService.getOrThrow<string>('app.frontendUrl');
+    const expiresInHours = Math.round(
+      Duration.fromObject({ seconds: expiresInSeconds }).as('hours'),
+    );
 
     await this.mailerService.sendMail({
       to,
@@ -50,9 +46,7 @@ export class EmailVerificationMailService {
         appUrl,
         // TODO: When fronend is finally ready change this mock url
         verifyEmailUrl: `${appUrl}/verify-email/${verificationToken}`,
-        expiresIn: Math.round(
-          Duration.fromObject({ seconds: expiresInSeconds }).as('hours'),
-        ),
+        expiresInLabel: `${expiresInHours} hour${expiresInHours === 1 ? '' : 's'}`,
       },
     });
   }
