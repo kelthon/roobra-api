@@ -77,6 +77,7 @@ import { join } from 'node:path';
             dir: join(__dirname, '/modules/notifications/templates/partials'),
             options: { strict: true },
           },
+          layout: 'layouts/main',
         },
         preview: config.getOrThrow('app.mode') !== 'production' && {
           open: true,
