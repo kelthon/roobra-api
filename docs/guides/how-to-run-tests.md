@@ -2,7 +2,9 @@
 
 ## Objective
 
-Run the unit and end-to-end test suites locally, the same way CI does.
+Run the unit and end-to-end test suites locally, the same way CI does. For general testing
+conventions and best practices (not specific to this repo), see `roobra-docs`'s
+[guidelines/testing.md](https://github.com/kelthon/roobra-docs/blob/main/guidelines/testing.md).
 
 ## Prerequisites
 
