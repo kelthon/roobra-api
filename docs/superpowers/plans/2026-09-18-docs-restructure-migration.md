@@ -172,7 +172,7 @@ Guides use the format Title, Objective, Prerequisites, numbered Steps, Troublesh
 1. `docs/guides/onboarding-and-technical-functions.md` is empty and its intent is unclear. Per the taxonomy, general engineering onboarding belongs in `roobra-docs`. Keep a repo-specific version here, or drop the placeholder?
 2. Task 9: the `env` config key read by `PrismaService` is not defined by any loaded config. Confirm what was intended.
 3. Task 19: `preferredLang` is modeled but not yet populated at registration. Confirm the decision stands and the wiring is follow-up work.
-4. The spec references business rule numbers (BR-011, BR-012, BR-030). BR-030 in `roobra-docs` is "Misuse", not rate limiting. ADRs cite only BR-011 and BR-012.
+4. The spec references business rule numbers (BR-11, BR-12, BR-30, legacy ids). BR-30 in `roobra-docs` (now BR-028) is "Misuse", not rate limiting. ADRs cite only BR-011 and BR-012 (legacy BR-11 and BR-12; ids renumbered 2026-09-23).
 5. `docs/incidents/` is not created until the first incident. The stale-Postgres-role episode in `docs/deployment.md` could be back-written as the first post-mortem if a date and impact are known.
 
 ## Self-Review Notes
