@@ -19,7 +19,8 @@ as one schema, so the split carried no technical meaning.
 ## Decision
 
 Models are grouped into four files that mirror the product's system boundaries in
-`roobra-docs` `management/mvp-summary.md`:
+`roobra-docs` `management/roadmap.md` (its milestones: auth, content, subscriptions and payments,
+notifications, audit):
 
 | File | Models |
 | --- | --- |

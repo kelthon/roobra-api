@@ -34,7 +34,7 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | `@UserOnly()` | `JwtAuthGuard` | Requires a valid access token |
 | `@GuestOnly()` | `OptionalJwtAuthGuard`, `ForbidAuthenticatedGuard` | Rejects requests that carry a valid access token |
 | `@LoginWith('local')` | Passport `AuthGuard('local')` | Validates email and password through `AuthService.validateUser` |
-| `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Sprint 2 (`roobra-docs` `management/mvp-summary.md`) |
+| `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Milestone 2 (`roobra-docs` `management/backlog.md`, tasks 1.2.1 and 1.2.3) |
 
 `@User()` injects the authenticated user as `UserDto`, mapping the JWT `sub` claim to `id`.
 

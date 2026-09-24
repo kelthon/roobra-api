@@ -13,8 +13,9 @@ superseded-by:
 ## Context
 
 `AuthModule` must send an email when a user requests a password reset or email verification.
-`roobra-docs` `management/mvp-summary.md` §2.4 schedules background jobs (BullMQ) for Sprint 4
-(P1), which depends on subscriptions (Sprint 3); neither exists in code yet. `REDIS_URL` is already
+`roobra-docs` `management/roadmap.md` schedules background jobs (BullMQ) in Milestone 4
+(Notifications & Background Jobs), which depends on subscriptions (Milestone 3); neither exists in
+code yet. `REDIS_URL` is already
 in `.env.example`.
 
 ## Decision

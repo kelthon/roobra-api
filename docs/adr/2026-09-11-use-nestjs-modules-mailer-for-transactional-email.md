@@ -12,8 +12,8 @@ superseded-by:
 
 ## Context
 
-Password recovery (BR-011) and email verification (BR-012) are P0 in `roobra-docs`
-`management/mvp-summary.md` and need transactional email. A first pass hand-rolled a `MailProvider`
+Password recovery (BR-011) and email verification (BR-012) are part of Milestone 1
+(Auth & Foundation) in `roobra-docs` `management/roadmap.md` and need transactional email. A first pass hand-rolled a `MailProvider`
 interface plus an SMTP provider over nodemailer, building HTML with template literals. It was
 discarded during the 2026-09-11 design session.
 
