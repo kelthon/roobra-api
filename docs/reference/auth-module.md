@@ -44,8 +44,8 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | --- | --- | --- | --- | --- |
 | Access | JWT (`sub`, `email`, `username`, `role`) | 15 min | No | `jwt.expiresIn` |
 | Refresh | 64 hex characters | 7 days | SHA-256 hash, `refresh_tokens` | `refreshToken.*` |
-| Password reset | 64 hex characters | 5 min (placeholder, not decided) | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
-| Email verification | 64 hex characters | 48 h (placeholder, not decided) | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
+| Password reset | 64 hex characters | 30 min | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
+| Email verification | 64 hex characters | 24 h | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
 
 Why: [refresh tokens](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md),
 [hashing](../adr/2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md),
