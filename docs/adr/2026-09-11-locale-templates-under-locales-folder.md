@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-09-11
 recorded-at: 2026-09-18
-source: docs/notifications-module-spec.md §2.5; src/app.module.ts; src/modules/notifications/templates/
+source: docs/notifications-module-spec.md §2.5; src/app.module.ts; src/modules/notifications/templates/ — the legacy doc cited first was removed in the docs restructuring (see git history)
 supersedes:
 superseded-by:
 ---

@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-09-11
 recorded-at: 2026-09-18
-source: docs/notifications-module-spec.md §2.6; prisma/models/auth.prisma; prisma/migrations/20260913195813_add_preferred_lang_column_to_user; src/common/utils/locale.util.ts
+source: docs/notifications-module-spec.md §2.6; prisma/models/auth.prisma; prisma/migrations/20260913195813_add_preferred_lang_column_to_user; src/common/utils/locale.util.ts — the legacy doc cited first was removed in the docs restructuring (see git history)
 supersedes:
 superseded-by:
 ---

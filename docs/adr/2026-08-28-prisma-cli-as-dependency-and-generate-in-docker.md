@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-08-28
 recorded-at: 2026-09-18
-source: docs/docker.md "Why prisma generate runs inside deps"; Dockerfile; package.json
+source: docs/docker.md "Why prisma generate runs inside deps"; Dockerfile; package.json — the legacy doc cited first was removed in the docs restructuring (see git history)
 supersedes:
 superseded-by:
 ---
