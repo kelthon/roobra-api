@@ -31,6 +31,7 @@ src/modules/notifications/
 | `defaults.from` | `mail.from` |
 | Template adapter | `HandlebarsAdapter` with `inlineCssEnabled: true` |
 | Template and partial options | `strict: true` |
+| Layout | `layouts/main` (`options.layout`), the shared shell every leaf template is rendered inside |
 | Template directory | `src/modules/notifications/templates` |
 | Partials directory | `templates/partials` |
 | `i18n` | `defaultLocale: 'en'`, `templateDirPattern: 'locales/{{locale}}/'`, `fallback: true` |
@@ -46,7 +47,8 @@ src/modules/notifications/
 | `EmailVerificationMailService` | `to`, `username`, `verificationToken`, `expiresInSeconds`, `locale = 'en'` | `verify-email` | `app.frontendUrl` + `/verify-email/<token>` |
 
 Both call `MailerService.sendMail` with a typed-by-convention `context` and are invoked directly and
-synchronously from `AuthService`.
+synchronously from `AuthService`. `EmailVerificationMailService` passes the expiry as a ready-made
+label (`expiresInLabel`, for example `2 hours`) instead of a number.
 
 ## Locales
 
@@ -83,17 +85,10 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 - [Preferred language column](../adr/2026-09-11-user-preferred-lang-column.md)
 - [Transport provider (open)](../adr/2026-09-11-email-transport-provider.md)
 
-## Known Issues Found While Documenting
+## Checking Templates
 
-These are code observations, not decisions. They are listed for the reviewer and are not fixed by
-this documentation branch.
-
-- `verify-email.hbs` renders `{{#if expiresIn}}{{expiresIn}}{{else}}48{{/if}} hours`.
-  `EmailVerificationMailService` passes `Math.round(seconds / 3600)`, which is `0` for the
-  15-minute token, so the email says the link is valid for **48 hours**.
-- `verify-email.hbs` and `new-device.hbs` contain leftover `[cite: ...]` text in the email body.
-- `create-password.hbs` and `confirm-action.hbs` use `(#if ...)` inside a subexpression, which is not
-  valid Handlebars syntax. Nothing renders them yet.
-- No `layout` option is set for the adapter and no template references `layouts/main`, so it is
-  unclear how the shared layout is applied.
-- The JSDoc on `EmailVerificationMailService` still says it is not wired to any endpoint.
+- `src/modules/notifications/templates/render.spec.ts` renders every template through the real
+  `HandlebarsAdapter`, with the same directory, `strict` and layout options as `app.module.ts`, so a
+  syntax error or a missing variable fails the unit suite instead of a live send.
+- `npm run email:preview` (`scripts/preview-email.ts`) renders a template and opens it in the
+  browser, without SMTP or a running app.
