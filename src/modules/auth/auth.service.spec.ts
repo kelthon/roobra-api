@@ -82,6 +82,7 @@ describe('AuthService', () => {
         const values: Record<string, unknown> = {
           'passwordResetToken.length': 64,
           'passwordResetToken.expiresIn': 300,
+          'emailVerificationToken.length': 64,
           'emailVerificationToken.expiresIn': 900,
         };
         return values[propertyPath];
@@ -549,6 +550,48 @@ describe('AuthService', () => {
       expect(result).toEqual(
         expect.objectContaining({ message: expect.any(String) }),
       );
+    });
+
+    it('should save the token before sending the email', async () => {
+      const calls: string[] = [];
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+        email: 'john.doe@example.com',
+        username: 'john.doe',
+      });
+      (
+        prismaMock.emailVerificationToken.create as jest.Mock
+      ).mockImplementation(() => {
+        calls.push('create');
+        return Promise.resolve({ id: 'verification-token-id' });
+      });
+      (emailVerificationMailServiceMock.send as jest.Mock).mockImplementation(
+        () => {
+          calls.push('send');
+          return Promise.resolve();
+        },
+      );
+
+      await authService.sendVerificationEmail('user-id');
+
+      expect(calls).toEqual(['create', 'send']);
+    });
+
+    it('should not send the email when the token cannot be saved', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+        email: 'john.doe@example.com',
+        username: 'john.doe',
+      });
+      (prismaMock.emailVerificationToken.create as jest.Mock).mockRejectedValue(
+        new Error('database unavailable'),
+      );
+
+      await expect(
+        authService.sendVerificationEmail('user-id'),
+      ).rejects.toThrow('database unavailable');
+
+      expect(emailVerificationMailServiceMock.send).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException if the user no longer exists', async () => {
