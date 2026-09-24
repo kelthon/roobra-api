@@ -208,14 +208,28 @@ export class AuthService {
     return await this.accessTokenService.refresh(refreshToken);
   }
 
+  /**
+   * Starts the password recovery: creates a reset token and emails the link
+   *
+   * Always answers with the same message, whether or not an account exists for
+   * the email, so the endpoint cannot be used to find out which emails are
+   * registered.
+   *
+   * @param forgotPasswordDto The recovery request
+   * @param forgotPasswordDto.email The email of the account to recover
+   */
   async forgotPassword(
     forgotPasswordDto: ForgotPasswordDto,
   ): Promise<InfoResponse> {
     const { email } = forgotPasswordDto;
+    const response = {
+      message:
+        'If an account exists for that email, a password reset link has been sent. Please check your inbox',
+    };
 
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
-        where: { email },
+        where: { email, deletedAt: null },
       });
 
       const token = this.simpleTokenService.generate(
@@ -243,13 +257,10 @@ export class AuthService {
         token,
       );
 
-      return {
-        message:
-          'A password reset link has been sent for the provided e-mail account, please check your inbox',
-      };
+      return response;
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found with the provided email');
+        return response;
       }
       throw error;
     }

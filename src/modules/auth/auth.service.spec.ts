@@ -384,14 +384,52 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw BadRequestException when no user is found for the email', async () => {
+    it('should answer exactly the same, and do nothing, when no account has the email', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValueOnce({
+        id: 'user-id',
+        email: 'john.doe@example.com',
+        username: 'john.doe',
+      });
+      (prismaMock.passwordResetToken.create as jest.Mock).mockResolvedValue({
+        id: 'reset-token-id',
+      });
+      const forExistingAccount = await authService.forgotPassword({
+        email: 'john.doe@example.com',
+      });
+      jest.clearAllMocks();
+
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+        code: 'P2025',
+      });
+      const forMissingAccount = await authService.forgotPassword({
+        email: 'missing@example.com',
+      });
+
+      expect(forMissingAccount).toEqual(forExistingAccount);
+      expect(prismaMock.passwordResetToken.create).not.toHaveBeenCalled();
+      expect(passwordResetMailServiceMock.send).not.toHaveBeenCalled();
+    });
+
+    it('should not recover a soft-deleted account', async () => {
       (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
         code: 'P2025',
       });
 
+      await authService.forgotPassword({ email: 'deleted@example.com' });
+
+      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith({
+        where: { email: 'deleted@example.com', deletedAt: null },
+      });
+    });
+
+    it('should rethrow errors that are not "record not found"', async () => {
+      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue(
+        new Error('database unavailable'),
+      );
+
       await expect(
-        authService.forgotPassword({ email: 'missing@example.com' }),
-      ).rejects.toThrow(BadRequestException);
+        authService.forgotPassword({ email: 'john.doe@example.com' }),
+      ).rejects.toThrow('database unavailable');
     });
   });
 
