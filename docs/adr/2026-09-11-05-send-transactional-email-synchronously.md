@@ -42,6 +42,8 @@ from a separate worker).
 
 ## Implementation Status
 
-`forgotPassword` creates the token and then awaits the send. `sendVerificationEmail` runs the token
-insert and the send **concurrently** in `Promise.all`, so an email can be sent with a link whose
-token was not persisted, and a failed send can still leave a persisted token.
+Both flows now save the token first and then await the send: `forgotPassword`, and
+`sendVerificationEmail` (which used to run the insert and the send concurrently in `Promise.all`, so a
+link could be sent for a token that was not saved). If the send fails after the token was saved, the
+request still returns an error and an unused, expiring token row stays behind; that is the
+known, accepted gap described above.
