@@ -21,9 +21,8 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
    `SimpleTokenService`, stored only as a SHA-256 hash in its own table
    (`password_reset_tokens`, `email_verification_tokens`) with `expiresAt` and `usedAt`.
 2. Lifetimes, set in `password-reset-token.config.ts` and `email-verification-token.config.ts`:
-   password reset currently **5 minutes**, email verification currently **48 hours**. **Neither
-   number is a final product decision** — both are placeholder/test values (confirmed 2026-09-22)
-   and should not be treated as settled until someone signs off on them.
+   password reset **30 minutes**, email verification **24 hours**. Decided on 2026-09-24; both were
+   test placeholders (5 minutes and, briefly, 48 hours) before that.
 3. A token is accepted only if it exists by hash, `usedAt` is null and `expiresAt` is in the future.
    Consuming it sets `usedAt` in the same transaction as the effect (password update, or
    `emailVerifiedAt`).
@@ -49,8 +48,3 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
 
 Both flows are implemented. `forgotPassword` responds with "No user found" for an unknown email,
 which reveals whether an address is registered; whether that is intended has not been recorded.
-
-**Open:** the specific TTL values in §Decision.2 are test placeholders, not decided — pick real
-values (and confirm whether email verification's 48h was intended, versus a bug that happened to
-match the em-dash fallback already in `verify-email.hbs`) before this ships. Tracked in
-[issue #5](https://github.com/kelthon/roobra-api/issues/5).
