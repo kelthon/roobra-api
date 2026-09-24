@@ -75,8 +75,8 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
 - [x] `.github/instructions/*.md` linked to the old repository `kelthon/ph-docs` in 7 places across
   4 files; fixed to `kelthon/roobra-docs` (2026-09-22).
 - [ ] **`UserRole.STAFF` looks vestigial — candidate for removal.** Cross-checked every RBAC surface
-  in `roobra-docs` (`business/personas.md`, `architecture/auth-flow.md` §4, and
-  `management/roadmap-dashboard.md`'s own feature-by-feature "Access Control by Role" table and its
+  in `roobra-docs` (`business/personas.md`, `architecture/auth-flow.md` §2, and
+  `management/roadmaps/dashboard.md`'s own feature-by-feature "Access Control by Role" table and its
   "Staff Management" epic, which is the most granular permission doc that exists) — all of them
   recognize exactly 3 staff-facing roles (`ADMIN`, `CONTENT_MANAGER`, `SUPPORT_AGENT`) plus
   `SUBSCRIBER`. None mention a 4th generic staff role. In code, `UserRole.STAFF` is never read,
@@ -88,11 +88,11 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
 
 ## Docs To Update When The Fixes Above Are Committed
 
-- [ ] [Query logging ADR](docs/adr/2026-09-04-environment-based-prisma-query-logging.md): drop the "diverges from intent" section.
-- [ ] [Global omit ADR](docs/adr/2026-09-04-global-omit-for-credential-hashes.md): drop the `EmailVerificationToken` open point.
+- [x] [Query logging ADR](docs/adr/2026-09-04-environment-based-prisma-query-logging.md): drop the "diverges from intent" section.
+- [x] [Global omit ADR](docs/adr/2026-09-04-global-omit-for-credential-hashes.md): drop the `EmailVerificationToken` open point.
 - [x] [One-time tokens ADR](docs/adr/2026-09-11-one-time-opaque-tokens-for-reset-and-verification.md) and
   [auth reference](docs/reference/auth-module.md): verification lifetime 15 minutes → 48 hours, and
   both TTLs flagged as undecided placeholders (2026-09-22).
-- [ ] [Notifications reference](docs/reference/notifications-module.md), "Known Issues": remove what is fixed.
+- [x] [Notifications reference](docs/reference/notifications-module.md), "Known Issues": remove what is fixed.
 - [ ] [Sync send ADR](docs/adr/2026-09-11-send-transactional-email-synchronously.md): update the Implementation Status.
-- [ ] [Migration plan](docs/superpowers/plans/2026-09-18-docs-restructure-migration.md), "Findings": remove what is fixed.
+- [x] [Migration plan](docs/superpowers/plans/2026-09-18-docs-restructure-migration.md), "Findings": remove what is fixed.

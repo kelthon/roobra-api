@@ -40,4 +40,4 @@ Rationale not recorded.
 ## Implementation Status
 
 The notifications spec calls this "BR-30" (a legacy id). In `roobra-docs`, that rule (now BR-028) is "Misuse" (account suspension),
-not rate limiting, so this ADR does not cite it.
+not rate limiting. Rate limiting now has its own rule, `BR-061`, added on 2026-09-23.
