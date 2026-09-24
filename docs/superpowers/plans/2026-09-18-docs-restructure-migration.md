@@ -148,6 +148,7 @@ Guides use the format Title, Objective, Prerequisites, numbered Steps, Troublesh
 - [x] Replace `docker.md`, `deployment.md` and `notifications-module-spec.md` with stubs (title, one sentence, links to the new documents).
 - [x] Rewrite `docs/README.md` as an index grouped by folder, plus a short "where does this go" table.
 - [x] Commit: `docs: replace legacy docs with stubs and update index`.
+- [x] (2026-09-23) Repoint the readme, `scripts/ensure-db-user.sh` and `docs/README.md` away from the stubs, then delete the three stubs and the empty `docs/business/` and `docs/references/` folders.
 
 ### Task 32: Prisma Proposals Banner
 
@@ -164,16 +165,16 @@ Guides use the format Title, Objective, Prerequisites, numbered Steps, Troublesh
 - [ ] List drafts: `grep -l '^status: Draft' docs/adr/*.md`.
 - [ ] For each, set `status:` to its `intended-status` value and add `accepted-at: <merge date>`. The transport ADR (Task 21) becomes `Proposed` instead.
 - [ ] Update the status column in `docs/adr/README.md`.
-- [ ] Remove the three stubs from Task 31 and `docs/superpowers/plans/2026-09-12-notifications-service-migration.md` (already executed).
+- [ ] Remove `docs/superpowers/plans/2026-09-12-notifications-service-migration.md` (already executed). The three stubs were already removed on 2026-09-23.
 - [ ] Commit on a follow-up branch: `docs(adr): promote drafts after merge`.
 
 ## Open Questions For Reviewers
 
-1. `docs/guides/onboarding-and-technical-functions.md` is empty and its intent is unclear. Per the taxonomy, general engineering onboarding belongs in `roobra-docs`. Keep a repo-specific version here, or drop the placeholder?
-2. Task 9: the `env` config key read by `PrismaService` is not defined by any loaded config. Confirm what was intended.
-3. Task 19: `preferredLang` is modeled but not yet populated at registration. Confirm the decision stands and the wiring is follow-up work.
-4. The spec references business rule numbers (BR-11, BR-12, BR-30, legacy ids). BR-30 in `roobra-docs` (now BR-028) is "Misuse", not rate limiting. ADRs cite only BR-011 and BR-012 (legacy BR-11 and BR-12; ids renumbered 2026-09-23).
-5. `docs/incidents/` is not created until the first incident. The stale-Postgres-role episode in `docs/deployment.md` could be back-written as the first post-mortem if a date and impact are known.
+1. ~~`docs/guides/onboarding-and-technical-functions.md` is empty.~~ Closed: the placeholder no longer exists, and general engineering onboarding belongs in `roobra-docs`.
+2. ~~Task 9: the `env` config key read by `PrismaService` is not defined.~~ Closed: it was a bug, fixed to `app.mode` (commit `3a6e350`).
+3. Task 19: `preferredLang` is modeled but not yet populated at registration. **Open**: code follow-up, tracked in `todo.md`.
+4. ~~The spec cites `BR-30` for rate limiting.~~ Closed: that rule is "Misuse"; rate limiting gets its own rule in `roobra-docs` (ids were renumbered on 2026-09-23, so the old `BR-30` is now `BR-028`).
+5. `docs/incidents/` is not created until the first incident. The stale-Postgres-role episode (now a troubleshooting section of `guides/how-to-deploy-app.md`) could be back-written as the first post-mortem if a date and impact are known. **Open**.
 
 ## Self-Review Notes
 
@@ -208,3 +209,19 @@ Tasks 1–32 were executed on `docs/restructure-documentation`. Task 33 runs aft
 6. `JwtStrategy.validate` does not reject deleted or blocked users (ADR 11).
 7. `forgotPassword` answers "No user found" for unknown emails (ADR 13).
 8. The workflow `deploy.yml` does not deploy (ADR 7).
+
+## Execution Notes (2026-09-23)
+
+The cutover is done on this branch; only Task 33 (after the merge into `main`) remains.
+
+- Readme, `docs/README.md` and `scripts/ensure-db-user.sh` no longer link to removed files; the three
+  stubs and the empty folders are deleted.
+- `notifications-module.md`, the query logging ADR and the omit ADR were brought up to date with the
+  fixes below.
+- `.github/instructions/architecture.instructions.md` is now a short map to the real docs.
+- Eight citations of `roobra-docs/management/mvp-summary.md` (a personal file that is never committed)
+  now cite `management/roadmap.md` or `backlog.md`.
+
+**Status of the findings above:** 1, 2 and 5 are fixed (commits `3a6e350`, `c2a4e34`, `3c9fa02`).
+3, 4, 6, 7 and 8 are still open code follow-ups, tracked in `todo.md`, which should become issues
+before it is deleted.
