@@ -32,7 +32,8 @@ forever if `DATABASE_USER` was empty on the first run of an empty data directory
    It never drops a role, a database or data, and is safe to run twice. Wiping the production bind
    mount is never the first move.
 5. The GitHub Actions workflow `deploy.yml` runs `build`, `lint` and `test` (unit and e2e) on pushes
-   and pull requests to `main` and `dev`. **It does not deploy**, despite its file name.
+   and pull requests to `main` and `dev`. **It does not deploy.** Its workflow name is `CI`; the file
+   is still called `deploy.yml`, which is misleading and can be renamed when a deploy job is added.
 
 ## Alternatives Considered
 
@@ -43,5 +44,5 @@ forever if `DATABASE_USER` was empty on the first run of an empty data directory
 ## Consequences
 
 - Deployment depends on a person and on the server's `.env` being current.
-- The workflow name is misleading; renaming it is a separate change.
+- The workflow file name is misleading; the workflow itself was renamed to `CI` on 2026-09-24.
 - Steps and troubleshooting live in [the deployment guide](../guides/how-to-deploy-app.md).
