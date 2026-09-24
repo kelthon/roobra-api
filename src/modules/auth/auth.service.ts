@@ -342,26 +342,30 @@ export class AuthService {
       const user = await this.prisma.user.findUniqueOrThrow({
         where: { id: userId, deletedAt: null },
       });
-      const token = this.simpleTokenService.generate(64);
+      const token = this.simpleTokenService.generate(
+        this.configService.getOrThrow<number>('emailVerificationToken.length'),
+      );
       const expiresIn = this.configService.getOrThrow<number>(
         'emailVerificationToken.expiresIn',
       );
 
-      await Promise.all([
-        this.prisma.emailVerificationToken.create({
-          data: {
-            userId: user.id,
-            hashedToken: this.simpleHashService.hash(token),
-            expiresAt: DateTime.now().plus({ seconds: expiresIn }).toJSDate(),
-          },
-        }),
-        this.emailVerificationMailService.send(
-          user.email,
-          user.username,
-          token,
-          expiresIn,
-        ),
-      ]);
+      // The token must be saved before the link is sent, otherwise a link can
+      // reach the user for a token that does not exist (or fail to send and
+      // leave a token nobody knows about).
+      await this.prisma.emailVerificationToken.create({
+        data: {
+          userId: user.id,
+          hashedToken: this.simpleHashService.hash(token),
+          expiresAt: DateTime.now().plus({ seconds: expiresIn }).toJSDate(),
+        },
+      });
+
+      await this.emailVerificationMailService.send(
+        user.email,
+        user.username,
+        token,
+        expiresIn,
+      );
 
       return {
         message:
