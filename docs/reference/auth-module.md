@@ -19,7 +19,7 @@ Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 
 | `POST /auth/logout` | Authenticated | global | `refreshToken` | Revoke one refresh token |
 | `POST /auth/logout/all` | Authenticated | global | — | Revoke all active refresh tokens |
 | `POST /auth/refresh-token` | Public | strict | `refreshToken` | Rotate tokens |
-| `POST /auth/forgot-password` | Public | strict | `email` | Create reset token and email it |
+| `POST /auth/forgot-password` | Public | strict | `email` | Create reset token and email it. Always answers the same, whether or not the email is registered |
 | `POST /auth/reset-password` | Public | strict | `resetToken`, `newPassword`, `confirmNewPassword` | Consume reset token, set password |
 | `POST /auth/change-password` | Authenticated | global | current and new password | Change password |
 | `GET /auth/verify-email` | Authenticated | global | — | Create verification token and email it |

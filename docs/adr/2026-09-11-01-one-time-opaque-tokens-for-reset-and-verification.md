@@ -46,5 +46,8 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
 
 ## Implementation Status
 
-Both flows are implemented. `forgotPassword` responds with "No user found" for an unknown email,
-which reveals whether an address is registered; whether that is intended has not been recorded.
+Both flows are implemented. `forgotPassword` gives the same answer whether or not an account exists
+for the email (decided 2026-09-24), so it cannot be used to discover which emails are registered; it
+does not recover soft-deleted accounts. The time the request takes still differs (an existing account
+saves a token and sends an email), which the rate limit makes impractical to exploit but does not
+remove.
