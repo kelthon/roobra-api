@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { IsName } from './is-name.decorator';
+import { IsName } from './is-name.decorator.js';
 
 class NoSpacesDto {
   @IsName()

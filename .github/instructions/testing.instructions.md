@@ -10,19 +10,21 @@ This document describes the testing strategy, tools, and best practices for this
 
 ## Testing Framework and Tools
 
-- **Frameworks**: Jest (unit, integration, e2e), Supertest (API e2e)
+- **Frameworks**: Vitest (unit, integration, e2e), Supertest (API e2e)
+- **Globals**: `describe`, `it`, `expect` and `vi` are globals; import types such as `Mock` from `vitest`
 - **Mocks/Fakes**: Use for external dependencies
 
 ## How to Run Tests
 
-- **Locally**: Use the project's test scripts (e.g., `npm test`, `npm run test:e2e`).
+- **Locally**: Use the project's test scripts (e.g., `npm test`, `npm run test:e2e`). See [how to run tests](../../docs/guides/how-to-run-tests.md).
 - **In CI**: Tests are run automatically in the CI pipeline (see project configuration).
 
 ## Test Folder Organization
 
 - `test/`: Contains all automated tests.
-  - `app.e2e-spec.ts`: End-to-end tests
-  - `jest-e2e.json`: E2E test configuration
+  - `*.e2e-spec.ts`: End-to-end tests
+- `vitest.config.ts`: Unit and integration test configuration
+- `vitest.config.e2e.ts`: E2E test configuration
 - `src/`: May contain unit/integration tests alongside code (if co-located)
 
 ## Naming Conventions

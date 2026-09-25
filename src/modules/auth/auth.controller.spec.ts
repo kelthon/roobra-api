@@ -2,32 +2,32 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
-import { ForbidAuthenticatedGuard } from './guards/forbid-authenticated/forbid-authenticated.guard';
-import { type UserDto } from 'src/common/dto/user-dto';
-import { LoginDto } from './dto/login.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { LogoutDto } from './dto/logout.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { App } from 'supertest/types.js';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard.js';
+import { ForbidAuthenticatedGuard } from './guards/forbid-authenticated/forbid-authenticated.guard.js';
+import { type UserDto } from 'src/common/dto/user-dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RegisterUserDto } from './dto/register-user.dto.js';
+import { LogoutDto } from './dto/logout.dto.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 
 const mockAuthService = {
-  getMe: jest.fn(),
-  register: jest.fn(),
-  login: jest.fn(),
-  logout: jest.fn(),
-  logoutAllSessions: jest.fn(),
-  refreshSession: jest.fn(),
-  forgotPassword: jest.fn(),
-  resetPassword: jest.fn(),
-  changePassword: jest.fn(),
-  sendVerificationEmail: jest.fn(),
-  verifyEmail: jest.fn(),
+  getMe: vi.fn(),
+  register: vi.fn(),
+  login: vi.fn(),
+  logout: vi.fn(),
+  logoutAllSessions: vi.fn(),
+  refreshSession: vi.fn(),
+  forgotPassword: vi.fn(),
+  resetPassword: vi.fn(),
+  changePassword: vi.fn(),
+  sendVerificationEmail: vi.fn(),
+  verifyEmail: vi.fn(),
 };
 
 const mockUser: UserDto = {
@@ -47,7 +47,7 @@ describe('AuthController', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Guards', () => {

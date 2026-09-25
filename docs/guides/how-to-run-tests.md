@@ -1,3 +1,7 @@
+---
+doc-status: draft
+---
+
 # How To Run Tests
 
 ## Objective
@@ -9,15 +13,15 @@ conventions and best practices (not specific to this repo), see `roobra-docs`'s
 ## Prerequisites
 
 - Node.js 24 and dependencies installed with `npm ci`.
-- A `.env` that defines the variables required at startup (see
+- A `.env` that passes the startup validation (see
   [how to configure the environment](./how-to-configure-environment.md)). The e2e specs boot the whole
-  `AppModule`.
-- No database is needed: both jest configs replace `src/generated/prisma` with
-  `src/__mocks__/prisma-client.mock.ts`.
+  `AppModule`, which validates every variable before anything else runs.
+- No database is needed. Unit specs replace `PrismaService` with a mock, and the e2e specs never reach
+  a query, so the Prisma client is created but never connects.
 
 ## Steps
 
-1. Run the unit tests (`src/**/*.spec.ts`):
+1. Run the unit tests (`**/*.spec.ts`, configured in `vitest.config.ts`):
 
    ```sh
    npm test
@@ -30,7 +34,7 @@ conventions and best practices (not specific to this repo), see `roobra-docs`'s
    npm run test:cov
    ```
 
-3. Run the end-to-end tests (`test/*.e2e-spec.ts`):
+3. Run the end-to-end tests (`**/*.e2e-spec.ts`, configured in `vitest.config.e2e.ts`):
 
    ```sh
    npm run test:e2e
@@ -39,21 +43,27 @@ conventions and best practices (not specific to this repo), see `roobra-docs`'s
 4. Run a single file or test by name:
 
    ```sh
-   npx jest src/modules/auth/auth.service.spec.ts
-   npx jest -t "refresh"
+   npx vitest run src/modules/auth/auth.service.spec.ts
+   npx vitest run -t "refresh"
    ```
 
 ## Notes
 
-- Because Prisma is stubbed, the e2e specs only cover behavior decided before any database access:
+- The tests run on [Vitest](https://vitest.dev/) with `globals: true`, so `describe`, `it`, `expect`
+  and `vi` need no import. Import types such as `Mock` from `vitest` (`import type { Mock } from
+  'vitest'`); `vi` is a value, not a type namespace.
+- The project is an ES module (`"type": "module"`): relative and `src/...` imports end in `.js`, even
+  in specs.
+- Because the e2e specs never reach the database, they only cover behavior decided before any query:
   routing, guards and request validation. Behavior that reads or writes data is covered by unit specs
   with mocked Prisma calls.
-- Coverage ignores `*.module.ts`, `*.config.ts`, `src/generated` and `src/main.ts`.
+- Coverage uses Vitest's defaults; `vitest.config.ts` sets no exclusions.
 - CI (`.github/workflows/deploy.yml`) runs `npm run test` and `npm run test:e2e` as one job.
 
 ## Troubleshooting
 
-- **A spec fails with a `Cannot find module 'src/...'` error:** run jest through the npm scripts or
-  with the project's config; the `src/` alias comes from `moduleNameMapper`.
-- **An e2e spec fails during `compile()` with a missing configuration value:** define the variable
-  in `.env`, see the prerequisites.
+- **A spec fails with a `Cannot find module 'src/...'` error:** run Vitest from the repository root,
+  through the npm scripts or `npx vitest`, so it picks up `vitest.config.ts`; the `src/` alias comes
+  from `resolve.tsconfigPaths`. If the path is right, check that the import ends in `.js`.
+- **An e2e spec fails with `Config validation error`:** the error lists each invalid variable; fix
+  them in `.env`, see the prerequisites.

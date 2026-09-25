@@ -1,12 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from 'src/app.module';
+import { App } from 'supertest/types.js';
+import { AppModule } from 'src/app.module.js';
 
-// Prisma is stubbed in the e2e jest config (see test/jest-e2e.json), so these
-// specs only cover behaviour decided before any database access: routing,
-// guards and request validation.
 describe('Auth (e2e)', () => {
   let app: INestApplication<App>;
 

@@ -1,7 +1,7 @@
 export default () => ({
   app: {
-    mode: process.env.NODE_ENV || 'development',
+    mode: process.env.NODE_ENV,
     // Base URL of the frontend, used to build links sent in emails
-    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+    frontendUrl: process.env.FRONTEND_URL,
   },
 });

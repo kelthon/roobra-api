@@ -1,3 +1,7 @@
+---
+doc-status: draft
+---
+
 # How To Run With Docker
 
 ## Objective
@@ -56,6 +60,20 @@ Start the API and its Postgres database with Docker Compose, in development or i
    docker compose down -v
    ```
 
+### After Changing Dependencies
+
+1. When `package.json` or `package-lock.json` changes, after a pull, a checkout or a rebase, rebuild
+   the image and renew the container's `node_modules`:
+
+   ```sh
+   docker compose up -d --build --renew-anon-volumes server
+   ```
+
+   `node_modules` lives in an anonymous volume, filled from the image only when the volume is
+   created. `--build` and `--force-recreate` can hand the old volume to the new container, so the container would go on using
+   the old dependencies. `--renew-anon-volumes` (`-V`) does not touch the named volumes, so the
+   database and Redis data stay.
+
 ### Production Mode
 
 1. Pass both files explicitly, which disables the automatic override:
@@ -92,3 +110,9 @@ Start the API and its Postgres database with Docker Compose, in development or i
   `1000`); set them to the output of `id -u` and `id -g` rather than removing the override. Reset
   ownership of `dist/` once, then restart.
 - **`FATAL: role "..." does not exist`:** see [how to deploy](./how-to-deploy-app.md).
+- **`server` logs `Cannot find module` or `Cannot find type definition file` for a package that is in
+  `package.json`:** the container still has the old `node_modules`, see
+  [After Changing Dependencies](#after-changing-dependencies).
+- **`server` restarts with `JavaScript heap out of memory`:** check first that its `node_modules` is
+  current, as above. Switching branches while `start:dev` runs makes the watch compiler rebuild every
+  changed file, so stop the server first (`docker compose stop server`) and start it again after.

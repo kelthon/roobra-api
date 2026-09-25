@@ -21,6 +21,13 @@ services:
     volumes:
       - ".:/usr/src/app"
       - "/usr/src/app/node_modules"
+    # `start:dev` keeps the TypeScript compiler in memory next to the app; the 512M of
+    # compose.yaml is sized for running dist/ only.
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
   # Published to the host only in dev (this file is never loaded in prod), so tools like
   # DBeaver/psql can connect via DATABASE_HOST/DATABASE_PORT from .env. The app itself keeps
   # using DATABASE_URL's `postgres:5432` (the Compose service name) from compose.yaml.

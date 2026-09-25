@@ -76,6 +76,7 @@ their real decision date in `date`, and the day they were documented goes in `re
 | [2026-09-11-06-locale-templates-under-locales-folder](./2026-09-11-06-locale-templates-under-locales-folder.md) | Keep Layouts And Partials Shared, And Put Locale-Specific Templates Under `locales/<locale>/` | `Draft` → `Accepted` |
 | [2026-09-11-07-user-preferred-lang-column](./2026-09-11-07-user-preferred-lang-column.md) | Store The Email Language In A Nullable `User.preferredLang`, Seeded Once From `Accept-Language` | `Draft` → `Accepted` |
 | [2026-09-12-marketing-email-templates-db-backed-marketing-only](./2026-09-12-marketing-email-templates-db-backed-marketing-only.md) | Allow Database-Managed Templates For Marketing Email Only | `Draft` → `Accepted` |
+| [2026-09-25-es-modules-vitest-and-oxlint](./2026-09-25-es-modules-vitest-and-oxlint.md) | Run As ES Modules, Test With Vitest And Lint With oxlint | `Draft` → `Accepted` |
 | [2026-09-30-deploy-from-main-through-ghcr-and-ssh](./2026-09-30-deploy-from-main-through-ghcr-and-ssh.md) | Deploy Automatically From `main` Through GHCR And SSH, And Check More On Pull Requests | `Draft` → `Accepted` |
 
 ## Decisions Kept In `roobra-docs`

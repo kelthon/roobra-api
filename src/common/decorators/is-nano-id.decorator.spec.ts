@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { IsNanoId } from './is-nano-id.decorator';
+import { IsNanoId } from './is-nano-id.decorator.js';
 
 class DummyDto {
   @IsNanoId()

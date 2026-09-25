@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { PasswordHashService } from './password-hash.service';
+import { PasswordHashService } from './password-hash.service.js';
 
 describe('HashService', () => {
   let hashService: PasswordHashService;

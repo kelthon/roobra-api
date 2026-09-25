@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { IsConfirmPassword } from './is-confirm-password.decorator';
+import { IsConfirmPassword } from './is-confirm-password.decorator.js';
 
 class DummyDto {
   password!: string;

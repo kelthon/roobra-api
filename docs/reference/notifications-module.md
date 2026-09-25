@@ -90,5 +90,5 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 - `src/modules/notifications/templates/render.spec.ts` renders every template through the real
   `HandlebarsAdapter`, with the same directory, `strict` and layout options as `app.module.ts`, so a
   syntax error or a missing variable fails the unit suite instead of a live send.
-- `npm run email:preview` (`scripts/preview-email.ts`) renders a template and opens it in the
+- `npm run preview:email` (`scripts/preview-email.ts`) renders a template and opens it in the
   browser, without SMTP or a running app.

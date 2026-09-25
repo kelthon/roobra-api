@@ -1,4 +1,4 @@
-import { User } from 'src/generated/prisma/client';
+import { User } from 'src/generated/prisma/client.js';
 
 export interface AuthTokensResponse {
   accessToken: string;

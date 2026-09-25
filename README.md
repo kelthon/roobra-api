@@ -63,7 +63,7 @@ still talks to `postgres:5432` via `DATABASE_URL`, the Compose service name. You
 | `npm run start:dev` | Start the API in watch mode (what the dev container runs) |
 | `npm run build` | Compile to `dist/` |
 | `npm run start:prod` | Run the compiled build (`dist/main.js`) |
-| `npm run lint` | Lint and auto-fix |
+| `npm run lint` | Lint `src/` and `test/` with oxlint (type-aware), without fixing |
 | `npm run test` | Unit tests |
 | `npm run test:e2e` | End-to-end tests |
 | `npm run test:cov` | Test coverage |

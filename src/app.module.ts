@@ -1,28 +1,30 @@
-import { AppController } from 'src/app.controller';
-import { AppService } from 'src/app.service';
-import { AuthModule } from './modules/auth/auth.module';
-import { CommonModule } from './common/common.module';
+import { AppController } from 'src/app.controller.js';
+import { AppService } from 'src/app.service.js';
+import { AuthModule } from './modules/auth/auth.module.js';
+import { CommonModule } from './common/common.module.js';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import databaseConfig from './config/database.config';
-import jwtConfig from './config/jwt.config';
-import throttlerConfig from './config/throttler.config';
-import passwordResetTokenConfig from './config/password-reset-token.config';
-import emailVerificationTokenConfig from './config/email-verification-token.config';
-import mailConfig from './config/mail.config';
-import appConfig from './config/app.config';
+import { NotificationsModule } from './modules/notifications/notifications.module.js';
+import jwtConfig from './config/jwt.config.js';
+import throttlerConfig from './config/throttler.config.js';
+import passwordResetTokenConfig from './config/password-reset-token.config.js';
+import emailVerificationTokenConfig from './config/email-verification-token.config.js';
+import mailConfig from './config/mail.config.js';
+import appConfig from './config/app.config.js';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { join } from 'node:path';
+import { EnvSchema } from 'common/schemas/env.schema.js';
+import databaseConfig from 'config/database.config.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.development', '.env'],
+      validationSchema: EnvSchema,
       load: [
         databaseConfig,
         jwtConfig,
@@ -59,7 +61,7 @@ import { join } from 'node:path';
           },
         },
         template: {
-          dir: join(__dirname, '/modules/notifications/templates'),
+          dir: join(import.meta.dirname, '/modules/notifications/templates'),
           adapter: new HandlebarsAdapter(undefined, {
             inlineCssEnabled: true,
           }),
@@ -74,7 +76,10 @@ import { join } from 'node:path';
         },
         options: {
           partials: {
-            dir: join(__dirname, '/modules/notifications/templates/partials'),
+            dir: join(
+              import.meta.dirname,
+              '/modules/notifications/templates/partials',
+            ),
             options: { strict: true },
           },
           layout: 'layouts/main',

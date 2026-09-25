@@ -3,7 +3,7 @@ import {
   isProvidedValueTooLongError,
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
-} from './database.util';
+} from './database.util.js';
 
 describe('database.util', () => {
   describe('isPrismaClientError', () => {

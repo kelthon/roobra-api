@@ -1,5 +1,5 @@
-import type { PrismaClient, User } from '../../src/generated/prisma/client';
-import { UserRole } from '../../src/generated/prisma/enums';
+import type { PrismaClient, User } from '../../src/generated/prisma/client.js';
+import { UserRole } from '../../src/generated/prisma/enums.js';
 
 interface UserSeeds {
   subscriber: User;

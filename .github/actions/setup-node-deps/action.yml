@@ -1,5 +1,5 @@
 name: "Setup node dependencies"
-description: "Checks out the repository, sets up Node.js, and installs dependencies via npm ci"
+description: "Checks out the repository, sets up Node.js, installs dependencies via npm ci and generates the Prisma client"
 
 runs:
   using: "composite"
@@ -10,9 +10,14 @@ runs:
     - name: "Set up Node.js"
       uses: actions/setup-node@v7
       with:
-        node-version: "24"
+        node-version: "24.21"
         cache: "npm"
 
     - name: "Install dependencies"
       run: npm ci
       shell: bash
+
+    - name: "Generate prisma files"
+      run: "npx prisma generate"
+      shell: bash
+

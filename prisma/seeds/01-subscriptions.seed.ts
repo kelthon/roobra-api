@@ -1,8 +1,8 @@
 import type {
   PrismaClient,
   Subscription,
-} from '../../src/generated/prisma/client';
-import { SUBSCRIPTION_IDS } from './constants';
+} from '../../src/generated/prisma/client.js';
+import { SUBSCRIPTION_IDS } from './constants.js';
 
 interface SubscriptionSeeds {
   basic: Subscription;

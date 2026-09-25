@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from 'src/generated/prisma/client';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { PrismaClient } from 'src/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 /**
@@ -11,7 +11,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
  * @see docs/adr/2026-09-04-02-environment-based-prisma-query-logging.md
  */
 @Injectable()
-export class PrismaService extends PrismaClient {
+export class PrismaService extends PrismaClient implements OnModuleDestroy {
   constructor(config: ConfigService) {
     const connectionString = `${config.get<string>('database.url')}`;
     const adapter = new PrismaPg({ connectionString });

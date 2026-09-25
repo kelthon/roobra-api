@@ -1,6 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { PasswordResetMailService } from './password-reset-mail.service';
+import { PasswordResetMailService } from './password-reset-mail.service.js';
 
 describe('PasswordResetMailService', () => {
   let mailerServiceMock: MailerService;
@@ -9,11 +9,11 @@ describe('PasswordResetMailService', () => {
 
   beforeEach(() => {
     mailerServiceMock = {
-      sendMail: jest.fn(),
+      sendMail: vi.fn(),
     } as unknown as MailerService;
 
     configServiceMock = {
-      getOrThrow: jest.fn((key: string) => {
+      getOrThrow: vi.fn((key: string) => {
         const values: Record<string, unknown> = {
           'app.frontendUrl': 'https://app.roobra.com',
           'passwordResetToken.expiresIn': 900,

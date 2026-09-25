@@ -11,9 +11,17 @@ This document describes the TypeScript configuration and best practices for this
 ## TypeScript Configuration
 
 - Configuration is defined in `tsconfig.json` and `tsconfig.build.json`.
-- Target: Modern JavaScript (ES2020+)
-- Module resolution: Node
+- Target: ES2023
+- Module system: ES modules (`"type": "module"` in `package.json`, `module` and `moduleResolution`
+  set to `nodenext`).
 - Strict type checking is enabled.
+
+## Import Paths
+
+- Relative and alias (`src/...`, `common/...`) imports end in `.js`, even though the file on disk is
+  `.ts`: `import { AppModule } from 'src/app.module.js';`. Node's ES module loader does not add
+  extensions, and `tsc` rejects a relative import without one.
+- Package imports keep their package path (`@nestjs/common`).
 
 ## Typing Rules and Best Practices
 
@@ -43,7 +51,9 @@ This document describes the TypeScript configuration and best practices for this
 
 ## Linting in Test Files
 
-- Test files are skipped for ESLint strict rules to allow for more flexible test code patterns.
+- Test files are linted with the same oxlint rules as the rest of the code (`.oxlintrc.json`),
+  except `typescript/unbound-method`: `expect(mock.method)` reads a mock's calls without invoking
+  it, so the rule only reports false positives there.
 - Typing in test files should be permissive; types are optional and only required when essential for testing correctness or clarity.
 
 ## Code Comments

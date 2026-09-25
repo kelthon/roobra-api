@@ -19,7 +19,10 @@ const previewEmail = previewEmailImport as (
  * automatic dev-mode preview. No SMTP or running app required.
  */
 
-const TEMPLATES_DIR = join(__dirname, '../src/modules/notifications/templates');
+const TEMPLATES_DIR = join(
+  import.meta.dirname,
+  '../src/modules/notifications/templates',
+);
 
 const mailerOptions = {
   template: {

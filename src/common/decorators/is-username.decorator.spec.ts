@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { IsUserName } from './is-username.decorator';
+import { IsUserName } from './is-username.decorator.js';
 
 class DummyDto {
   @IsUserName()

@@ -1,6 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
+import { JwtAuthGuard } from './jwt-auth.guard.js';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;

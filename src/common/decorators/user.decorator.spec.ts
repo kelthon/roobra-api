@@ -1,5 +1,5 @@
 import { ExecutionContext } from '@nestjs/common';
-import { User } from './user.decorator';
+import { User } from './user.decorator.js';
 
 // NestJS's documented recipe for unit-testing a custom param decorator:
 // createParamDecorator() only exposes the factory through route metadata,

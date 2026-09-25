@@ -1,13 +1,14 @@
-import { PrismaService } from '../database/prisma.service';
-import { AuthService } from './auth.service';
-import { PasswordHashService } from './services/password-hash/password-hash.service';
-import { AccessTokenService } from './services/access-token/access-token.service';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';
+import { PrismaService } from '../database/prisma.service.js';
+import { AuthService } from './auth.service.js';
+import { PasswordHashService } from './services/password-hash/password-hash.service.js';
+import { AccessTokenService } from './services/access-token/access-token.service.js';
+import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import { BadRequestException } from '@nestjs/common';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
+import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
-import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service';
-import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service';
+import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
+import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service.js';
+import type { Mock } from 'vitest';
 
 describe('AuthService', () => {
   let prismaMock: PrismaService;
@@ -29,27 +30,27 @@ describe('AuthService', () => {
   beforeEach(() => {
     prismaMock = {
       user: {
-        create: jest.fn(),
-        findUnique: jest.fn(),
-        findUniqueOrThrow: jest.fn(),
-        update: jest.fn(),
+        create: vi.fn(),
+        findUnique: vi.fn(),
+        findUniqueOrThrow: vi.fn(),
+        update: vi.fn(),
       },
       passwordResetToken: {
-        create: jest.fn(),
-        findUniqueOrThrow: jest.fn(),
-        update: jest.fn(),
+        create: vi.fn(),
+        findUniqueOrThrow: vi.fn(),
+        update: vi.fn(),
       },
       emailVerificationToken: {
-        create: jest.fn(),
-        findUniqueOrThrow: jest.fn(),
-        update: jest.fn(),
+        create: vi.fn(),
+        findUniqueOrThrow: vi.fn(),
+        update: vi.fn(),
       },
       // Mirrors both Prisma `$transaction` call styles used by AuthService:
       // an interactive callback (register/resetPassword) and a batch of
       // promises (verifyEmail). The callback is handed `prismaMock` itself
-      // so `tx.user.create(...)` etc. hit the same jest mocks as the rest
+      // so `tx.user.create(...)` etc. hit the same vi mocks as the rest
       // of the suite.
-      $transaction: jest.fn((arg: unknown) =>
+      $transaction: vi.fn((arg: unknown) =>
         typeof arg === 'function'
           ? arg(prismaMock)
           : Promise.all(arg as Promise<unknown>[]),
@@ -57,28 +58,28 @@ describe('AuthService', () => {
     } as unknown as PrismaService;
 
     hashServiceMock = {
-      hash: jest.fn(),
-      verify: jest.fn(),
+      hash: vi.fn(),
+      verify: vi.fn(),
     } as unknown as PasswordHashService;
 
     accessTokenServiceMock = {
-      generate: jest.fn().mockResolvedValue(tokens),
-      refresh: jest.fn(),
-      revoke: jest.fn(),
-      revokeAll: jest.fn(),
+      generate: vi.fn().mockResolvedValue(tokens),
+      refresh: vi.fn(),
+      revoke: vi.fn(),
+      revokeAll: vi.fn(),
     } as unknown as AccessTokenService;
 
     simpleHashServiceMock = {
-      hash: jest.fn((raw: string) => `hashed(${raw})`),
-      verify: jest.fn(),
+      hash: vi.fn((raw: string) => `hashed(${raw})`),
+      verify: vi.fn(),
     } as unknown as SimpleHashService;
 
     simpleTokenServiceMock = {
-      generate: jest.fn((size?: number) => `${size}`),
+      generate: vi.fn((size?: number) => `${size}`),
     } as unknown as SimpleTokenService;
 
     configServiceMock = {
-      getOrThrow: jest.fn((propertyPath: string) => {
+      getOrThrow: vi.fn((propertyPath: string) => {
         const values: Record<string, unknown> = {
           'passwordResetToken.length': 64,
           'passwordResetToken.expiresIn': 300,
@@ -90,11 +91,11 @@ describe('AuthService', () => {
     } as unknown as ConfigService;
 
     passwordResetMailServiceMock = {
-      send: jest.fn(),
+      send: vi.fn(),
     } as unknown as PasswordResetMailService;
 
     emailVerificationMailServiceMock = {
-      send: jest.fn(),
+      send: vi.fn(),
     } as unknown as EmailVerificationMailService;
 
     authService = new AuthService(
@@ -116,9 +117,7 @@ describe('AuthService', () => {
         email: 'john.doe@example.com',
         username: 'john.doe',
       };
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(
-        profile,
-      );
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue(profile);
 
       const result = await authService.getMe('user-id');
 
@@ -131,7 +130,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if no user is found', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -143,14 +142,14 @@ describe('AuthService', () => {
 
   describe('validateUser', () => {
     it('should return the auth payload for valid credentials', async () => {
-      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUnique as Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
         role: 'SUBSCRIBER',
         hashedPassword: 'hashed-password',
       });
-      (hashServiceMock.verify as jest.Mock).mockResolvedValue(true);
+      (hashServiceMock.verify as Mock).mockResolvedValue(true);
 
       const result = await authService.validateUser(
         'john.doe@example.com',
@@ -171,7 +170,7 @@ describe('AuthService', () => {
     });
 
     it('should return null when no user is found for the email', async () => {
-      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prismaMock.user.findUnique as Mock).mockResolvedValue(null);
 
       const result = await authService.validateUser(
         'missing@example.com',
@@ -183,11 +182,11 @@ describe('AuthService', () => {
     });
 
     it('should return null for an invalid password', async () => {
-      (prismaMock.user.findUnique as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUnique as Mock).mockResolvedValue({
         id: 'user-id',
         hashedPassword: 'hashed-password',
       });
-      (hashServiceMock.verify as jest.Mock).mockResolvedValue(false);
+      (hashServiceMock.verify as Mock).mockResolvedValue(false);
 
       const result = await authService.validateUser(
         'john.doe@example.com',
@@ -214,8 +213,8 @@ describe('AuthService', () => {
         role: 'SUBSCRIBER',
         photoUrl: null,
       };
-      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
-      (prismaMock.user.create as jest.Mock).mockResolvedValue(createdUser);
+      (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as Mock).mockResolvedValue(createdUser);
 
       const result = await authService.register(dto);
 
@@ -239,8 +238,8 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException when the email is already in use', async () => {
-      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
-      (prismaMock.user.create as jest.Mock).mockRejectedValue({
+      (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as Mock).mockRejectedValue({
         code: 'P2002',
         meta: { target: ['email'] },
       });
@@ -251,8 +250,8 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException when the username is already in use', async () => {
-      (hashServiceMock.hash as jest.Mock).mockResolvedValue('hashed-password');
-      (prismaMock.user.create as jest.Mock).mockRejectedValue({
+      (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as Mock).mockRejectedValue({
         code: 'P2002',
         meta: { target: ['username'] },
       });
@@ -272,7 +271,7 @@ describe('AuthService', () => {
         role: 'SUBSCRIBER',
         photoUrl: null,
       };
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue(user);
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue(user);
 
       const result = await authService.login('user-id');
 
@@ -288,7 +287,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if the user no longer exists', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -300,7 +299,7 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('should revoke the given refresh token for the user', async () => {
-      (accessTokenServiceMock.revoke as jest.Mock).mockResolvedValue({
+      (accessTokenServiceMock.revoke as Mock).mockResolvedValue({
         message: 'Refresh token revoked successfully',
       });
 
@@ -320,7 +319,7 @@ describe('AuthService', () => {
 
   describe('logoutAllSessions', () => {
     it('should revoke every refresh token for the user', async () => {
-      (accessTokenServiceMock.revokeAll as jest.Mock).mockResolvedValue({
+      (accessTokenServiceMock.revokeAll as Mock).mockResolvedValue({
         message: 'All refresh tokens revoked successfully',
       });
 
@@ -335,7 +334,7 @@ describe('AuthService', () => {
 
   describe('refreshSession', () => {
     it('should delegate straight to accessTokenService.refresh using the raw token', async () => {
-      (accessTokenServiceMock.refresh as jest.Mock).mockResolvedValue(tokens);
+      (accessTokenServiceMock.refresh as Mock).mockResolvedValue(tokens);
 
       const result = await authService.refreshSession({
         refreshToken: 'refresh-token',
@@ -350,12 +349,12 @@ describe('AuthService', () => {
 
   describe('forgotPassword', () => {
     it('should create a hashed reset token and return a generic confirmation message', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
       });
-      (prismaMock.passwordResetToken.create as jest.Mock).mockResolvedValue({
+      (prismaMock.passwordResetToken.create as Mock).mockResolvedValue({
         id: 'reset-token-id',
       });
 
@@ -385,20 +384,20 @@ describe('AuthService', () => {
     });
 
     it('should answer exactly the same, and do nothing, when no account has the email', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValueOnce({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValueOnce({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
       });
-      (prismaMock.passwordResetToken.create as jest.Mock).mockResolvedValue({
+      (prismaMock.passwordResetToken.create as Mock).mockResolvedValue({
         id: 'reset-token-id',
       });
       const forExistingAccount = await authService.forgotPassword({
         email: 'john.doe@example.com',
       });
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
       const forMissingAccount = await authService.forgotPassword({
@@ -411,7 +410,7 @@ describe('AuthService', () => {
     });
 
     it('should not recover a soft-deleted account', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -423,7 +422,7 @@ describe('AuthService', () => {
     });
 
     it('should rethrow errors that are not "record not found"', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue(
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue(
         new Error('database unavailable'),
       );
 
@@ -436,15 +435,13 @@ describe('AuthService', () => {
   describe('resetPassword', () => {
     it('should hash the reset token before looking it up, mark it used and update the password', async () => {
       (
-        prismaMock.passwordResetToken.findUniqueOrThrow as jest.Mock
+        prismaMock.passwordResetToken.findUniqueOrThrow as Mock
       ).mockResolvedValue({
         id: 'reset-token-id',
         userId: 'user-id',
       });
-      (hashServiceMock.hash as jest.Mock).mockResolvedValue(
-        'new-hashed-password',
-      );
-      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+      (hashServiceMock.hash as Mock).mockResolvedValue('new-hashed-password');
+      (prismaMock.user.update as Mock).mockResolvedValue({
         id: 'user-id',
       });
 
@@ -483,7 +480,7 @@ describe('AuthService', () => {
 
     it('should throw BadRequestException for an invalid, used or expired reset token', async () => {
       (
-        prismaMock.passwordResetToken.findUniqueOrThrow as jest.Mock
+        prismaMock.passwordResetToken.findUniqueOrThrow as Mock
       ).mockRejectedValue({ code: 'P2025' });
 
       await expect(
@@ -498,14 +495,12 @@ describe('AuthService', () => {
 
   describe('changePassword', () => {
     it('should update the password when the current password is correct', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         hashedPassword: 'old-hashed-password',
       });
-      (hashServiceMock.verify as jest.Mock).mockResolvedValue(true);
-      (hashServiceMock.hash as jest.Mock).mockResolvedValue(
-        'new-hashed-password',
-      );
-      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+      (hashServiceMock.verify as Mock).mockResolvedValue(true);
+      (hashServiceMock.hash as Mock).mockResolvedValue('new-hashed-password');
+      (prismaMock.user.update as Mock).mockResolvedValue({
         id: 'user-id',
       });
 
@@ -527,10 +522,10 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException when the current password is wrong', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         hashedPassword: 'old-hashed-password',
       });
-      (hashServiceMock.verify as jest.Mock).mockResolvedValue(false);
+      (hashServiceMock.verify as Mock).mockResolvedValue(false);
 
       await expect(
         authService.changePassword('user-id', {
@@ -543,7 +538,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if the user no longer exists', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -558,14 +553,14 @@ describe('AuthService', () => {
 
   describe('sendVerificationEmail', () => {
     it('should create a hashed verification token and email it to the user', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
       });
-      (prismaMock.emailVerificationToken.create as jest.Mock).mockResolvedValue(
-        { id: 'verification-token-id' },
-      );
+      (prismaMock.emailVerificationToken.create as Mock).mockResolvedValue({
+        id: 'verification-token-id',
+      });
 
       const result = await authService.sendVerificationEmail('user-id');
 
@@ -592,23 +587,21 @@ describe('AuthService', () => {
 
     it('should save the token before sending the email', async () => {
       const calls: string[] = [];
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
       });
-      (
-        prismaMock.emailVerificationToken.create as jest.Mock
-      ).mockImplementation(() => {
-        calls.push('create');
-        return Promise.resolve({ id: 'verification-token-id' });
-      });
-      (emailVerificationMailServiceMock.send as jest.Mock).mockImplementation(
+      (prismaMock.emailVerificationToken.create as Mock).mockImplementation(
         () => {
-          calls.push('send');
-          return Promise.resolve();
+          calls.push('create');
+          return Promise.resolve({ id: 'verification-token-id' });
         },
       );
+      (emailVerificationMailServiceMock.send as Mock).mockImplementation(() => {
+        calls.push('send');
+        return Promise.resolve();
+      });
 
       await authService.sendVerificationEmail('user-id');
 
@@ -616,12 +609,12 @@ describe('AuthService', () => {
     });
 
     it('should not send the email when the token cannot be saved', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockResolvedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         id: 'user-id',
         email: 'john.doe@example.com',
         username: 'john.doe',
       });
-      (prismaMock.emailVerificationToken.create as jest.Mock).mockRejectedValue(
+      (prismaMock.emailVerificationToken.create as Mock).mockRejectedValue(
         new Error('database unavailable'),
       );
 
@@ -633,7 +626,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if the user no longer exists', async () => {
-      (prismaMock.user.findUniqueOrThrow as jest.Mock).mockRejectedValue({
+      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
@@ -648,17 +641,17 @@ describe('AuthService', () => {
   describe('verifyEmail', () => {
     it('should hash the token, mark it used and mark the user as verified', async () => {
       (
-        prismaMock.emailVerificationToken.findUniqueOrThrow as jest.Mock
+        prismaMock.emailVerificationToken.findUniqueOrThrow as Mock
       ).mockResolvedValue({
         id: 'verification-token-id',
         userId: 'user-id',
       });
-      (prismaMock.user.update as jest.Mock).mockResolvedValue({
+      (prismaMock.user.update as Mock).mockResolvedValue({
         id: 'user-id',
       });
-      (prismaMock.emailVerificationToken.update as jest.Mock).mockResolvedValue(
-        { id: 'verification-token-id' },
-      );
+      (prismaMock.emailVerificationToken.update as Mock).mockResolvedValue({
+        id: 'verification-token-id',
+      });
 
       const result = await authService.verifyEmail('raw-verification-token');
 
@@ -694,7 +687,7 @@ describe('AuthService', () => {
 
     it('should throw BadRequestException for an invalid, used or expired verification token', async () => {
       (
-        prismaMock.emailVerificationToken.findUniqueOrThrow as jest.Mock
+        prismaMock.emailVerificationToken.findUniqueOrThrow as Mock
       ).mockRejectedValue({ code: 'P2025' });
 
       await expect(authService.verifyEmail('invalid-token')).rejects.toThrow(

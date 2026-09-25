@@ -1,4 +1,4 @@
-import { LocaleType } from 'src/shared/types/locale.type';
+import { LocaleType } from 'src/shared/types/locale.type.js';
 
 export const SUPPORTED_LOCALES: readonly LocaleType[] = ['en', 'pt'];
 export const DEFAULT_LOCALE: LocaleType = 'en';

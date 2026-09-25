@@ -1,4 +1,4 @@
-import { SimpleTokenService } from './simple-token.service';
+import { SimpleTokenService } from './simple-token.service.js';
 
 describe('SimpleTokenService', () => {
   let simpleTokenService: SimpleTokenService;

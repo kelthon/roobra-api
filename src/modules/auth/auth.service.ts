@@ -1,27 +1,27 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/database/prisma.service';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { PasswordHashService } from './services/password-hash/password-hash.service';
+import { PrismaService } from 'src/modules/database/prisma.service.js';
+import { RegisterUserDto } from './dto/register-user.dto.js';
+import { PasswordHashService } from './services/password-hash/password-hash.service.js';
 import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
-} from 'src/common/utils/database.util';
-import { AccessTokenService } from './services/access-token/access-token.service';
-import { LogoutDto } from './dto/logout.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { InfoResponse } from 'src/shared/interfaces/info-response';
+} from 'src/common/utils/database.util.js';
+import { AccessTokenService } from './services/access-token/access-token.service.js';
+import { LogoutDto } from './dto/logout.dto.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
+import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
+import { InfoResponse } from 'src/shared/interfaces/info-response.js';
 import { DateTime } from 'luxon';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';
-import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses';
-import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload';
+import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
+import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses.js';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
 import { ConfigService } from '@nestjs/config';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
-import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service';
-import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service';
-import { Prisma } from 'src/generated/prisma/client';
+import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
+import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
+import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service.js';
+import { Prisma } from 'src/generated/prisma/client.js';
 
 /**
  * Reset and verification links carry one-time opaque tokens, stored only as

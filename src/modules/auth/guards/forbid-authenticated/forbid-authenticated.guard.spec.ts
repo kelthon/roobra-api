@@ -1,5 +1,5 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { ForbidAuthenticatedGuard } from './forbid-authenticated.guard';
+import { ForbidAuthenticatedGuard } from './forbid-authenticated.guard.js';
 
 describe('ForbidAuthenticatedGuard', () => {
   let guard: ForbidAuthenticatedGuard;

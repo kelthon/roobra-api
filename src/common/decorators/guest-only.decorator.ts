@@ -1,6 +1,6 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { ForbidAuthenticatedGuard } from 'src/modules/auth/guards/forbid-authenticated/forbid-authenticated.guard';
-import { OptionalJwtAuthGuard } from 'src/modules/auth/guards/optional-jwt/optional-jwt-auth.guard';
+import { ForbidAuthenticatedGuard } from 'src/modules/auth/guards/forbid-authenticated/forbid-authenticated.guard.js';
+import { OptionalJwtAuthGuard } from 'src/modules/auth/guards/optional-jwt/optional-jwt-auth.guard.js';
 
 /**
  * Restricts a route to guests. A missing, invalid or expired access token

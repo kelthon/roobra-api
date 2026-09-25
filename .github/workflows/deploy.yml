@@ -25,6 +25,9 @@ jobs:
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
 
+      - name: "Check types"
+        run: npm run typecheck
+
       - name: "Checkout code linting"
         run: npm run lint
 

@@ -6,4 +6,4 @@ applyTo: ["**/*.ts", "**/*.js"]
 
 ## run-tests
 
-Executes automated tests using the project's configured framework (Jest for unit/integration/e2e, Supertest for API e2e) and provides a detailed success/failure report.
+Executes automated tests using the project's configured framework (Vitest for unit/integration/e2e, Supertest for API e2e) and provides a detailed success/failure report.

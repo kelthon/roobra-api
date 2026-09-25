@@ -1,6 +1,6 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { ResetPasswordDto } from './reset-password.dto';
+import { ResetPasswordDto } from './reset-password.dto.js';
 
 describe('ResetPasswordDto', () => {
   const validPayload = {

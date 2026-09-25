@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppModule } from 'src/app.module';
+import { AppModule } from 'src/app.module.js';
 
 describe('Application config wiring (e2e)', () => {
   let app: INestApplication;

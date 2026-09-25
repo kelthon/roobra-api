@@ -27,11 +27,11 @@
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
-  "jest.runMode": "on-demand",
   "[handlebars]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[dockercompose]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
-  }
+  },
+  "vitest.filesWatcherInclude": "**/*"
 }

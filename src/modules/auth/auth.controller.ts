@@ -1,18 +1,18 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { LogoutDto } from './dto/logout.dto';
-import { User } from 'src/common/decorators/user.decorator';
-import { UserOnly } from 'src/common/decorators/auth-users-only.decorator';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { GuestOnly } from 'src/common/decorators/guest-only.decorator';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { type UserDto } from 'src/common/dto/user-dto';
-import { LoginWith } from 'src/common/decorators/login-with.decorator';
+import { AuthService } from './auth.service.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RegisterUserDto } from './dto/register-user.dto.js';
+import { LogoutDto } from './dto/logout.dto.js';
+import { User } from 'src/common/decorators/user.decorator.js';
+import { UserOnly } from 'src/common/decorators/auth-users-only.decorator.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { GuestOnly } from 'src/common/decorators/guest-only.decorator.js';
+import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
+import { VerifyEmailDto } from './dto/verify-email.dto.js';
+import { type UserDto } from 'src/common/dto/user-dto.js';
+import { LoginWith } from 'src/common/decorators/login-with.decorator.js';
 import { Throttle } from '@nestjs/throttler';
 
 // Shared limit for auth endpoints sensitive to brute-forcing/enumeration

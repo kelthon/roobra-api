@@ -1,15 +1,18 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "test",
     "dist",
-    "**/*spec.ts",
     "prisma",
-    "prisma.config.ts"
-  ],
-  "compilerOptions": {
-    "rootDir": "./src",
-    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
-  }
+    "scripts",
+    "**/*spec.ts"
+  ]
 }

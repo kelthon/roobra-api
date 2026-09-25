@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, resolveLocale } from './locale.util';
+import { DEFAULT_LOCALE, resolveLocale } from './locale.util.js';
 
 describe('resolveLocale', () => {
   it('should return the default locale when no header is provided', () => {

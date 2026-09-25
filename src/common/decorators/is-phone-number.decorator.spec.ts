@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { IsPhoneNumber } from './is-phone-number.decorator';
+import { IsPhoneNumber } from './is-phone-number.decorator.js';
 
 class DummyDto {
   @IsPhoneNumber()

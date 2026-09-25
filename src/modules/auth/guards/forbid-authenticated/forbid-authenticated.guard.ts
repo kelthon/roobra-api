@@ -4,7 +4,7 @@ import {
   Injectable,
   ForbiddenException,
 } from '@nestjs/common';
-import { getJwtPayload } from 'src/common/utils/jwt-payload.util';
+import { getJwtPayload } from 'src/common/utils/jwt-payload.util.js';
 
 @Injectable()
 export class ForbidAuthenticatedGuard implements CanActivate {

@@ -9,12 +9,12 @@ import { join } from 'node:path';
  */
 const mailerOptions = {
   template: {
-    dir: __dirname,
+    dir: import.meta.dirname,
     options: { strict: true },
   },
   options: {
     partials: {
-      dir: join(__dirname, 'partials'),
+      dir: join(import.meta.dirname, 'partials'),
       options: { strict: true },
     },
     layout: 'layouts/main',

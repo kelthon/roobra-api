@@ -22,7 +22,7 @@ which is too small to build images while serving traffic.
 
 ## Decision
 
-1. **Every pull request runs:** ESLint with the Prettier plugin, checking only (no `--fix`); a Prettier
+1. **Every pull request runs:** oxlint with type-aware rules, checking only (no `--fix`); a Prettier
    format check; `tsc --noEmit`; `prisma validate`; the unit tests; the end-to-end tests; and the
    business rule id check from `roobra-docs` against this repository.
 2. **Every push to `main` builds and deploys:**
@@ -59,4 +59,5 @@ Not implemented on 2026-09-30: `deploy.yml` runs `build`, `lint` (with `--fix`),
 `test:e2e` on pushes and pull requests to `main` and `dev`, and deploys nothing. `main` has no branch
 protection. The final stage of the `Dockerfile` copies only `package.json`, `node_modules` and
 `dist`, so `prisma migrate deploy` (step 2.4) cannot run in the image until it also contains
-`prisma/` and `prisma.config.ts`. No script or Compose file applies migrations today.
+`prisma/` and `prisma.config.ts`. No script or Compose file applies migrations today. Since the move to oxlint, `npm run lint` no longer fixes anything, so the `lint` job
+already checks only; the Prettier format check is still missing.

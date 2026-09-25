@@ -4,15 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma, User } from 'src/generated/prisma/client';
-import { PrismaService } from 'src/modules/database/prisma.service';
+import { Prisma, User } from 'src/generated/prisma/client.js';
+import { PrismaService } from 'src/modules/database/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service';
-import { InfoResponse } from 'src/shared/interfaces/info-response';
+import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses.js';
+import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
+import { InfoResponse } from 'src/shared/interfaces/info-response.js';
 import { DateTime } from 'luxon';
-import { isRecordNotFoundError } from 'src/common/utils/database.util';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
+import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
+import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 
 /**
  * Access tokens are short-lived JWTs. Refresh tokens are opaque, stored only as

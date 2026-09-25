@@ -1,6 +1,7 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../auth.service';
-import { LocalStrategy } from './local.strategy';
+import { AuthService } from '../auth.service.js';
+import { LocalStrategy } from './local.strategy.js';
+import type { Mock } from 'vitest';
 
 describe('LocalStrategy', () => {
   let authServiceMock: AuthService;
@@ -8,7 +9,7 @@ describe('LocalStrategy', () => {
 
   beforeEach(() => {
     authServiceMock = {
-      validateUser: jest.fn(),
+      validateUser: vi.fn(),
     } as unknown as AuthService;
 
     strategy = new LocalStrategy(authServiceMock);
@@ -21,7 +22,7 @@ describe('LocalStrategy', () => {
       username: 'john.doe',
       role: 'SUBSCRIBER',
     };
-    (authServiceMock.validateUser as jest.Mock).mockResolvedValue(payload);
+    (authServiceMock.validateUser as Mock).mockResolvedValue(payload);
 
     const result = await strategy.validate(
       'john.doe@example.com',
@@ -36,7 +37,7 @@ describe('LocalStrategy', () => {
   });
 
   it('should throw UnauthorizedException for invalid credentials', async () => {
-    (authServiceMock.validateUser as jest.Mock).mockResolvedValue(null);
+    (authServiceMock.validateUser as Mock).mockResolvedValue(null);
 
     await expect(
       strategy.validate('john.doe@example.com', 'WrongPassword123!'),

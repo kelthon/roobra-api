@@ -1,4 +1,4 @@
-import { SimpleHashService } from './simple-hash.service';
+import { SimpleHashService } from './simple-hash.service.js';
 
 describe('SimpleHashService', () => {
   let simpleHashService: SimpleHashService;

@@ -1,6 +1,6 @@
 import { IsEmail, IsStrongPassword } from 'class-validator';
-import { IsConfirmPassword } from 'src/common/decorators/is-confirm-password.decorator';
-import { IsUserName } from 'src/common/decorators/is-username.decorator';
+import { IsConfirmPassword } from 'src/common/decorators/is-confirm-password.decorator.js';
+import { IsUserName } from 'src/common/decorators/is-username.decorator.js';
 
 export class RegisterUserDto {
   @IsEmail()

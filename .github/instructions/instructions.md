@@ -60,7 +60,7 @@ For additional local documentation, see the other files in `.github/instructions
 
 ## Code Style and Formatting Rules
 
-- Follow the linting and formatting tools defined in the project (e.g., ESLint, Prettier).
+- Follow the linting and formatting tools defined in the project (oxlint, Prettier).
 - Use descriptive variable and function names.
 - Prefer pure functions and reusable components.
 - Add clear comments for complex logic or modules.
