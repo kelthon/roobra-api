@@ -1,5 +1,9 @@
 # Prisma Client global configuration
 
+**Last update:** 2026-09-28 \
+**Status:** 2 of 7 sections done; the rest are proposals, not decisions — see below for why this
+file still exists.
+
 > **Partially migrated (2026-09-18).** §1 (global `omit`) and §4 (query logging) are implemented and
 > now recorded in [the omit ADR](./adr/2026-09-04-01-global-omit-for-credential-hashes.md) and
 > [the logging ADR](./adr/2026-09-04-02-environment-based-prisma-query-logging.md); the text below
@@ -262,3 +266,16 @@ last one to tackle of the seven.
    whichever comes first.
 5. **§7 audit extension** — blocked on request-scoped context existing at all; revisit once that
    exists for other reasons (e.g. request-id propagation, current-user access in services).
+
+## Why This File Still Exists
+
+Splitting a proposal into an ADR happens on touch, not on a schedule (see
+[how-to-document-app](./adr/2026-09-15-how-to-document-app.md) and this repo's restructuring
+plan) — nobody has picked up §2, §3, §5, §6 or §7 since §1 and §4 were split out on 2026-09-18.
+The file disappears once the last section is split; until then it is the one place all five
+undecided proposals live, instead of being scattered across five draft ADRs nobody asked for yet.
+
+## Changelog
+
+- 2026-09-28 - Kelthon - Added this section and the Status line; no content otherwise.
+- 2026-09-18 - Kelthon - §1 and §4 split into ADRs, banner added.
