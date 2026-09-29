@@ -34,7 +34,8 @@
 **/build
 **/dist
 **/*.tsbuildinfo
+scripts
+docs
 AGENTS.md
 LICENSE
 README.md
-scripts
