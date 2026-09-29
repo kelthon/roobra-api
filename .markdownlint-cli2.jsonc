@@ -1,0 +1,14 @@
+// Matches roobra-docs/documentation-formatting-guidelines.md. Real content bugs (MD033:
+// unescaped "<"/">") stay on; rules that would fight the house style used across every
+// existing document (a fixed 80-column wrap, a "+" list marker) are off instead of
+// silenced file-by-file.
+{
+  "config": {
+    "default": true,
+    "MD004": { "style": "dash" },
+    "MD013": false,
+    "MD024": { "siblings_only": true },
+    "MD041": false
+  },
+  "ignores": ["node_modules", ".agents", "dist", "build", "coverage", "src/generated"]
+}

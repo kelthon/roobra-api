@@ -43,5 +43,5 @@ Two failure modes were hit or anticipated with the `db` service:
 - Upgrading Postgres requires a planned data migration; changing the tag alone against an existing
   data directory will not work.
 - `initdb` only runs on the first start of an empty data directory, so a wrong `DATABASE_USER` on the
-  first run persists. [The deployment ADR](./2026-08-28-manual-deployment-via-script.md) covers the
+  first run persists. [The deployment ADR](./2026-08-28-05-manual-deployment-via-script.md) covers the
   fail-fast check and the recovery script.

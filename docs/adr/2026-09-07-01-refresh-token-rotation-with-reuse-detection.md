@@ -20,7 +20,7 @@ them individually or all at once.
 1. **Access token:** a signed JWT with claims `sub`, `email`, `username` and `role`, valid for 15
    minutes. It is read from the `Authorization: Bearer` header and is not revocable before expiry.
 2. **Refresh token:** an opaque random value (64 hex characters), valid for 7 days, stored only as a
-   SHA-256 hash in `refresh_tokens` ([hashing ADR](./2026-09-07-hash-secrets-by-entropy-argon2-and-sha256.md)).
+   SHA-256 hash in `refresh_tokens` ([hashing ADR](./2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md)).
 3. **Rotation:** every refresh revokes the presented token and issues a new access and refresh pair.
 4. **Reuse detection:** presenting a token that is already revoked revokes **all** the user's active
    refresh tokens and fails the request. Logout revokes one token; logout-all revokes every active

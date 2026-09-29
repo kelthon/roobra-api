@@ -8,7 +8,7 @@ supersedes:
 superseded-by:
 ---
 
-# <Short Decision Title>
+# \<Short Decision Title\>
 
 ## Context
 
@@ -20,7 +20,7 @@ What was decided, in one or two sentences, followed by the details someone needs
 
 ## Alternatives Considered
 
-- **<Alternative>** — why it was not chosen. Write `Rationale not recorded` if the reason was never written down.
+- **\<Alternative\>** — why it was not chosen. Write `Rationale not recorded` if the reason was never written down.
 
 ## Consequences
 
