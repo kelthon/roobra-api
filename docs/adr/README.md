@@ -18,7 +18,8 @@ in (not necessarily the order they happened within that day, which usually isn't
 once and never reordered — adding a ninth decision to a day that already has eight does not
 renumber the first eight.
 
-Start from [_template.md](./_template.md).
+Start from the [ADR template](https://github.com/kelthon/roobra-docs/blob/main/meta/templates/adr.md)
+in `roobra-docs`, where every template for every repository is kept.
 
 ## Lifecycle
 
