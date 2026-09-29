@@ -18,7 +18,7 @@ are in `prisma/migrations`, and the seed runs with `tsx prisma/seed.ts`.
 
 Why: [domain-based schema files](../adr/2026-09-10-domain-based-prisma-schema-files.md). The
 generated client is gitignored and produced by `npx prisma generate`, see
-[the Docker ADR](../adr/2026-08-28-prisma-cli-as-dependency-and-generate-in-docker.md).
+[the Docker ADR](../adr/2026-08-28-01-prisma-cli-as-dependency-and-generate-in-docker.md).
 
 ## Identifier Types
 
@@ -47,8 +47,8 @@ place clients are built.
 | Option | Value | Decision |
 | --- | --- | --- |
 | `adapter` | `PrismaPg` with `connectionString` from `database.url`; no pool options, so `pg` defaults apply | — |
-| `omit` | `hashedPassword`, `hashedToken` (refresh and password reset), `hashedKey` | [Global omit](../adr/2026-09-04-global-omit-for-credential-hashes.md) |
-| `log` | `warn`, `error` in production; adds `query` otherwise | [Query logging](../adr/2026-09-04-environment-based-prisma-query-logging.md) |
+| `omit` | `hashedPassword`, `hashedToken` (refresh and password reset), `hashedKey` | [Global omit](../adr/2026-09-04-01-global-omit-for-credential-hashes.md) |
+| `log` | `warn`, `error` in production; adds `query` otherwise | [Query logging](../adr/2026-09-04-02-environment-based-prisma-query-logging.md) |
 
 `onModuleDestroy` calls `$disconnect()`. Interactive transactions use Prisma's default isolation
 level (Postgres `Read Committed`).

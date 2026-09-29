@@ -46,7 +46,6 @@ This document describes the TypeScript configuration and best practices for this
 - Test files are skipped for ESLint strict rules to allow for more flexible test code patterns.
 - Typing in test files should be permissive; types are optional and only required when essential for testing correctness or clarity.
 
-
 ## Documentation of Core Modules
 
 - All core modules must be documented in the `roobra-docs` repository.

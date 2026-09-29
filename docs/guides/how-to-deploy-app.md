@@ -41,7 +41,7 @@ fixes its own permissions.
 ## Notes
 
 - CI does not deploy. `.github/workflows/deploy.yml` runs build, lint and tests only. See
-  [the deployment ADR](../adr/2026-08-28-manual-deployment-via-script.md) for the reasoning and for
+  [the deployment ADR](../adr/2026-08-28-05-manual-deployment-via-script.md) for the reasoning and for
   what a `deploy` job would need.
 
 ## Troubleshooting

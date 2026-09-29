@@ -14,7 +14,7 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
 - [ ] **`sendVerificationEmail` creates the token and sends the email in one `Promise.all`**
   ([auth.service.ts:350](src/modules/auth/auth.service.ts#L350)). A link can be sent for a token that was not
   saved, and a failed send can leave a saved token. Await the insert first, then send, as `forgotPassword` does.
-  See [send-transactional-email-synchronously](docs/adr/2026-09-11-send-transactional-email-synchronously.md).
+  See [send-transactional-email-synchronously](docs/adr/2026-09-11-05-send-transactional-email-synchronously.md).
 - [x] Prisma query logging checked the undefined key `env`; now reads `app.mode`
   ([prisma.service.ts:14](src/modules/database/prisma.service.ts#L14)).
 - [x] `emailVerificationToken.hashedToken` added to the global `omit`
@@ -24,14 +24,14 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
   - [ ] **Neither TTL is a real decision.** Confirmed (2026-09-22): both the password reset 5-minute
     value and the email verification 48-hour value are test placeholders, not product-approved
     numbers. Pick real values before shipping. Tracked in
-    [the tokens ADR](docs/adr/2026-09-11-one-time-opaque-tokens-for-reset-and-verification.md).
+    [the tokens ADR](docs/adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md).
 
 ## P1: Wrong Or Missing Behavior
 
 - [x] Remove the leftover `[cite: 1, 3]` in `verify-email.hbs:36` and `[cite: 4, 7]` in `new-device.hbs:49`.
 - [ ] Wire `preferredLang`: `register()` should store `resolveLocale(acceptLanguage)`, and the mail services should
   read `user.preferredLang` instead of defaulting to `'en'`. Needs the `Accept-Language` header in
-  `AuthController.register`. See [user-preferred-lang-column](docs/adr/2026-09-11-user-preferred-lang-column.md).
+  `AuthController.register`. See [user-preferred-lang-column](docs/adr/2026-09-11-07-user-preferred-lang-column.md).
 - [ ] `JwtStrategy.validate` accepts deleted or blocked users
   ([jwt.strategy.ts:17](src/modules/auth/strategies/jwt.strategy.ts#L17)).
 - [x] `create-password.hbs:29` and `confirm-action.hbs:41` used `(#if ...)` (parse error); both now
@@ -44,7 +44,7 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
 - [ ] **Mail services leak English copy through `context`, contradicting the locale-folder ADR.**
   `EmailVerificationMailService` and `PasswordResetMailService` pass `title`, `messageBody`, `buttonText`
   and `categoryBadge` as hardcoded English strings in `context`. Per
-  [locale-templates-under-locales-folder](docs/adr/2026-09-11-locale-templates-under-locales-folder.md)
+  [locale-templates-under-locales-folder](docs/adr/2026-09-11-06-locale-templates-under-locales-folder.md)
   (decision 3), only text living in the *shared* layout/partials should travel through `context`; text in
   a `locales/<tag>/*.hbs` leaf template should be hardcoded in that file, since the whole point of the
   locale folder is that each language gets its own copy of it. As-is, adding `locales/pt/verify-email.hbs`
@@ -67,7 +67,7 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
   ([auth.service.ts:252](src/modules/auth/auth.service.ts#L252)); it reveals which emails are registered. `login`
   answers similarly at line 190.
 - [ ] `.github/workflows/deploy.yml` does not deploy. Rename it (for example `ci.yml`, workflow name "CI") or add the
-  deploy job. See [manual-deployment-via-script](docs/adr/2026-08-28-manual-deployment-via-script.md).
+  deploy job. See [manual-deployment-via-script](docs/adr/2026-08-28-05-manual-deployment-via-script.md).
 - [ ] `database.config.ts` reads `process.env.USER` for `database.user` (probably meant `DATABASE_USER`), and only
   `database.url` is used anywhere. Fix or remove the unused keys.
 - [x] The JSDoc on `EmailVerificationMailService` (line 8) said it was not wired to any endpoint; removed
@@ -88,11 +88,11 @@ issues or PRs. `[x]` means the fix is already in the working tree but uncommitte
 
 ## Docs To Update When The Fixes Above Are Committed
 
-- [x] [Query logging ADR](docs/adr/2026-09-04-environment-based-prisma-query-logging.md): drop the "diverges from intent" section.
-- [x] [Global omit ADR](docs/adr/2026-09-04-global-omit-for-credential-hashes.md): drop the `EmailVerificationToken` open point.
-- [x] [One-time tokens ADR](docs/adr/2026-09-11-one-time-opaque-tokens-for-reset-and-verification.md) and
+- [x] [Query logging ADR](docs/adr/2026-09-04-02-environment-based-prisma-query-logging.md): drop the "diverges from intent" section.
+- [x] [Global omit ADR](docs/adr/2026-09-04-01-global-omit-for-credential-hashes.md): drop the `EmailVerificationToken` open point.
+- [x] [One-time tokens ADR](docs/adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md) and
   [auth reference](docs/reference/auth-module.md): verification lifetime 15 minutes → 48 hours, and
   both TTLs flagged as undecided placeholders (2026-09-22).
 - [x] [Notifications reference](docs/reference/notifications-module.md), "Known Issues": remove what is fixed.
-- [ ] [Sync send ADR](docs/adr/2026-09-11-send-transactional-email-synchronously.md): update the Implementation Status.
+- [ ] [Sync send ADR](docs/adr/2026-09-11-05-send-transactional-email-synchronously.md): update the Implementation Status.
 - [x] [Migration plan](docs/superpowers/plans/2026-09-18-docs-restructure-migration.md), "Findings": remove what is fixed.

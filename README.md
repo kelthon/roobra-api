@@ -34,7 +34,7 @@ permissions for the Roobra website.
    Fill in at least `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `DATABASE_URL`
    (`DATABASE_HOST` should be `db`, the Compose service name). Do not leave `DATABASE_USER` empty
    on the first run — see
-   [the Postgres image ADR](docs/adr/2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md)
+   [the Postgres image ADR](docs/adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md)
    for why.
 
 3. Start the stack:
@@ -75,7 +75,7 @@ still talks to `db:5432` via `DATABASE_URL`, the Compose service name. You can a
 Production runs the same containers via `compose.prod.yaml` and `scripts/deploy.sh`. See
 [how to deploy](docs/guides/how-to-deploy-app.md) for the full process, prerequisites and how to
 recover a misconfigured database role without losing data, and
-[the deployment ADR](docs/adr/2026-08-28-manual-deployment-via-script.md) for why CI does not deploy.
+[the deployment ADR](docs/adr/2026-08-28-05-manual-deployment-via-script.md) for why CI does not deploy.
 
 ## Documentation
 

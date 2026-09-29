@@ -18,8 +18,8 @@ The base image is `node:${NODE_VERSION}-alpine` with `NODE_VERSION=24.14.0` and
 | `build` | `deps` | `npm ci` (all dependencies), `COPY . .`, `npm run build`. The target used for development |
 | `final` | `base` | `NODE_ENV=production`, runs as `node`, copies `node_modules` from `deps` and `dist` from `build`, exposes `3000`, runs `npm run start:prod`. The default target, used in production |
 
-Decisions: [Prisma CLI and generate step](../adr/2026-08-28-prisma-cli-as-dependency-and-generate-in-docker.md),
-[flat build output](../adr/2026-08-28-flat-build-output-and-pinned-tsbuildinfo.md).
+Decisions: [Prisma CLI and generate step](../adr/2026-08-28-01-prisma-cli-as-dependency-and-generate-in-docker.md),
+[flat build output](../adr/2026-08-28-02-flat-build-output-and-pinned-tsbuildinfo.md).
 
 ## Compose Files
 
@@ -31,8 +31,8 @@ All three files use `name: roobra-api`.
 | `compose.override.yaml` | Automatically with a plain `docker compose up` | `server`: `target: build`, `user: node`, `NODE_ENV=development`, command `npx prisma generate && npm run start:dev`, bind mounts `.:/usr/src/app` plus an anonymous `node_modules` volume; `db`: publishes `${DATABASE_PORT:-5432}:5432` |
 | `compose.prod.yaml` | Only with `-f compose.yaml -f compose.prod.yaml` | `server`: `restart: unless-stopped`; `db`: bind mount `/var/lib/repositories/roobra-api/postgresql:/var/lib/postgresql` |
 
-Decisions: [three Compose files](../adr/2026-08-28-three-compose-files-for-dev-and-prod.md),
-[Postgres image and permissions](../adr/2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md).
+Decisions: [three Compose files](../adr/2026-08-28-03-three-compose-files-for-dev-and-prod.md),
+[Postgres image and permissions](../adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md).
 
 ## Environment Mapping For `db`
 

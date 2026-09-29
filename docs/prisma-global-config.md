@@ -1,8 +1,8 @@
 # Prisma Client global configuration
 
 > **Partially migrated (2026-09-18).** §1 (global `omit`) and §4 (query logging) are implemented and
-> now recorded in [the omit ADR](./adr/2026-09-04-global-omit-for-credential-hashes.md) and
-> [the logging ADR](./adr/2026-09-04-environment-based-prisma-query-logging.md); the text below
+> now recorded in [the omit ADR](./adr/2026-09-04-01-global-omit-for-credential-hashes.md) and
+> [the logging ADR](./adr/2026-09-04-02-environment-based-prisma-query-logging.md); the text below
 > still describes them as missing. Current behavior is in [reference/prisma-setup.md](./reference/prisma-setup.md).
 > §2, §3, §5, §6 and §7 are still undecided proposals and stay here until each one is split into a
 > `Proposed` ADR.

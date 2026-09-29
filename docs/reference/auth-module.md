@@ -9,7 +9,7 @@ This page describes how the module is implemented.
 ## Endpoints
 
 Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 20 per 60 seconds
-(see [the rate limiting ADR](../adr/2026-09-11-rate-limit-auth-endpoints.md)).
+(see [the rate limiting ADR](../adr/2026-09-11-02-rate-limit-auth-endpoints.md)).
 
 | Method and path | Access | Rate limit | Body | Purpose |
 | --- | --- | --- | --- | --- |
@@ -47,9 +47,9 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | Password reset | 64 hex characters | 5 min (placeholder, not decided) | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
 | Email verification | 64 hex characters | 48 h (placeholder, not decided) | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
 
-Why: [refresh tokens](../adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md),
-[hashing](../adr/2026-09-07-hash-secrets-by-entropy-argon2-and-sha256.md),
-[one-time tokens](../adr/2026-09-11-one-time-opaque-tokens-for-reset-and-verification.md).
+Why: [refresh tokens](../adr/2026-09-07-01-refresh-token-rotation-with-reuse-detection.md),
+[hashing](../adr/2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md),
+[one-time tokens](../adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md).
 
 ## Structure
 
