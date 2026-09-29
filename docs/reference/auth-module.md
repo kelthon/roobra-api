@@ -3,7 +3,7 @@
 **Location:** `src/modules/auth/` — verified against branch `docs/restructure-documentation`, 2026-09-18.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
-the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/auth-flow.md`).
+the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/flows/auth.md`).
 This page describes how the module is implemented.
 
 ## Endpoints
