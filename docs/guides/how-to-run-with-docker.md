@@ -24,13 +24,32 @@ Start the API and its Postgres database with Docker Compose, in development or i
    `npx prisma generate` and then `npm run start:dev` (watch mode). The database port is published
    on `${DATABASE_PORT:-5432}`.
 
-2. Follow the logs:
+2. Create the tables. Compose does not apply migrations, so a new database is empty until you run
+   them in the `server` container, which has the Prisma CLI version from `package-lock.json`:
+
+   ```sh
+   docker compose exec server npx prisma migrate deploy
+   ```
+
+   The container reaches the database through `DATABASE_URL`, so its host must be `db`, not
+   `localhost` (see [how to configure the environment](./how-to-configure-environment.md), step 2).
+
+3. Load the development data. The seed creates plans, a sample catalog and four accounts,
+   `subscriber@roobra.test`, `guest@roobra.test`, `staff@roobra.test` (content manager) and
+   `admin@roobra.test`, all with the password in `prisma/seeds/constants.ts`. It is safe to run
+   again: every step upserts its records or skips those that already exist.
+
+   ```sh
+   docker compose exec server npx prisma db seed
+   ```
+
+4. Follow the logs:
 
    ```sh
    docker compose logs -f server
    ```
 
-3. Stop the stack. Add `-v` to also delete the development database (the named volume `db-data`):
+5. Stop the stack. Add `-v` to also delete the development database (the named volume `db-data`):
 
    ```sh
    docker compose down
@@ -49,6 +68,12 @@ Start the API and its Postgres database with Docker Compose, in development or i
    [how to deploy](./how-to-deploy-app.md).
 
 ## Notes
+
+- To change the schema, edit `prisma/models/*.prisma` and create a migration with
+  `docker compose exec server npx prisma migrate dev --name <change>`.
+- The Prisma CLI reads only `.env` (through `prisma.config.ts`), while the app reads
+  `.env.development` first. If both files set `DATABASE_URL`, keep them equal, or the CLI and the
+  app will use different databases.
 
 - Do not run both stacks on the same machine: all Compose files use `name: roobra-api`, so container,
   network and volume names collide.
