@@ -12,6 +12,10 @@ instruction files in [.github/instructions/](.github/instructions/).
 **Before contributing or generating code/documentation, read and follow all instructions in
 `.github/instructions/`.**
 
+**Before any documentation change** (creating, moving, splitting or deleting a document, or writing an
+ADR), read [`roobra-docs`'s `meta/how-to-document.md`](https://github.com/kelthon/roobra-docs/blob/main/meta/how-to-document.md). It is the normative guide for
+documentation in every Roobra repository and takes precedence over any older rule.
+
 Refer to [.github/instructions/instructions.md](.github/instructions/instructions.md) for:
 
 - Language standards
