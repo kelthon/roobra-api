@@ -67,17 +67,26 @@ their real decision date in `date`, and the day they were documented goes in `re
 | [2026-08-28-05-manual-deployment-via-script](./2026-08-28-05-manual-deployment-via-script.md) | Deploy Manually With A Validating Script; Keep CI To Build, Lint And Test | `Draft` → `Superseded` |
 | [2026-09-04-01-global-omit-for-credential-hashes](./2026-09-04-01-global-omit-for-credential-hashes.md) | Omit Credential Hashes Globally On The Prisma Client | `Draft` → `Accepted` |
 | [2026-09-04-02-environment-based-prisma-query-logging](./2026-09-04-02-environment-based-prisma-query-logging.md) | Log Prisma Queries In Development Only | `Draft` → `Accepted` |
-| [2026-09-07-01-refresh-token-rotation-with-reuse-detection](./2026-09-07-01-refresh-token-rotation-with-reuse-detection.md) | Use Short-Lived JWT Access Tokens And Rotating Opaque Refresh Tokens With Reuse Detection | `Draft` → `Accepted` |
 | [2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256](./2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md) | Hash Passwords With Argon2 And Random Tokens With SHA-256 | `Draft` → `Accepted` |
 | [2026-09-10-domain-based-prisma-schema-files](./2026-09-10-domain-based-prisma-schema-files.md) | Organize Prisma Models In Four Domain-Based Schema Files | `Draft` → `Accepted` |
 | [2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification](./2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md) | Use Single-Use Opaque Tokens For Password Reset And Email Verification | `Draft` → `Accepted` |
-| [2026-09-11-02-rate-limit-auth-endpoints](./2026-09-11-02-rate-limit-auth-endpoints.md) | Rate Limit The API Globally And Auth Endpoints More Strictly | `Draft` → `Accepted` |
 | [2026-09-11-03-use-nestjs-modules-mailer-for-transactional-email](./2026-09-11-03-use-nestjs-modules-mailer-for-transactional-email.md) | Use `@nestjs-modules/mailer` For Transactional Email | `Draft` → `Accepted` |
 | [2026-09-11-04-handlebars-as-email-template-engine](./2026-09-11-04-handlebars-as-email-template-engine.md) | Use Plain Handlebars As The Email Template Engine | `Draft` → `Accepted` |
 | [2026-09-11-05-send-transactional-email-synchronously](./2026-09-11-05-send-transactional-email-synchronously.md) | Trigger Transactional Email With A Direct, Synchronous Call | `Draft` → `Accepted` |
 | [2026-09-11-06-locale-templates-under-locales-folder](./2026-09-11-06-locale-templates-under-locales-folder.md) | Keep Layouts And Partials Shared, And Put Locale-Specific Templates Under `locales/<locale>/` | `Draft` → `Accepted` |
 | [2026-09-11-07-user-preferred-lang-column](./2026-09-11-07-user-preferred-lang-column.md) | Store The Email Language In A Nullable `User.preferredLang`, Seeded Once From `Accept-Language` | `Draft` → `Accepted` |
-| [2026-09-11-08-email-transport-provider](./2026-09-11-08-email-transport-provider.md) | Choose The Email Transport Provider (Open) | `Draft` → `Proposed` |
 | [2026-09-12-marketing-email-templates-db-backed-marketing-only](./2026-09-12-marketing-email-templates-db-backed-marketing-only.md) | Allow Database-Managed Templates For Marketing Email Only | `Draft` → `Accepted` |
-| [2026-09-15-how-to-document-app](./2026-09-15-how-to-document-app.md) | Document With A Central Repository And A Small Local Taxonomy | `Draft` → `Accepted` |
 | [2026-09-30-deploy-from-main-through-ghcr-and-ssh](./2026-09-30-deploy-from-main-through-ghcr-and-ssh.md) | Deploy Automatically From `main` Through GHCR And SSH, And Check More On Pull Requests | `Draft` → `Accepted` |
+
+## Decisions Kept In `roobra-docs`
+
+These decisions affect other repositories too, so they live only in `roobra-docs`
+([why](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-29-03-keep-each-decision-in-one-repository.md)).
+They were copies here until 2026-09-30.
+
+| ADR | Decision |
+| --- | --- |
+| [2026-09-07-refresh-token-rotation-with-reuse-detection](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md) | Use Short-Lived JWT Access Tokens And Rotating Opaque Refresh Tokens With Reuse Detection |
+| [2026-09-11-01-rate-limit-auth-endpoints](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-01-rate-limit-auth-endpoints.md) | Rate Limit The API Globally And Auth Endpoints More Strictly |
+| [2026-09-11-02-email-transport-provider](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-02-email-transport-provider.md) | Choose The Email Transport Provider (Open) |
+| [2026-09-15-how-to-document-app](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-15-how-to-document-app.md) | Document With A Central Repository And A Small Local Taxonomy |
