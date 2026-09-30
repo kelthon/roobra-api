@@ -32,8 +32,9 @@ which is too small to build images while serving traffic.
    3. `docker compose pull` the new image;
    4. run `prisma migrate deploy` in a one-off container of the new image;
    5. recreate only the API container (`docker compose up -d --no-deps server`).
-3. **Secrets live in GitHub Secrets** (SSH key, host, GHCR credentials); the server's `.env` stays on
-   the server, as before.
+3. **Secrets live in GitHub Secrets:** the SSH key, the host, the registry credentials and every
+   variable of the production `.env`. The deploy writes the server's `.env` from them before starting
+   the containers, so the file on the VPS is a copy any deploy recreates.
 4. **`main` accepts changes only through pull requests** whose checks pass.
 
 ## Alternatives Considered
