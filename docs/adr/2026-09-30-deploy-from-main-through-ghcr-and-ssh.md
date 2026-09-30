@@ -56,4 +56,6 @@ which is too small to build images while serving traffic.
 
 Not implemented on 2026-09-30: `deploy.yml` runs `build`, `lint` (with `--fix`), `test` and
 `test:e2e` on pushes and pull requests to `main` and `dev`, and deploys nothing. `main` has no branch
-protection.
+protection. The final stage of the `Dockerfile` copies only `package.json`, `node_modules` and
+`dist`, so `prisma migrate deploy` (step 2.4) cannot run in the image until it also contains
+`prisma/` and `prisma.config.ts`. No script or Compose file applies migrations today.
