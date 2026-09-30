@@ -39,7 +39,9 @@ To change an accepted decision, write a new ADR with `supersedes: <old file>` an
 Every ADR carries two fields while its pull request is open:
 
 - `status: Draft` — always, even when the decision is already in force in the code.
-- `intended-status` — what the status becomes on merge (`Accepted`, `Rejected`, `Proposed`).
+- `intended-status` — what the status becomes on merge (`Accepted`, `Rejected`, `Proposed`, or
+  `Superseded` when a newer ADR in the same pull request replaces a decision that was already in
+  force).
 
 When the pull request merges into `main`, `status` takes the value of `intended-status` and
 `accepted-at` records the merge date. Decisions that were made before they were written down keep
@@ -62,7 +64,7 @@ their real decision date in `date`, and the day they were documented goes in `re
 | [2026-08-28-02-flat-build-output-and-pinned-tsbuildinfo](./2026-08-28-02-flat-build-output-and-pinned-tsbuildinfo.md) | Build To A Flat `dist/` And Pin The Incremental Build Cache Inside It | `Draft` → `Accepted` |
 | [2026-08-28-03-three-compose-files-for-dev-and-prod](./2026-08-28-03-three-compose-files-for-dev-and-prod.md) | Split Docker Compose Into A Shared Base, A Dev Override And A Prod Override | `Draft` → `Accepted` |
 | [2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions](./2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md) | Pin The Postgres Major Version And Let The Image Entrypoint Manage Permissions | `Draft` → `Accepted` |
-| [2026-08-28-05-manual-deployment-via-script](./2026-08-28-05-manual-deployment-via-script.md) | Deploy Manually With A Validating Script; Keep CI To Build, Lint And Test | `Draft` → `Accepted` |
+| [2026-08-28-05-manual-deployment-via-script](./2026-08-28-05-manual-deployment-via-script.md) | Deploy Manually With A Validating Script; Keep CI To Build, Lint And Test | `Draft` → `Superseded` |
 | [2026-09-04-01-global-omit-for-credential-hashes](./2026-09-04-01-global-omit-for-credential-hashes.md) | Omit Credential Hashes Globally On The Prisma Client | `Draft` → `Accepted` |
 | [2026-09-04-02-environment-based-prisma-query-logging](./2026-09-04-02-environment-based-prisma-query-logging.md) | Log Prisma Queries In Development Only | `Draft` → `Accepted` |
 | [2026-09-07-01-refresh-token-rotation-with-reuse-detection](./2026-09-07-01-refresh-token-rotation-with-reuse-detection.md) | Use Short-Lived JWT Access Tokens And Rotating Opaque Refresh Tokens With Reuse Detection | `Draft` → `Accepted` |
@@ -78,3 +80,4 @@ their real decision date in `date`, and the day they were documented goes in `re
 | [2026-09-11-08-email-transport-provider](./2026-09-11-08-email-transport-provider.md) | Choose The Email Transport Provider (Open) | `Draft` → `Proposed` |
 | [2026-09-12-marketing-email-templates-db-backed-marketing-only](./2026-09-12-marketing-email-templates-db-backed-marketing-only.md) | Allow Database-Managed Templates For Marketing Email Only | `Draft` → `Accepted` |
 | [2026-09-15-how-to-document-app](./2026-09-15-how-to-document-app.md) | Document With A Central Repository And A Small Local Taxonomy | `Draft` → `Accepted` |
+| [2026-09-30-deploy-from-main-through-ghcr-and-ssh](./2026-09-30-deploy-from-main-through-ghcr-and-ssh.md) | Deploy Automatically From `main` Through GHCR And SSH, And Check More On Pull Requests | `Draft` → `Accepted` |
