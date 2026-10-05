@@ -46,9 +46,26 @@ This document describes the TypeScript configuration and best practices for this
 - Test files are skipped for ESLint strict rules to allow for more flexible test code patterns.
 - Typing in test files should be permissive; types are optional and only required when essential for testing correctness or clarity.
 
+## Code Comments
+
+Follow [Code Comments in `roobra-docs`'s coding guidelines](https://github.com/kelthon/roobra-docs/blob/main/guidelines/coding.md#code-comments):
+a minimal JSDoc, written only when it says something the types and the names do not. In short:
+
+- No doc comment on a function, method or class whose purpose and signature are already clear.
+- A doc comment, when written, is complete: a one-line summary, `@param` for every parameter, then
+  `@returns` (only when the result means more than its type) and `@throws` (whenever the caller must
+  handle an error). Never a lone tag, and no types in tags.
+- References to business rules, requirements and ADRs go on the class, controller or service, not on
+  its methods. `@see` on a method only for counter-intuitive code, a deliberate trade-off or a
+  workaround.
+
+In this repository, a `@param` about one field of a DTO names it as `dto.field`
+(`@param registerDto.email`).
+
 ## Documentation of Core Modules
 
-- All core modules must be documented in the `roobra-docs` repository.
+- How a module works today is documented in this repository, in `docs/reference/`, and why it is built
+  that way in `docs/adr/`. What other repositories must agree on is documented in `roobra-docs`.
 - Documentation must explain both **why** (the rationale and purpose) and **how** (usage and implementation) for each core module, to provide clear guidance and examples for contributors.
 
 For more details, see [guidelines/coding.md](https://github.com/kelthon/roobra-docs/blob/main/guidelines/coding.md) and [guidelines/testing.md](https://github.com/kelthon/roobra-docs/blob/main/guidelines/testing.md) in the `roobra-docs` repository.
