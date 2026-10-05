@@ -19,7 +19,7 @@ as one schema, so the split carried no technical meaning.
 ## Decision
 
 Models are grouped into four files that mirror the product's system boundaries in
-`roobra-docs` `management/roadmap.md` (its milestones: auth, content, subscriptions and payments,
+`roobra-docs` `management/roadmaps/index.md` (its milestones: auth, content, subscriptions and payments,
 notifications, audit):
 
 | File | Models |

@@ -13,7 +13,7 @@ superseded-by:
 ## Context
 
 Password recovery (BR-011) and email verification (BR-012) are part of Milestone 1
-(Auth & Foundation) in `roobra-docs` `management/roadmap.md` and need transactional email. A first pass hand-rolled a `MailProvider`
+(Auth & Foundation) in `roobra-docs` `management/roadmaps/index.md` and need transactional email. A first pass hand-rolled a `MailProvider`
 interface plus an SMTP provider over nodemailer, building HTML with template literals. It was
 discarded during the 2026-09-11 design session.
 
@@ -40,7 +40,7 @@ engine (`handlebars`) is pulled in.
 - There is no transport-agnostic seam: `MailerService` is the transport layer. This was traded away
   knowingly. Nodemailer itself supports SMTP, SES, sendmail and streaming, so the cost is soft
   except for a pure-HTTP provider with no SMTP interface (see
-  [the transport ADR](./2026-09-11-08-email-transport-provider.md)).
+  [the transport ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-02-email-transport-provider.md)).
 - Each use case keeps a small typed service (`PasswordResetMailService`,
   `EmailVerificationMailService`) that builds the `context` and calls `sendMail`, to recover
   compile-time type safety that `sendMail`'s `Record<string, any>` context gives up.

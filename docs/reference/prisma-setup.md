@@ -29,8 +29,7 @@ generated client is gitignored and produced by `npx prisma generate`, see
 | `BigInt` autoincrement | every other model |
 
 `BigInt` values cannot be serialized by `JSON.stringify`. Nothing on this branch converts them, so an
-endpoint that returns one directly would fail. This is an open item in
-[prisma-global-config.md](../prisma-global-config.md) §2.
+endpoint that returns one directly would fail. This is tracked in [issue #9](https://github.com/kelthon/roobra-api/issues/9).
 
 ## Soft Delete
 
@@ -60,6 +59,6 @@ level (Postgres `Read Committed`).
 
 ## Not Implemented Yet
 
-Soft-delete enforcement, `BigInt` serialization, connection pool tuning, explicit isolation levels
-for money-touching transactions and an audit extension are proposals only, described in
-[prisma-global-config.md](../prisma-global-config.md).
+Soft-delete enforcement ([#10](https://github.com/kelthon/roobra-api/issues/10)), `BigInt` serialization ([#9](https://github.com/kelthon/roobra-api/issues/9)), connection pool
+tuning ([#11](https://github.com/kelthon/roobra-api/issues/11)) and explicit isolation levels for money-touching transactions ([#12](https://github.com/kelthon/roobra-api/issues/12))
+are proposals only, tracked as issues. The audit log is `roobra-docs`'s backlog task 5.1.1.

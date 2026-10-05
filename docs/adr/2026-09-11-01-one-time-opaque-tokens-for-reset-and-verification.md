@@ -52,4 +52,5 @@ which reveals whether an address is registered; whether that is intended has not
 
 **Open:** the specific TTL values in §Decision.2 are test placeholders, not decided — pick real
 values (and confirm whether email verification's 48h was intended, versus a bug that happened to
-match the em-dash fallback already in `verify-email.hbs`, see `todo.md`) before this ships.
+match the em-dash fallback already in `verify-email.hbs`) before this ships. Tracked in
+[issue #5](https://github.com/kelthon/roobra-api/issues/5).

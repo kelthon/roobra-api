@@ -83,7 +83,7 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 - [Synchronous sending](../adr/2026-09-11-05-send-transactional-email-synchronously.md)
 - [Locale folder structure](../adr/2026-09-11-06-locale-templates-under-locales-folder.md)
 - [Preferred language column](../adr/2026-09-11-07-user-preferred-lang-column.md)
-- [Transport provider (open)](../adr/2026-09-11-08-email-transport-provider.md)
+- [Transport provider (open)](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-02-email-transport-provider.md)
 
 ## Checking Templates
 

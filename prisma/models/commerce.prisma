@@ -1,4 +1,4 @@
-// Subscriptions & Payments — see management/roadmap.md in the roobra-docs repo
+// Subscriptions & Payments — see management/roadmaps/index.md in the roobra-docs repo
 
 model Subscription {
   id BigInt @id @default(autoincrement())

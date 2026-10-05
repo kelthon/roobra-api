@@ -3,7 +3,7 @@
 API-specific documentation for `roobra-api`. For ecosystem-wide and cross-service documentation
 (business rules, personas, architecture across services, general onboarding), see the `roobra-docs`
 repository. Why the documentation is organized this way:
-[adr/2026-09-15-how-to-document-app.md](./adr/2026-09-15-how-to-document-app.md).
+[roobra-docs's `adr/2026-09-15-how-to-document-app.md`](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-15-how-to-document-app.md).
 
 ## Where Does This Go
 
@@ -19,7 +19,7 @@ repository. Why the documentation is organized this way:
 ## Templates
 
 This repository keeps no templates. Start every new document from
-[`roobra-docs`'s `meta/templates/`](https://github.com/kelthon/roobra-docs/blob/main/meta/templates/README.md),
+[`roobra-docs`'s `meta/templates/`](https://github.com/kelthon/roobra-docs/blob/main/meta/templates/index.md),
 which also says where each kind of document is saved.
 
 ## Decisions
@@ -45,7 +45,7 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 
 ## Open Proposals
 
-- [prisma-global-config.md](./prisma-global-config.md) — Five Prisma client proposals that are not
-  decided yet (BigInt serialization, soft delete, pool tuning, transaction isolation, audit
-  logging). Each becomes a `Proposed` ADR when someone works on it, and the file is deleted when
-  it is empty.
+Undecided proposals are GitHub issues, not files; each becomes an ADR when it is decided:
+`BigInt` serialization ([#9](https://github.com/kelthon/roobra-api/issues/9)), soft delete ([#10](https://github.com/kelthon/roobra-api/issues/10)), connection pool tuning
+([#11](https://github.com/kelthon/roobra-api/issues/11)) and transaction isolation ([#12](https://github.com/kelthon/roobra-api/issues/12)). Audit logging is `roobra-docs`'s backlog
+task 5.1.1.

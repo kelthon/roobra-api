@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-09-04
 recorded-at: 2026-09-18
-source: docs/prisma-global-config.md §1; src/modules/database/prisma.service.ts; commit 1126efd
+source: docs/prisma-global-config.md §1 (removed in the docs restructuring, see git history); src/modules/database/prisma.service.ts; commit 1126efd
 supersedes:
 superseded-by:
 ---
@@ -50,5 +50,4 @@ does. Queries with an explicit `select` are unaffected, and `where`/`data` are n
 
 ## Implementation Status
 
-Implemented, including the `emailVerificationToken` entry. [prisma-global-config.md](../prisma-global-config.md)
-§1 still describes this as missing and is stale on that point.
+Implemented, including the `emailVerificationToken` entry.
