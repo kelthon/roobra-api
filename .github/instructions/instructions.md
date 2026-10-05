@@ -7,7 +7,7 @@ This document is the single source of truth for all standards, rules, and workfl
 - Always read all instruction files in `.github/instructions` before starting any contribution or using automation.
 - Follow the existing documentation structure and formatting for consistency.
 - Use clear and concise English in all code, comments, and documentation.
-- Refer to the [documentation-formatting-guidelines.md](https://github.com/kelthon/roobra-docs/blob/main/documentation-formatting-guidelines.md) for markdown and formatting standards.
+- Refer to the [formatting guidelines](https://github.com/kelthon/roobra-docs/blob/main/meta/formatting.md) for markdown and formatting standards.
 - Adhere to the team [culture and values](https://github.com/kelthon/roobra-docs/blob/main/guidelines/culture.md) in all interactions.
 - Documentation must explain "why" decisions are made, not just "how" to use or implement features.
 

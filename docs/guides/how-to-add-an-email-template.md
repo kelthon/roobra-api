@@ -25,7 +25,7 @@ Add a new transactional email, or a new language for an existing one, to the not
    `configService.getOrThrow('app.frontendUrl')`.
 3. Register the service in `providers` and `exports` of `notifications.module.ts`.
 4. Inject it where the email is triggered and `await` the send, following
-   [the synchronous sending ADR](../adr/2026-09-11-send-transactional-email-synchronously.md).
+   [the synchronous sending ADR](../adr/2026-09-11-05-send-transactional-email-synchronously.md).
 5. Add `<name>-mail.service.spec.ts` next to it, modelled on
    `password-reset-mail.service.spec.ts`.
 

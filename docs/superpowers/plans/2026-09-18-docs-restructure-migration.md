@@ -91,34 +91,34 @@ Used by Tasks 2–21. Each task names the file, sources and the facts that must 
 
 ### Tasks 3–7: Docker and Deployment
 
-- [x] **Task 3:** `docs/adr/2026-08-28-prisma-cli-as-dependency-and-generate-in-docker.md`. Source `docs/docker.md` "Why prisma generate runs inside deps". Verify: `prisma` is in `dependencies` in `package.json`; `Dockerfile` `deps` stage runs `npm ci --omit=dev && npx prisma generate`; `compose.override.yaml` command runs `npx prisma generate`.
-- [x] **Task 4:** `docs/adr/2026-08-28-flat-build-output-and-pinned-tsbuildinfo.md`. Source `docs/docker.md` (flat output, stray tsbuildinfo). Verify `tsconfig.build.json` `rootDir` and `tsBuildInfoFile`, `start:prod` script, `nest-cli.json` `deleteOutDir`.
-- [x] **Task 5:** `docs/adr/2026-08-28-three-compose-files-for-dev-and-prod.md`. Verify `compose.yaml`, `compose.override.yaml`, `compose.prod.yaml`, shared `name: roobra-api`, dev `user: node`.
-- [x] **Task 6:** `docs/adr/2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md`. Verify `image: postgres:18-alpine`, volume mounted at `/var/lib/postgresql`, no `user:` on `db`, `POSTGRES_USER` mapping.
-- [x] **Task 7:** `docs/adr/2026-08-28-manual-deployment-via-script.md`. Verify `scripts/deploy.sh` checks (`.env`, four variables), `scripts/ensure-db-user.sh` never drops data, workflow `deploy.yml` has no deploy job.
+- [x] **Task 3:** `docs/adr/2026-08-28-01-prisma-cli-as-dependency-and-generate-in-docker.md`. Source `docs/docker.md` "Why prisma generate runs inside deps". Verify: `prisma` is in `dependencies` in `package.json`; `Dockerfile` `deps` stage runs `npm ci --omit=dev && npx prisma generate`; `compose.override.yaml` command runs `npx prisma generate`.
+- [x] **Task 4:** `docs/adr/2026-08-28-02-flat-build-output-and-pinned-tsbuildinfo.md`. Source `docs/docker.md` (flat output, stray tsbuildinfo). Verify `tsconfig.build.json` `rootDir` and `tsBuildInfoFile`, `start:prod` script, `nest-cli.json` `deleteOutDir`.
+- [x] **Task 5:** `docs/adr/2026-08-28-03-three-compose-files-for-dev-and-prod.md`. Verify `compose.yaml`, `compose.override.yaml`, `compose.prod.yaml`, shared `name: roobra-api`, dev `user: node`.
+- [x] **Task 6:** `docs/adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md`. Verify `image: postgres:18-alpine`, volume mounted at `/var/lib/postgresql`, no `user:` on `db`, `POSTGRES_USER` mapping.
+- [x] **Task 7:** `docs/adr/2026-08-28-05-manual-deployment-via-script.md`. Verify `scripts/deploy.sh` checks (`.env`, four variables), `scripts/ensure-db-user.sh` never drops data, workflow `deploy.yml` has no deploy job.
 
 ### Tasks 8–9: Prisma Client and Schema
 
-- [x] **Task 8:** `docs/adr/2026-09-04-global-omit-for-credential-hashes.md`. Verify `prisma.service.ts` `omit` block and the `omit: { hashedPassword: false }` opt-in in `AuthService.validateUser`. Note that `docs/prisma-global-config.md` §1 still describes this as missing.
-- [x] **Task 9:** `docs/adr/2026-09-04-environment-based-prisma-query-logging.md`. Verify the `log` option keyed on `config.get('env')`. Note: `env` is not defined by any loaded config (`app.config.ts` exposes `app.mode`), so verify what the branch evaluates to and record it under Implementation Status.
+- [x] **Task 8:** `docs/adr/2026-09-04-01-global-omit-for-credential-hashes.md`. Verify `prisma.service.ts` `omit` block and the `omit: { hashedPassword: false }` opt-in in `AuthService.validateUser`. Note that `docs/prisma-global-config.md` §1 still describes this as missing.
+- [x] **Task 9:** `docs/adr/2026-09-04-02-environment-based-prisma-query-logging.md`. Verify the `log` option keyed on `config.get('env')`. Note: `env` is not defined by any loaded config (`app.config.ts` exposes `app.mode`), so verify what the branch evaluates to and record it under Implementation Status.
 - [x] **Task 10:** `docs/adr/2026-09-10-domain-based-prisma-schema-files.md`. Source commit `3d2bd2f` body. Verify `prisma/models/` files and `prisma.config.ts` `schema: 'prisma/models'`.
 
 ### Tasks 11–14: Auth
 
-- [x] **Task 11:** `docs/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md`. Verify `AccessTokenService.refresh` (revoked token presented → `revokeAll`), `jwt.config.ts` lifetimes (access 15 min, refresh 7 days, length 64).
-- [x] **Task 12:** `docs/adr/2026-09-07-hash-secrets-by-entropy-argon2-and-sha256.md`. Verify `PasswordHashService` (argon2), `SimpleHashService` (sha256 + `timingSafeEqual`), `User.hashedPassword` vs `hashedToken` columns.
-- [x] **Task 13:** `docs/adr/2026-09-11-one-time-opaque-tokens-for-reset-and-verification.md`. Verify `SimpleTokenService` (hex), `passwordResetToken` 5 min, `emailVerificationToken` 15 min, `usedAt` single-use checks in `AuthService`, `ResetPasswordDto` hex validation.
-- [x] **Task 14:** `docs/adr/2026-09-11-rate-limit-auth-endpoints.md`. Verify global `ThrottlerGuard` (20/60s), `AUTH_THROTTLE` (5/60s) on register, login, refresh-token, forgot-password, reset-password, and `trust proxy` in `main.ts`.
+- [x] **Task 11:** `docs/adr/2026-09-07-01-refresh-token-rotation-with-reuse-detection.md`. Verify `AccessTokenService.refresh` (revoked token presented → `revokeAll`), `jwt.config.ts` lifetimes (access 15 min, refresh 7 days, length 64).
+- [x] **Task 12:** `docs/adr/2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md`. Verify `PasswordHashService` (argon2), `SimpleHashService` (sha256 + `timingSafeEqual`), `User.hashedPassword` vs `hashedToken` columns.
+- [x] **Task 13:** `docs/adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md`. Verify `SimpleTokenService` (hex), `passwordResetToken` 5 min, `emailVerificationToken` 15 min, `usedAt` single-use checks in `AuthService`, `ResetPasswordDto` hex validation.
+- [x] **Task 14:** `docs/adr/2026-09-11-02-rate-limit-auth-endpoints.md`. Verify global `ThrottlerGuard` (20/60s), `AUTH_THROTTLE` (5/60s) on register, login, refresh-token, forgot-password, reset-password, and `trust proxy` in `main.ts`.
 
 ### Tasks 15–21: Notifications
 
-- [x] **Task 15:** `docs/adr/2026-09-11-use-nestjs-modules-mailer-for-transactional-email.md`. Source spec §2.1. Verify pinned versions in `package.json` and `MailerModule.forRootAsync` location (`app.module.ts`, not `notifications.module.ts`).
-- [x] **Task 16:** `docs/adr/2026-09-11-handlebars-as-email-template-engine.md`. Source spec §2.2. Verify `HandlebarsAdapter` options (`inlineCssEnabled`, `strict: true`).
-- [x] **Task 17:** `docs/adr/2026-09-11-send-transactional-email-synchronously.md`. Source spec §2.4. Verify `forgotPassword` awaits the send after creating the token; record that `sendVerificationEmail` runs create and send in `Promise.all`.
-- [x] **Task 18:** `docs/adr/2026-09-11-locale-templates-under-locales-folder.md`. Source spec §2.5. Verify actual layout: `templates/locales/<locale>/`, `i18n.templateDirPattern`, `fallback: true`. The spec says `templates/locale/` and `pt-BR`; the code differs. Record the as-built decision and the divergence.
-- [x] **Task 19:** `docs/adr/2026-09-11-user-preferred-lang-column.md`. Source spec §2.6. Verify column in `auth.prisma`, migration `20260913195813_...`, `resolveLocale` in `locale.util.ts`. Verify that `AuthService.register` does **not** call it yet and record that under Implementation Status.
+- [x] **Task 15:** `docs/adr/2026-09-11-03-use-nestjs-modules-mailer-for-transactional-email.md`. Source spec §2.1. Verify pinned versions in `package.json` and `MailerModule.forRootAsync` location (`app.module.ts`, not `notifications.module.ts`).
+- [x] **Task 16:** `docs/adr/2026-09-11-04-handlebars-as-email-template-engine.md`. Source spec §2.2. Verify `HandlebarsAdapter` options (`inlineCssEnabled`, `strict: true`).
+- [x] **Task 17:** `docs/adr/2026-09-11-05-send-transactional-email-synchronously.md`. Source spec §2.4. Verify `forgotPassword` awaits the send after creating the token; record that `sendVerificationEmail` runs create and send in `Promise.all`.
+- [x] **Task 18:** `docs/adr/2026-09-11-06-locale-templates-under-locales-folder.md`. Source spec §2.5. Verify actual layout: `templates/locales/<locale>/`, `i18n.templateDirPattern`, `fallback: true`. The spec says `templates/locale/` and `pt-BR`; the code differs. Record the as-built decision and the divergence.
+- [x] **Task 19:** `docs/adr/2026-09-11-07-user-preferred-lang-column.md`. Source spec §2.6. Verify column in `auth.prisma`, migration `20260913195813_...`, `resolveLocale` in `locale.util.ts`. Verify that `AuthService.register` does **not** call it yet and record that under Implementation Status.
 - [x] **Task 20:** `docs/adr/2026-09-12-marketing-email-templates-db-backed-marketing-only.md`. Source spec §9.2, §9.3, §9.5, §9.6, §9.8. Verify no `MarketingEmailTemplate` model exists in `prisma/models/`.
-- [x] **Task 21:** `docs/adr/2026-09-11-email-transport-provider.md`. Source spec §2.3. `status: Draft`, `intended-status: Proposed`: the team explicitly deferred the decision, so the ADR merges as Proposed. Verify the SMTP transport config in `app.module.ts` and `mail.config.ts`.
+- [x] **Task 21:** `docs/adr/2026-09-11-08-email-transport-provider.md`. Source spec §2.3. `status: Draft`, `intended-status: Proposed`: the team explicitly deferred the decision, so the ADR merges as Proposed. Verify the SMTP transport config in `app.module.ts` and `mail.config.ts`.
 
 ## Phase 3: Guides and References
 
@@ -186,7 +186,7 @@ Guides use the format Title, Objective, Prerequisites, numbered Steps, Troublesh
 
 Tasks 1–32 were executed on `docs/restructure-documentation`. Task 33 runs after the merge into `main`.
 
-**Deviations**
+### Deviations
 
 - `docs/adr/README.md` got its index in a separate commit, generated from each ADR's frontmatter.
 - The draft `MarketingEmailTemplate` schema moved into an appendix of ADR 20, so the notifications
@@ -197,7 +197,9 @@ Tasks 1–32 were executed on `docs/restructure-documentation`. Task 33 runs aft
 - Empty local folders `docs/business/`, `docs/references/` and `docs/runbooks/` come from the RFC's
   first six-folder layout. They are untracked and unused; delete them unless a use appears.
 
-**Findings from verifying the docs against the code** (not fixed here; each needs a code change or a decision)
+### Findings From Verifying The Docs Against The Code
+
+(Not fixed here; each needs a code change or a decision.)
 
 1. `PrismaService` reads `config.get('env')`, which no config defines, so queries are logged in
    production (ADR 9).
@@ -222,6 +224,8 @@ The cutover is done on this branch; only Task 33 (after the merge into `main`) r
 - Eight citations of `roobra-docs/management/mvp-summary.md` (a personal file that is never committed)
   now cite `management/roadmap.md` or `backlog.md`.
 
-**Status of the findings above:** 1, 2 and 5 are fixed (commits `3a6e350`, `c2a4e34`, `3c9fa02`).
+### Status Of The Findings Above (2026-09-23)
+
+1, 2 and 5 are fixed (commits `3a6e350`, `c2a4e34`, `3c9fa02`).
 3, 4, 6, 7 and 8 are still open code follow-ups, tracked in `todo.md`, which should become issues
 before it is deleted.

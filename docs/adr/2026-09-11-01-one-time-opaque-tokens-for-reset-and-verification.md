@@ -36,7 +36,7 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
 
 - **Signed JWT as reset token** — not used; the fix in `e1b2cfb` aligned validation with the opaque
   token actually issued. Rationale for opaque over JWT is not otherwise recorded; it is consistent
-  with [the hashing ADR](./2026-09-07-hash-secrets-by-entropy-argon2-and-sha256.md), which makes
+  with [the hashing ADR](./2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md), which makes
   tokens revocable and single-use through the database.
 
 ## Consequences

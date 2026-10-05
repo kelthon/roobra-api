@@ -16,6 +16,12 @@ repository. Why the documentation is organized this way:
 | Plan or spec for an AI agent (transient) | [superpowers/](./superpowers/) |
 | Does another repository need to know? | `roobra-docs` |
 
+## Templates
+
+This repository keeps no templates. Start every new document from
+[`roobra-docs`'s `meta/templates/`](https://github.com/kelthon/roobra-docs/blob/main/meta/templates/README.md),
+which also says where each kind of document is saved.
+
 ## Decisions
 
 [adr/](./adr/) lists every decision with its status. ADRs stay `Draft` until the restructuring branch

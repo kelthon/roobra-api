@@ -40,7 +40,7 @@ engine (`handlebars`) is pulled in.
 - There is no transport-agnostic seam: `MailerService` is the transport layer. This was traded away
   knowingly. Nodemailer itself supports SMTP, SES, sendmail and streaming, so the cost is soft
   except for a pure-HTTP provider with no SMTP interface (see
-  [the transport ADR](./2026-09-11-email-transport-provider.md)).
+  [the transport ADR](./2026-09-11-08-email-transport-provider.md)).
 - Each use case keeps a small typed service (`PasswordResetMailService`,
   `EmailVerificationMailService`) that builds the `context` and calls `sendMail`, to recover
   compile-time type safety that `sendMail`'s `Record<string, any>` context gives up.

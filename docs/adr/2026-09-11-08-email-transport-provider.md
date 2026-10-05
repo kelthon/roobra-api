@@ -19,8 +19,7 @@ and complaint handling, DKIM/SPF or IP reputation.
 
 ## Decision
 
-**None yet, on purpose.** On 2026-09-11 the team explicitly deferred the choice ("ainda não sei /
-decidir depois"). An assumption made earlier in the same session was called out and corrected.
+**None yet, on purpose.** On 2026-09-11 the team explicitly deferred the choice. An assumption made earlier in the same session was called out and corrected.
 **Do not assume a provider; ask before implementing against one.** `roobra-docs`
 `architecture/auth-flow.md` names "SES/Resend" in a sequence diagram, which is a signal and not a
 decision.
@@ -30,7 +29,7 @@ decision.
 - **Generic SMTP (current)** — placeholder only.
 - **Resend, AWS SES (native SDK), Postmark** — undecided. A pure-HTTP provider with no SMTP interface
   would be the case where using `@nestjs-modules/mailer` becomes a real lock-in (see
-  [the mailer ADR](./2026-09-11-use-nestjs-modules-mailer-for-transactional-email.md)).
+  [the mailer ADR](./2026-09-11-03-use-nestjs-modules-mailer-for-transactional-email.md)).
 
 ## Consequences
 
