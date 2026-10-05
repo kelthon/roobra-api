@@ -1,5 +1,12 @@
 # Prisma Client global configuration
 
+> **Partially migrated (2026-09-18).** §1 (global `omit`) and §4 (query logging) are implemented and
+> now recorded in [the omit ADR](./adr/2026-09-04-global-omit-for-credential-hashes.md) and
+> [the logging ADR](./adr/2026-09-04-environment-based-prisma-query-logging.md); the text below
+> still describes them as missing. Current behavior is in [reference/prisma-setup.md](./reference/prisma-setup.md).
+> §2, §3, §5, §6 and §7 are still undecided proposals and stay here until each one is split into a
+> `Proposed` ADR.
+
 This document expands on configuration that should live once, globally, on
 [`PrismaService`](../src/modules/database/prisma.service.ts) — the single place every
 `PrismaClient` instance in the app is constructed — instead of being repeated (or forgotten) at
@@ -228,7 +235,7 @@ throughput cost and most reads in the app do not need it.
 ## 7. `AuditLog` is not populated by anything yet
 
 **Problem:** the `AuditLog` model
-([audit-log.model.prisma](../prisma/models/audit-log.model.prisma)) exists in the schema, but a
+([audit-log.model.prisma](../prisma/models/audit.prisma)) exists in the schema, but a
 grep of `src/` for anything writing to `prisma.auditLog` turns up nothing — it is modeled but
 unused. Left as-is, every service that should audit something (role changes, `Key` issuance,
 `Promotion` edits) has to remember to call `prisma.auditLog.create(...)` by hand, which is exactly
