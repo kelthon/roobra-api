@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-08-28
 recorded-at: 2026-09-18
-source: docs/deployment.md; scripts/deploy.sh; scripts/ensure-db-user.sh; .github/workflows/deploy.yml; commit 8965e50
+source: docs/deployment.md; scripts/deploy.sh; scripts/ensure-db-user.sh; .github/workflows/deploy.yml; commit 8965e50 — the legacy doc cited first was removed in the docs restructuring (see git history)
 supersedes:
 superseded-by:
 ---

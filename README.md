@@ -33,7 +33,9 @@ permissions for the Roobra website.
 
    Fill in at least `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `DATABASE_URL`
    (`DATABASE_HOST` should be `db`, the Compose service name). Do not leave `DATABASE_USER` empty
-   on the first run — see [docs/docker.md](docs/docker.md#postgres_user--database_user) for why.
+   on the first run — see
+   [the Postgres image ADR](docs/adr/2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md)
+   for why.
 
 3. Start the stack:
 
@@ -42,7 +44,8 @@ permissions for the Roobra website.
    ```
 
    This builds the app image, starts PostgreSQL, and runs the API in watch mode with auto-reload.
-   See [docs/docker.md](docs/docker.md) for what each Compose file does and why.
+   See [how to run with Docker](docs/guides/how-to-run-with-docker.md) for the commands and the
+   [Docker reference](docs/reference/docker-setup.md) for what each Compose file does.
 
 4. Call the API with your HTTP client of choice (Postman, Insomnia, curl, ...) at
    `http://localhost:3000` (or whichever `PORT` you set in `.env`).
@@ -70,14 +73,15 @@ still talks to `db:5432` via `DATABASE_URL`, the Compose service name. You can a
 ## Deployment
 
 Production runs the same containers via `compose.prod.yaml` and `scripts/deploy.sh`. See
-[docs/deployment.md](docs/deployment.md) for the full process, prerequisites, the current CI
-pipeline status, and how to recover a misconfigured database role without losing data.
+[how to deploy](docs/guides/how-to-deploy-app.md) for the full process, prerequisites and how to
+recover a misconfigured database role without losing data, and
+[the deployment ADR](docs/adr/2026-08-28-manual-deployment-via-script.md) for why CI does not deploy.
 
 ## Documentation
 
-- [docs/docker.md](docs/docker.md) — Dockerfile stages, the three Compose files, and the reasoning
-  behind non-obvious infra decisions.
-- [docs/deployment.md](docs/deployment.md) — deployment process and troubleshooting.
+- [docs/README.md](docs/README.md) — index of this repository's documentation:
+  [decisions](docs/adr/) (why), [guides](docs/guides/) (how to), and
+  [reference](docs/reference/) (how it works today) for auth, notifications, Prisma and Docker.
 - [AGENTS.md](AGENTS.md) and [.github/instructions/](.github/instructions/) — contribution
   guidelines, coding standards, and architecture, including team culture and values.
 - Cross-service and business documentation: the `roobra-docs` repository.

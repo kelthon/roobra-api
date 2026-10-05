@@ -32,16 +32,13 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 ## Reference
 
 - [reference/auth-module.md](./reference/auth-module.md) — Endpoints, guards, tokens.
-- [reference/notifications-module.md](./reference/notifications-module.md) — Mailer setup, templates, known issues.
+- [reference/notifications-module.md](./reference/notifications-module.md) — Mailer setup, templates, locales.
 - [reference/prisma-setup.md](./reference/prisma-setup.md) — Schema layout, ID types, client options.
 - [reference/docker-setup.md](./reference/docker-setup.md) — Dockerfile stages and Compose files.
 
-## Pending Migration
+## Open Proposals
 
-- [prisma-global-config.md](./prisma-global-config.md) — Sections still undecided (BigInt serialization,
-  soft delete, pool tuning, transaction isolation, audit logging). Split each into a `Proposed` ADR
-  when someone works on it.
-- [docker.md](./docker.md), [deployment.md](./deployment.md),
-  [notifications-module-spec.md](./notifications-module-spec.md) — Stubs pointing at the new
-  documents; removed after the restructuring branch merges.
-- Migration plan: [superpowers/plans/2026-09-18-docs-restructure-migration.md](./superpowers/plans/2026-09-18-docs-restructure-migration.md).
+- [prisma-global-config.md](./prisma-global-config.md) — Five Prisma client proposals that are not
+  decided yet (BigInt serialization, soft delete, pool tuning, transaction isolation, audit
+  logging). Each becomes a `Proposed` ADR when someone works on it, and the file is deleted when
+  it is empty.

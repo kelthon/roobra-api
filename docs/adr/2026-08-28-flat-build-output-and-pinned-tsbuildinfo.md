@@ -3,7 +3,7 @@ status: Draft
 intended-status: Accepted
 date: 2026-08-28
 recorded-at: 2026-09-18
-source: docs/docker.md "Why the build output is flat" and "Stray *.tsbuildinfo files"; tsconfig.build.json; nest-cli.json
+source: docs/docker.md "Why the build output is flat" and "Stray *.tsbuildinfo files"; tsconfig.build.json; nest-cli.json — the legacy doc cited first was removed in the docs restructuring (see git history)
 supersedes:
 superseded-by:
 ---
