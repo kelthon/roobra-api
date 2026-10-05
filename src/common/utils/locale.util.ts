@@ -4,12 +4,11 @@ export const SUPPORTED_LOCALES: readonly LocaleType[] = ['en', 'pt'];
 export const DEFAULT_LOCALE: LocaleType = 'en';
 
 /**
- * Resolves a browser `Accept-Language` header to one of this app's
- * supported locales. Tries each tag left-to-right (browsers already send
- * them in preference order): first an exact match, then its primary
- * subtag (`en-GB` → `en`, `pt-BR` → `pt`) — so a region we don't ship a
- * dedicated template for still resolves to the language we do support.
- * Falls back to DEFAULT_LOCALE when nothing matches.
+ * Resolves an `Accept-Language` header to a supported locale. Tags are tried in
+ * order, each as is and then by its primary subtag (`pt-BR` → `pt`); falls back
+ * to `DEFAULT_LOCALE`.
+ *
+ * @param acceptLanguageHeader The raw header value
  */
 export function resolveLocale(acceptLanguageHeader?: string): LocaleType {
   if (!acceptLanguageHeader) return DEFAULT_LOCALE;

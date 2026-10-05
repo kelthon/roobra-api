@@ -35,6 +35,13 @@ export class AuthController {
     return await this.authService.register(registerDto);
   }
 
+  /**
+   * Signs a user in with email and password, already checked by
+   * `LoginWith('local')` before this runs.
+   *
+   * @param user The user the local strategy accepted
+   * @param _loginDto The credentials, only declared so the body is validated
+   */
   @Throttle(AUTH_THROTTLE)
   @GuestOnly()
   @LoginWith('local')

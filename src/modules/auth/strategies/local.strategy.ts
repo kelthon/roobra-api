@@ -9,6 +9,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({ usernameField: 'email' });
   }
 
+  /**
+   * Checks the email and password of a login request.
+   *
+   * @param email The user email
+   * @param password The plain password
+   * @throws UnauthorizedException When the credentials do not match
+   */
   async validate(email: string, password: string) {
     const user = await this.authService.validateUser(email, password);
     if (!user) {
