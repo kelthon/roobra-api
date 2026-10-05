@@ -78,12 +78,12 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 
 ## Decisions
 
-- [Mailer library](../adr/2026-09-11-use-nestjs-modules-mailer-for-transactional-email.md)
-- [Handlebars](../adr/2026-09-11-handlebars-as-email-template-engine.md)
-- [Synchronous sending](../adr/2026-09-11-send-transactional-email-synchronously.md)
-- [Locale folder structure](../adr/2026-09-11-locale-templates-under-locales-folder.md)
-- [Preferred language column](../adr/2026-09-11-user-preferred-lang-column.md)
-- [Transport provider (open)](../adr/2026-09-11-email-transport-provider.md)
+- [Mailer library](../adr/2026-09-11-03-use-nestjs-modules-mailer-for-transactional-email.md)
+- [Handlebars](../adr/2026-09-11-04-handlebars-as-email-template-engine.md)
+- [Synchronous sending](../adr/2026-09-11-05-send-transactional-email-synchronously.md)
+- [Locale folder structure](../adr/2026-09-11-06-locale-templates-under-locales-folder.md)
+- [Preferred language column](../adr/2026-09-11-07-user-preferred-lang-column.md)
+- [Transport provider (open)](../adr/2026-09-11-08-email-transport-provider.md)
 
 ## Checking Templates
 

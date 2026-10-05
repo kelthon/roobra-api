@@ -55,13 +55,13 @@ Start the API and its Postgres database with Docker Compose, in development or i
 - `docker compose down -v` does not delete the production database: production mounts a host
   directory, and `-v` only removes named volumes.
 - Why the files are split, and why the images are built this way, is in
-  [the Compose ADR](../adr/2026-08-28-three-compose-files-for-dev-and-prod.md) and the
+  [the Compose ADR](../adr/2026-08-28-03-three-compose-files-for-dev-and-prod.md) and the
   [Docker reference](../reference/docker-setup.md).
 
 ## Troubleshooting
 
 - **`db` exits with `mkdir: ... Permission denied`:** the `db` service must not have a `user:`
-  override, see [the Postgres ADR](../adr/2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md).
+  override, see [the Postgres ADR](../adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md).
 - **Host commands such as `npm run build` fail on files in `dist/` owned by `root`:** the dev
   container must run as `user: node` (UID 1000). If your host UID differs, align the container's
   UID/GID rather than removing the override. Reset ownership of `dist/` once, then restart.

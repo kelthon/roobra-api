@@ -24,7 +24,7 @@ forever if `DATABASE_USER` was empty on the first run of an empty data directory
    `docker compose -f compose.yaml -f compose.prod.yaml up -d --build`.
 2. The script creates and `chown`s nothing on the host. Docker creates the bind-mount source and the
    Postgres entrypoint fixes its own permissions (see
-   [the Postgres ADR](./2026-08-28-postgres-image-pinned-and-entrypoint-permissions.md)).
+   [the Postgres ADR](./2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md)).
 3. `.env` is neither committed nor managed by the script; it is created and maintained on the
    server.
 4. Recovery from a wrong Postgres role uses `scripts/ensure-db-user.sh`, which connects to the
