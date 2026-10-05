@@ -12,10 +12,14 @@ export class EmailVerificationMailService {
   ) {}
 
   /**
+   * Sends the email verification email with a link back to the frontend.
+   *
    * @param to The recipient email
    * @param username The recipient username, used for the greeting
-   * @param verificationToken The raw (unhashed) verification token to embed in the link
-   * @param expiresInSeconds How long the token is valid for
+   * @param verificationToken The raw (unhashed) verification token to embed in
+   *   the link
+   * @param expiresInSeconds How long the token is valid, shown in hours
+   * @param locale The language of the email
    */
   async send(
     to: string,

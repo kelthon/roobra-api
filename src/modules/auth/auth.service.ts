@@ -23,6 +23,12 @@ import { PasswordResetMailService } from 'src/modules/notifications/services/pas
 import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service';
 import { Prisma } from 'src/generated/prisma/client';
 
+/**
+ * Reset and verification links carry one-time opaque tokens, stored only as
+ * hashes and consumed in the same transaction as their effect.
+ *
+ * @see docs/adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md
+ */
 @Injectable()
 export class AuthService {
   private readonly AUTH_USER_SELECT = {
@@ -45,9 +51,10 @@ export class AuthService {
   ) {}
 
   /**
-   * Gets user profile information
+   * Gets the profile of a user.
    *
    * @param userId The user nano id
+   * @throws BadRequestException When the user does not exist
    */
   async getMe(userId: string) {
     try {
@@ -75,12 +82,11 @@ export class AuthService {
   }
 
   /**
-   * Validates user crendentials without generate access tokens
+   * Checks an email and password for the local strategy, returning null instead
+   * of throwing when they do not match.
    *
-   * Used for guards not requires throw errors
-   *
-   * @param email the user email
-   * @param password the user password
+   * @param email The user email
+   * @param password The plain password
    */
   async validateUser(
     email: string,
@@ -113,13 +119,11 @@ export class AuthService {
   }
 
   /**
-   * Register a new user account
+   * Creates an account and signs the user in.
    *
    * @param registerDto The account data
-   * @param registerDto.email The user email
-   * @param registerDto.username The user username
-   * @param registerDto.password The plain password
-   * @param registerDto.confirmPassword The password confirmation
+   * @throws BadRequestException When the email or the username is already in
+   *   use
    */
   async register(
     registerDto: RegisterUserDto,
@@ -168,6 +172,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Signs in a user the local strategy already authenticated.
+   *
+   * @param userId The user nano id
+   * @throws BadRequestException When the user no longer exists
+   */
   async login(userId: string): Promise<SuccessAuthenticationResponse> {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
@@ -266,6 +276,13 @@ export class AuthService {
     }
   }
 
+  /**
+   * Sets a new password using a reset token.
+   *
+   * @param resetPasswordDto The reset token and the new password
+   * @throws BadRequestException When the token does not exist, was used or has
+   *   expired
+   */
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { resetToken, newPassword } = resetPasswordDto;
     const hashedToken = this.simpleHashService.hash(resetToken);
@@ -300,6 +317,14 @@ export class AuthService {
     }
   }
 
+  /**
+   * Changes the password after checking the current one.
+   *
+   * @param userId The user nano id
+   * @param changePasswordDto The current and the new password
+   * @throws BadRequestException When the current password is wrong or the user
+   *   does not exist
+   */
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
     const { currentPassword, newPassword } = changePasswordDto;
 
@@ -324,6 +349,14 @@ export class AuthService {
     }
   }
 
+  /**
+   * Hashes and stores a new password.
+   *
+   * @param userId The user nano id
+   * @param newPassword The plain new password
+   * @param tx The transaction to run in, when called inside one
+   * @throws BadRequestException When the user does not exist
+   */
   async updatePassword(
     userId: string,
     newPassword: string,
@@ -348,6 +381,12 @@ export class AuthService {
     }
   }
 
+  /**
+   * Creates an email verification token and emails the link.
+   *
+   * @param userId The user nano id
+   * @throws BadRequestException When the user does not exist
+   */
   async sendVerificationEmail(userId: string) {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
@@ -390,6 +429,13 @@ export class AuthService {
     }
   }
 
+  /**
+   * Marks the user's email as verified.
+   *
+   * @param token The raw token from the verification link
+   * @throws BadRequestException When the token does not exist, was used or has
+   *   expired
+   */
   async verifyEmail(token: string) {
     try {
       const verificationEmailToken =

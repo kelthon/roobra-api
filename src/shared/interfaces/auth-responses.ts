@@ -3,6 +3,7 @@ import { User } from 'src/generated/prisma/client';
 export interface AuthTokensResponse {
   accessToken: string;
   refreshToken: string;
+  /** Seconds until the access token expires */
   expiresIn: number;
 }
 

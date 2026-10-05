@@ -1,5 +1,14 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
 
+/**
+ * Validates a person's name: letters only, with words separated by a hyphen or
+ * an apostrophe, or by a space when `allowSpaces` is true.
+ *
+ * @param minLength The minimum length
+ * @param maxLength The maximum length
+ * @param allowSpaces Whether words may be separated by a space
+ * @param validationOptions Standard class-validator options
+ */
 export function IsName(
   minLength: number = 3,
   maxLength: number = 75,

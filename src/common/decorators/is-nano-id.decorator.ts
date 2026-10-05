@@ -4,6 +4,11 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
+/**
+ * Validates a nano id: 21 characters, each a letter, a digit, `_` or `-`.
+ *
+ * @param validationOptions Standard class-validator options
+ */
 export function IsNanoId(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({

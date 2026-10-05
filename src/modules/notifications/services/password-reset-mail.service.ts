@@ -17,6 +17,7 @@ export class PasswordResetMailService {
    * @param to The recipient email
    * @param username The recipient username, used for the greeting
    * @param resetToken The raw (unhashed) reset token to embed in the link
+   * @param locale The language of the email
    */
   async send(
     to: string,

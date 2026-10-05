@@ -14,6 +14,13 @@ import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from 'src/common/utils/database.util';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service';
 
+/**
+ * Access tokens are short-lived JWTs. Refresh tokens are opaque, stored only as
+ * a hash, single-use and rotated on every refresh.
+ *
+ * @see https://github.com/kelthon/roobra-docs/blob/main/adr/2026-04-14-stateless-jwt-access-tokens.md
+ * @see https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md
+ */
 @Injectable()
 export class AccessTokenService {
   constructor(
@@ -71,6 +78,14 @@ export class AccessTokenService {
     return refreshToken;
   }
 
+  /**
+   * Exchanges a refresh token for a new access and refresh token. Presenting a
+   * revoked token is treated as reuse: every session of its user is revoked.
+   *
+   * @param refreshToken The raw refresh token
+   * @throws BadRequestException When the token is unknown, expired or revoked
+   * @throws NotFoundException When the user of the token no longer exists
+   */
   async refresh(refreshToken: string): Promise<AuthTokensResponse> {
     const token = await this.prisma.refreshToken.findFirst({
       where: {
@@ -119,6 +134,13 @@ export class AccessTokenService {
     return await this.generate(user);
   }
 
+  /**
+   * Revokes one active refresh token of the user.
+   *
+   * @param userId The user nano id
+   * @param refreshToken The raw refresh token
+   * @throws NotFoundException When the user has no active token matching it
+   */
   async revoke(userId: string, refreshToken: string): Promise<InfoResponse> {
     try {
       const token = await this.prisma.refreshToken.findFirstOrThrow({
