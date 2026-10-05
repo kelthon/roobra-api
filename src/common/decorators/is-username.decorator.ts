@@ -1,5 +1,12 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
 
+/**
+ * Validates a username: letters, digits and underscores only.
+ *
+ * @param minLength The minimum length
+ * @param maxLength The maximum length
+ * @param validationOptions Standard class-validator options
+ */
 export function IsUserName(
   minLength: number = 3,
   maxLength: number = 75,

@@ -8,6 +8,12 @@ import { getJwtPayload } from 'src/common/utils/jwt-payload.util';
 
 @Injectable()
 export class ForbidAuthenticatedGuard implements CanActivate {
+  /**
+   * Lets the request through only when it carries no valid access token.
+   *
+   * @param context The request context
+   * @throws ForbiddenException When the request carries a valid access token
+   */
   canActivate(context: ExecutionContext): boolean {
     const user = getJwtPayload(context);
 

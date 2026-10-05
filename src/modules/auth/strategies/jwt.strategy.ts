@@ -13,6 +13,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Returns the verified token payload, which becomes `request.user`. Does not
+   * check the database: a deleted or blocked user keeps a valid token until it
+   * expires.
+   *
+   * @param payload The verified token payload
+   */
   validate(payload: Record<string, unknown>) {
     // TODO: add deleted/blocked users verification
     return payload;

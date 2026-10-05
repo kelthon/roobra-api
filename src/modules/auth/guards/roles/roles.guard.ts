@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { getJwtPayload } from 'src/common/utils/jwt-payload.util';
 
+/**
+ * A route without `@Roles()` is open to everyone. Registered in `AuthModule`
+ * but not applied to any route yet.
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

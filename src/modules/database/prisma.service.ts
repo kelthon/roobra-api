@@ -3,6 +3,13 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from 'src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+/**
+ * Omits credential hashes from every query unless the query asks for them, and
+ * logs queries outside production.
+ *
+ * @see docs/adr/2026-09-04-01-global-omit-for-credential-hashes.md
+ * @see docs/adr/2026-09-04-02-environment-based-prisma-query-logging.md
+ */
 @Injectable()
 export class PrismaService extends PrismaClient {
   constructor(config: ConfigService) {
