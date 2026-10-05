@@ -5,7 +5,9 @@ This document is the single source of truth for all standards, rules, and workfl
 ## General Principles
 
 - Always read all instruction files in `.github/instructions` before starting any contribution or using automation.
-- Follow the existing documentation structure and formatting for consistency.
+- Follow [`roobra-docs`'s `meta/how-to-document.md`](https://github.com/kelthon/roobra-docs/blob/main/meta/how-to-document.md) before any documentation change: where a
+  document goes, templates, frontmatter, identifiers, the ADR lifecycle and the checks to run. It is
+  the normative guide for documentation in every Roobra repository.
 - Use clear and concise English in all code, comments, and documentation.
 - Refer to the [formatting guidelines](https://github.com/kelthon/roobra-docs/blob/main/meta/formatting.md) for markdown and formatting standards.
 - Adhere to the team [culture and values](https://github.com/kelthon/roobra-docs/blob/main/guidelines/culture.md) in all interactions.

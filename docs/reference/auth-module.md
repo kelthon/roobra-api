@@ -3,13 +3,13 @@
 **Location:** `src/modules/auth/` — verified against branch `docs/restructure-documentation`, 2026-09-18.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
-the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/flows/auth.md`).
+the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
 This page describes how the module is implemented.
 
 ## Endpoints
 
 Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 20 per 60 seconds
-(see [the rate limiting ADR](../adr/2026-09-11-02-rate-limit-auth-endpoints.md)).
+(see [the rate limiting ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-01-rate-limit-auth-endpoints.md)).
 
 | Method and path | Access | Rate limit | Body | Purpose |
 | --- | --- | --- | --- | --- |
@@ -47,7 +47,7 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | Password reset | 64 hex characters | 5 min (placeholder, not decided) | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
 | Email verification | 64 hex characters | 48 h (placeholder, not decided) | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
 
-Why: [refresh tokens](../adr/2026-09-07-01-refresh-token-rotation-with-reuse-detection.md),
+Why: [refresh tokens](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md),
 [hashing](../adr/2026-09-07-02-hash-secrets-by-entropy-argon2-and-sha256.md),
 [one-time tokens](../adr/2026-09-11-01-one-time-opaque-tokens-for-reset-and-verification.md).
 

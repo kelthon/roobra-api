@@ -1,4 +1,4 @@
-// Auth & Identity — see management/roadmap.md in the roobra-docs repo
+// Auth & Identity — see management/roadmaps/index.md in the roobra-docs repo
 
 enum UserRole {
   SUBSCRIBER      @map("subscriber")

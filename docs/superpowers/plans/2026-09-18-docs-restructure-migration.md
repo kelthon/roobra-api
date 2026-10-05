@@ -165,7 +165,7 @@ Guides use the format Title, Objective, Prerequisites, numbered Steps, Troublesh
 - [ ] List drafts: `grep -l '^status: Draft' docs/adr/*.md`.
 - [ ] For each, set `status:` to its `intended-status` value and add `accepted-at: <merge date>`. The transport ADR (Task 21) becomes `Proposed` instead.
 - [ ] Update the status column in `docs/adr/README.md`.
-- [ ] Remove `docs/superpowers/plans/2026-09-12-notifications-service-migration.md` (already executed). The three stubs were already removed on 2026-09-23.
+- [x] Remove `docs/superpowers/plans/2026-09-12-notifications-service-migration.md` (already executed; removed 2026-09-30). The three stubs were already removed on 2026-09-23.
 - [ ] Commit on a follow-up branch: `docs(adr): promote drafts after merge`.
 
 ## Open Questions For Reviewers

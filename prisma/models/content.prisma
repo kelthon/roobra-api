@@ -1,4 +1,4 @@
-// Content & Discovery — see management/roadmap.md in the roobra-docs repo
+// Content & Discovery — see management/roadmaps/index.md in the roobra-docs repo
 
 model Media {
   id BigInt @id @default(autoincrement())

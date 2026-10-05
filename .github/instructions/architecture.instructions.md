@@ -13,7 +13,7 @@ deliberately does not repeat either one, so it cannot drift from them.
 
 | You want to know | Read |
 | --- | --- |
-| How the ecosystem fits together (components, repositories, flows between services) | [`roobra-docs/architecture/`](https://github.com/kelthon/roobra-docs/tree/main/architecture), starting with `system-overview.md`. Each component there is marked built or planned |
+| How the ecosystem fits together (components, repositories, flows between services) | [`roobra-docs/architecture/`](https://github.com/kelthon/roobra-docs/tree/main/architecture), starting with its `index.md`, the overview. Each component there is marked built or planned |
 | Business rules, personas, glossary | [`roobra-docs/business/`](https://github.com/kelthon/roobra-docs/tree/main/business) |
 | How this API works today (auth, notifications, Prisma, Docker) | [`docs/reference/`](../../docs/reference/) |
 | Why this API is built the way it is | [`docs/adr/`](../../docs/adr/) |
