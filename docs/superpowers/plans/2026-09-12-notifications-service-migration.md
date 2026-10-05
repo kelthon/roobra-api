@@ -693,7 +693,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import EmailVerificationContext from '../interfaces/email-verification-context.interface';
 
 /**
- * NOTE: not wired to any endpoint yet. Email verification (BR-12) still
+ * NOTE: not wired to any endpoint yet. Email verification (BR-012) still
  * needs its own token model + generate/consume flow on the auth side
  * (there is no `EmailVerificationToken`, unlike `PasswordResetToken`) —
  * see docs/notifications-module-spec.md §5. This service only covers the

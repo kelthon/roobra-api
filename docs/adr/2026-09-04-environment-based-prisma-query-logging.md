@@ -34,12 +34,10 @@ values.
 ## Consequences
 
 - Development gets SQL visibility at no cost.
-- The environment check depends on a config key being correct (see below).
+- The environment check depends on the `app.mode` config key being loaded correctly.
 
 ## Implementation Status
 
-**Diverges from intent.** `PrismaService` reads `config.get('env')`, but no loaded config defines an
-`env` key (`app.config.ts` exposes `app.mode`, sourced from `NODE_ENV`). Unless an `env` variable is
-set in the process environment, the check is always false and **queries are logged in production
-too**. Fixing this (`config.get('app.mode')`) is a code change outside this documentation branch and
-is flagged for the reviewer.
+Implemented as decided. `PrismaService` reads `config.get('app.mode')` (sourced from `NODE_ENV`).
+Until 2026-09-23 it read `config.get('env')`, a key nothing loads, so the check was always false
+and queries were also logged in production; that was fixed in commit `3a6e350`.

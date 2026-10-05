@@ -7,8 +7,8 @@ This document is the single source of truth for all standards, rules, and workfl
 - Always read all instruction files in `.github/instructions` before starting any contribution or using automation.
 - Follow the existing documentation structure and formatting for consistency.
 - Use clear and concise English in all code, comments, and documentation.
-- Refer to the [documentation-formatting-guidelines.md](https://github.com/kelthon/ph-docs/blob/main/documentation-formatting-guidelines.md) for markdown and formatting standards.
-- Adhere to the team [culture and values](https://github.com/kelthon/ph-docs/blob/main/guidelines/culture.md) in all interactions.
+- Refer to the [documentation-formatting-guidelines.md](https://github.com/kelthon/roobra-docs/blob/main/documentation-formatting-guidelines.md) for markdown and formatting standards.
+- Adhere to the team [culture and values](https://github.com/kelthon/roobra-docs/blob/main/guidelines/culture.md) in all interactions.
 - Documentation must explain "why" decisions are made, not just "how" to use or implement features.
 
 ## Project Context
@@ -25,7 +25,7 @@ Before contributing, you must complete the following reading requirements:
 
 **If you need additional context (e.g., business rules, flows, personas, or detailed architecture):**
 
-- Consult the global documentation repository: [github.com/kelthon/ph-docs](https://github.com/kelthon/ph-docs) (locally checked out as `roobra-docs`; if you have it cloned as a sibling folder, it is available at `../roobra-docs`, but do not assume that path exists — it depends on how each contributor or agent has the workspace set up). Start with the `README.md` for navigation, then explore sections such as `architecture/`, `business/`, `management/`, and `guidelines/` as needed.
+- Consult the global documentation repository: [github.com/kelthon/roobra-docs](https://github.com/kelthon/roobra-docs) (locally checked out as `roobra-docs`; if you have it cloned as a sibling folder, it is available at `../roobra-docs`, but do not assume that path exists — it depends on how each contributor or agent has the workspace set up). Start with the `README.md` for navigation, then explore sections such as `architecture/`, `business/`, `management/`, and `guidelines/` as needed.
 
 Reading the local instruction and architecture files is mandatory. Reading the global documentation is strongly recommended whenever you need more information or clarification.
 

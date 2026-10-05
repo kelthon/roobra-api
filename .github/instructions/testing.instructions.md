@@ -44,4 +44,4 @@ This document describes the testing strategy, tools, and best practices for this
 
 ---
 
-Include test examples in pull requests whenever possible. For more details, see [guidelines/testing.md](https://github.com/kelthon/ph-docs/blob/main/guidelines/testing.md) in the `roobra-docs` repository.
+Include test examples in pull requests whenever possible. For more details, see [guidelines/testing.md](https://github.com/kelthon/roobra-docs/blob/main/guidelines/testing.md) in the `roobra-docs` repository.

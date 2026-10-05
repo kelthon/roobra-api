@@ -12,9 +12,9 @@ superseded-by:
 
 ## Context
 
-Four fields exist only so the app can compare a secret, never so it can read one back:
-`User.hashedPassword`, `RefreshToken.hashedToken`, `PasswordResetToken.hashedToken` and
-`Key.hashedKey`. Without an explicit `select`, any plain `findUnique`/`findMany` returns them, and
+Five fields exist only so the app can compare a secret, never so it can read one back:
+`User.hashedPassword`, `RefreshToken.hashedToken`, `PasswordResetToken.hashedToken`,
+`EmailVerificationToken.hashedToken` and `Key.hashedKey`. Without an explicit `select`, any plain `findUnique`/`findMany` returns them, and
 nothing stops a future `return user` in a controller from leaking a hash in a JSON response.
 
 ## Decision
@@ -26,6 +26,7 @@ omit: {
   user: { hashedPassword: true },
   refreshToken: { hashedToken: true },
   passwordResetToken: { hashedToken: true },
+  emailVerificationToken: { hashedToken: true },
   key: { hashedKey: true },
 }
 ```
@@ -43,11 +44,11 @@ does. Queries with an explicit `select` are unaffected, and `where`/`data` are n
 ## Consequences
 
 - Default results are safe; reading a hash is an explicit, greppable opt-in.
-- `EmailVerificationToken.hashedToken` is **not** in the omit list. The model was added after the
-  list was written (migration `20260915005934`). Whether it should be added is an open review
-  point.
+- `EmailVerificationToken.hashedToken` was missing from the list when the model was introduced
+  (migration `20260915005934`) and was added in commit `3a6e350`, so every hashed token field
+  is now omitted by default.
 
 ## Implementation Status
 
-Implemented. [prisma-global-config.md](../prisma-global-config.md) §1 still describes this as
-missing and is stale on that point.
+Implemented, including the `emailVerificationToken` entry. [prisma-global-config.md](../prisma-global-config.md)
+§1 still describes this as missing and is stale on that point.

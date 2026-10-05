@@ -12,7 +12,7 @@ superseded-by:
 
 ## Context
 
-Password recovery (BR-11) and email verification (BR-12) in `roobra-docs` require a secure link sent
+Password recovery (BR-011) and email verification (BR-012) in `roobra-docs` require a secure link sent
 to the user's email. The link must be safe to leak into an inbox, expire quickly and work only once.
 
 ## Decision
@@ -20,8 +20,10 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
 1. Both flows use the same mechanism: an opaque random hex token (64 characters) from
    `SimpleTokenService`, stored only as a SHA-256 hash in its own table
    (`password_reset_tokens`, `email_verification_tokens`) with `expiresAt` and `usedAt`.
-2. Lifetimes: password reset **5 minutes**, email verification **15 minutes**, set in
-   `password-reset-token.config.ts` and `email-verification-token.config.ts`.
+2. Lifetimes, set in `password-reset-token.config.ts` and `email-verification-token.config.ts`:
+   password reset currently **5 minutes**, email verification currently **48 hours**. **Neither
+   number is a final product decision** — both are placeholder/test values (confirmed 2026-09-22)
+   and should not be treated as settled until someone signs off on them.
 3. A token is accepted only if it exists by hash, `usedAt` is null and `expiresAt` is in the future.
    Consuming it sets `usedAt` in the same transaction as the effect (password update, or
    `emailVerifiedAt`).
@@ -47,3 +49,7 @@ to the user's email. The link must be safe to leak into an inbox, expire quickly
 
 Both flows are implemented. `forgotPassword` responds with "No user found" for an unknown email,
 which reveals whether an address is registered; whether that is intended has not been recorded.
+
+**Open:** the specific TTL values in §Decision.2 are test placeholders, not decided — pick real
+values (and confirm whether email verification's 48h was intended, versus a bug that happened to
+match the em-dash fallback already in `verify-email.hbs`, see `todo.md`) before this ships.

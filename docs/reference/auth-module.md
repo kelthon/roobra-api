@@ -2,8 +2,8 @@
 
 **Location:** `src/modules/auth/` — verified against branch `docs/restructure-documentation`, 2026-09-18.
 
-Authentication and account security for `roobra-api`. Business rules (BR-01, BR-02, BR-11, BR-12) and
-the cross-service flow live in `roobra-docs` (`business/business_rules.md`, `architecture/auth-flow.md`).
+Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
+the cross-service flow live in `roobra-docs` (`business/business-rules.md`, `architecture/auth-flow.md`).
 This page describes how the module is implemented.
 
 ## Endpoints
@@ -34,7 +34,7 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | `@UserOnly()` | `JwtAuthGuard` | Requires a valid access token |
 | `@GuestOnly()` | `OptionalJwtAuthGuard`, `ForbidAuthenticatedGuard` | Rejects requests that carry a valid access token |
 | `@LoginWith('local')` | Passport `AuthGuard('local')` | Validates email and password through `AuthService.validateUser` |
-| `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Sprint 2 (`roobra-docs` `management/mvp-summary.md`) |
+| `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Milestone 2 (`roobra-docs` `management/backlog.md`, tasks 1.2.1 and 1.2.3) |
 
 `@User()` injects the authenticated user as `UserDto`, mapping the JWT `sub` claim to `id`.
 
@@ -44,8 +44,8 @@ A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) val
 | --- | --- | --- | --- | --- |
 | Access | JWT (`sub`, `email`, `username`, `role`) | 15 min | No | `jwt.expiresIn` |
 | Refresh | 64 hex characters | 7 days | SHA-256 hash, `refresh_tokens` | `refreshToken.*` |
-| Password reset | 64 hex characters | 5 min | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
-| Email verification | 64 hex characters | 15 min | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
+| Password reset | 64 hex characters | 5 min (placeholder, not decided) | SHA-256 hash, `password_reset_tokens` | `passwordResetToken.*` |
+| Email verification | 64 hex characters | 48 h (placeholder, not decided) | SHA-256 hash, `email_verification_tokens` | `emailVerificationToken.*` |
 
 Why: [refresh tokens](../adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md),
 [hashing](../adr/2026-09-07-hash-secrets-by-entropy-argon2-and-sha256.md),
