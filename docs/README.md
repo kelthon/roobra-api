@@ -40,6 +40,7 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 - [reference/auth-module.md](./reference/auth-module.md) — Endpoints, guards, tokens.
 - [reference/notifications-module.md](./reference/notifications-module.md) — Mailer setup, templates, locales.
 - [reference/prisma-setup.md](./reference/prisma-setup.md) — Schema layout, ID types, client options.
+- [reference/data-model.md](./reference/data-model.md) — Every table, column and relationship, one diagram per schema file.
 - [reference/docker-setup.md](./reference/docker-setup.md) — Dockerfile stages and Compose files.
 
 ## Open Proposals
