@@ -24,9 +24,8 @@ FROM base as deps
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=bind,source=prisma,target=prisma \
     --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev && npx prisma generate
+    npm ci --omit=dev --ignore-scripts
 
 ################################################################################
 # Create a stage for building the application.
@@ -41,6 +40,11 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 
 # Copy the rest of the source files into the image.
 COPY . .
+
+# Generate prisma client
+RUN --mount=type=bind,source=prisma,target=prisma \
+  npx prisma generate
+
 # Run the build script.
 RUN npm run build
 
@@ -56,12 +60,12 @@ ENV NODE_ENV production
 USER node
 
 # Copy package.json so that package manager commands can be used.
-COPY package.json .
+COPY --chown=node:node package.json .
 
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/dist ./dist
+COPY --chown=node:node --from=deps /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 
 # Expose the port that the application listens on.

@@ -8,19 +8,19 @@ supersedes:
 superseded-by:
 ---
 
-# Keep The Prisma CLI In Dependencies And Generate The Client In The Docker Deps Stage
+# Keep The Prisma CLI In Dependencies And Generate The Client In The Docker Build
 
 ## Context
 
 `@prisma/client` needs generated code under `src/generated/prisma` before the app can import it.
 That directory is gitignored, so it is absent from the Docker build context. The `deps` stage
-installs production dependencies only (`npm ci --omit=dev`).
+installs production dependencies only (`npm ci --omit=dev --ignore-scripts`).
 
 ## Decision
 
 1. `prisma` (the CLI) lives in `dependencies`, not `devDependencies`.
-2. The `deps` stage runs `npx prisma generate` right after `npm ci --omit=dev`, with `prisma/`
-   bind-mounted. The `build` stage inherits `FROM deps`, so it already has the generated client.
+2. The `build` stage runs `npx prisma generate` after copying the sources, with `prisma/`
+   bind-mounted, so `npm run build` compiles the generated client into `dist/`.
 3. Generation is **not** an npm `postinstall` script.
 4. In development, `compose.override.yaml` bind-mounts the host repository over the image's `src/`,
    which hides the generated client. Its `command` therefore runs `npx prisma generate` before
