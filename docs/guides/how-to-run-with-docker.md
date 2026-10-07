@@ -31,7 +31,7 @@ Start the API and its Postgres database with Docker Compose, in development or i
    docker compose exec server npx prisma migrate deploy
    ```
 
-   The container reaches the database through `DATABASE_URL`, so its host must be `db`, not
+   The container reaches the database through `DATABASE_URL`, so its host must be `postgres`, not
    `localhost` (see [how to configure the environment](./how-to-configure-environment.md), step 2).
 
 3. Load the development data. The seed creates plans, a sample catalog and four accounts,
@@ -49,7 +49,7 @@ Start the API and its Postgres database with Docker Compose, in development or i
    docker compose logs -f server
    ```
 
-5. Stop the stack. Add `-v` to also delete the development database (the named volume `db-data`):
+5. Stop the stack. Add `-v` to also delete the development database and Redis data (the named volumes `postgres-data` and `redis-data`):
 
    ```sh
    docker compose down
@@ -85,9 +85,10 @@ Start the API and its Postgres database with Docker Compose, in development or i
 
 ## Troubleshooting
 
-- **`db` exits with `mkdir: ... Permission denied`:** the `db` service must not have a `user:`
+- **`postgres` exits with `mkdir: ... Permission denied`:** the `postgres` service must not have a `user:`
   override, see [the Postgres ADR](../adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md).
 - **Host commands such as `npm run build` fail on files in `dist/` owned by `root`:** the dev
-  container must run as `user: node` (UID 1000). If your host UID differs, align the container's
-  UID/GID rather than removing the override. Reset ownership of `dist/` once, then restart.
+  container must run as your own user. It uses `HOST_UID` and `HOST_GID` from `.env` (default
+  `1000`); set them to the output of `id -u` and `id -g` rather than removing the override. Reset
+  ownership of `dist/` once, then restart.
 - **`FATAL: role "..." does not exist`:** see [how to deploy](./how-to-deploy-app.md).

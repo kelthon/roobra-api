@@ -32,7 +32,7 @@ permissions for the Roobra website.
    ```
 
    Fill in at least `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME`, `DATABASE_URL`
-   (`DATABASE_HOST` should be `db`, the Compose service name). Do not leave `DATABASE_USER` empty
+   (the host in `DATABASE_URL` is `postgres`, the Compose service name), and `REDIS_PASSWORD`. Do not leave `DATABASE_USER` empty
    on the first run — see
    [the Postgres image ADR](docs/adr/2026-08-28-04-postgres-image-pinned-and-entrypoint-permissions.md)
    for why.
@@ -53,8 +53,8 @@ permissions for the Roobra website.
 The database is not exposed to the host in production (`expose`, not `ports`, in `compose.yaml`).
 In dev, `compose.override.yaml` publishes it at `DATABASE_HOST`:`DATABASE_PORT` from `.env` (default
 `localhost:5432`), so GUI clients like DBeaver or `psql` can connect directly; the app itself
-still talks to `db:5432` via `DATABASE_URL`, the Compose service name. You can also reach it with
-`docker compose exec db psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
+still talks to `postgres:5432` via `DATABASE_URL`, the Compose service name. You can also reach it with
+`docker compose exec postgres psql -U <DATABASE_USER> -d <DATABASE_NAME>`.
 
 ## Scripts
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensures the Postgres role/database described by .env exist inside the *running* db
+# Ensures the Postgres role/database described by .env exist inside the *running* postgres
 # container, without ever touching the data directory. This is the safe alternative to
 # wiping the volume/bind mount when the cluster was initialized with the wrong
 # POSTGRES_USER (see docs/guides/how-to-deploy-app.md#troubleshooting) — it never deletes anything, it
 # only creates what's missing or refreshes the password to match .env.
 #
 # Usage: ./scripts/ensure-db-user.sh
-# Requires the db service to already be up (docker compose ... up -d db).
+# Requires the postgres service to already be up (docker compose ... up -d postgres).
 
 cd "$(dirname "$0")/.."
 
@@ -51,20 +51,20 @@ COMPOSE=(docker compose -f compose.yaml -f compose.prod.yaml)
 # which is what a misconfigured first run creates instead.
 ADMIN_ROLE=""
 for candidate in "$DATABASE_USER" postgres; do
-  if "${COMPOSE[@]}" exec -T db psql -U "$candidate" -d postgres -tAc "SELECT 1" >/dev/null 2>&1; then
+  if "${COMPOSE[@]}" exec -T postgres psql -U "$candidate" -d postgres -tAc "SELECT 1" >/dev/null 2>&1; then
     ADMIN_ROLE="$candidate"
     break
   fi
 done
 
 if [ -z "$ADMIN_ROLE" ]; then
-  echo "Error: could not connect as '$DATABASE_USER' or 'postgres'. Is the db service running?" >&2
+  echo "Error: could not connect as '$DATABASE_USER' or 'postgres'. Is the postgres service running?" >&2
   exit 1
 fi
 
 echo "Connected as '$ADMIN_ROLE'. Ensuring role and database for '$DATABASE_USER' exist..."
 
-"${COMPOSE[@]}" exec -T db psql -U "$ADMIN_ROLE" -d postgres -v ON_ERROR_STOP=1 <<-SQL
+"${COMPOSE[@]}" exec -T postgres psql -U "$ADMIN_ROLE" -d postgres -v ON_ERROR_STOP=1 <<-SQL
 DO \$\$
 BEGIN
   IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$DB_USER_LITERAL') THEN

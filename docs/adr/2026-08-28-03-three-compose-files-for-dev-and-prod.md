@@ -20,17 +20,18 @@ The two must never share mounts.
 
 | File | Loaded | Purpose |
 | --- | --- | --- |
-| `compose.yaml` | Always | Shared defaults (`server`, `db`, healthcheck, named volume `db-data`) |
-| `compose.override.yaml` | Automatically by `docker compose up` with no `-f` | Development: `build` target, `user: node`, source bind mount, `prisma generate` + `start:dev`, published DB port |
+| `compose.yaml` | Always | Shared defaults (`server`, `postgres`, `redis`, health checks, resource limits, named volumes `postgres-data` and `redis-data`) |
+| `compose.override.yaml` | Automatically by `docker compose up` with no `-f` | Development: `build` target, the host user (`HOST_UID`/`HOST_GID`), source bind mount, `prisma generate` + `start:dev`, published database and Redis ports |
 | `compose.prod.yaml` | Only with `-f compose.yaml -f compose.prod.yaml` | Production: `restart: unless-stopped`, DB bind mount to `/var/lib/repositories/roobra-api/postgresql` |
 
 Passing `-f` explicitly (as `scripts/deploy.sh` does) disables auto-loading of the override, which
 keeps the dev and prod bind mounts from mixing.
 
-The dev `server` runs as `user: node`. The `build` stage has no `USER` instruction, so without the
-override `nest start --watch` would write `dist/` into the bind mount as `root` and break later
-host-side builds. UID `1000` matches the first user on most single-user Linux machines; if it does
-not match a contributor's UID, the fix is a matching UID/GID, not removing the override.
+The dev `server` runs as the host user, `user: "${HOST_UID:-1000}:${HOST_GID:-1000}"`. The `build`
+stage has no `USER` instruction, so without the override `nest start --watch` would write `dist/`
+into the bind mount as `root` and break later host-side builds. UID `1000` matches the first user on
+most single-user Linux machines; a contributor with another UID sets `HOST_UID` and `HOST_GID` in
+`.env` instead of removing the override.
 
 ## Alternatives Considered
 

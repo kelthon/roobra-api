@@ -12,7 +12,8 @@ superseded-by:
 
 ## Context
 
-Two failure modes were hit or anticipated with the `db` service:
+Two failure modes were hit or anticipated with the database service (`postgres`, called `db` until
+2026-10-06):
 
 - Forcing `user: postgres` at the Compose level skips the official image's entrypoint setup (which
   runs as `root`, creates the data directory with the right permissions, then drops privileges). The
@@ -25,7 +26,7 @@ Two failure modes were hit or anticipated with the `db` service:
 ## Decision
 
 1. `compose.yaml` uses `image: postgres:18-alpine`. Major upgrades are deliberate edits.
-2. The `db` service has **no** `user:` override.
+2. The `postgres` service has **no** `user:` override.
 3. The volume is mounted at the parent directory `/var/lib/postgresql`, not at `PGDATA`. Postgres 18
    defaults `PGDATA` to `/var/lib/postgresql/18/docker` (older versions used
    `/var/lib/postgresql/data`), so mounting the parent stays valid across that layout change.

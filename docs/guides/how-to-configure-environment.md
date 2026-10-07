@@ -21,17 +21,18 @@ app needs to start.
    Postgres itself (Compose maps them to `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB`).
    `DATABASE_URL` is what the app and `prisma.config.ts` connect with, so it must agree with them.
 
-   - App inside the Compose `server` container: use the service name `db` as the host.
+   - App inside the Compose `server` container: use the service name `postgres` as the host.
    - App on the host (`npm run start:dev`): use `localhost` and the published port
      (`DATABASE_PORT`, default `5432`).
 
-3. Set the secrets the app refuses to start without. These are read with `getOrThrow` and have no
-   default:
+3. Set the secrets the stack cannot start without. None has a default; the app reads `JWT_SECRET`
+   and the email credentials with `getOrThrow`:
 
    | Variable | Used for |
    | --- | --- |
    | `JWT_SECRET` | Signing and verifying access tokens |
    | `EMAIL_USER`, `EMAIL_PASSWORD` | SMTP credentials for the mailer |
+   | `REDIS_PASSWORD` | The Compose `redis` service's password; the `server` waits for Redis to be healthy |
 
 4. Set the values that have defaults if you need something else:
 
@@ -41,6 +42,8 @@ app needs to start.
    | `EMAIL_FROM` | `"Roobra" <no-reply@roobra.com>` | Sender address |
    | `FRONTEND_URL` | `http://localhost:5173` | Base URL of links sent in emails |
    | `PORT` | `3000` | Published port in Compose |
+   | `REDIS_PORT` | `6379` | Redis port published to the host in development |
+   | `HOST_UID`, `HOST_GID` | `1000`, `1000` | User and group the development container runs as (`id -u`, `id -g`) |
 
 5. Start the app (see [how to run with Docker](./how-to-run-with-docker.md)).
 
@@ -50,12 +53,12 @@ app needs to start.
 - Compose requires `.env` (`env_file: .env`). Without it, `docker compose up` fails.
 - `.env` is gitignored. On the production server it is created and kept up to date by hand, see
   [how to deploy](./how-to-deploy-app.md).
-- The remaining keys in `.env.example` (Redis, WhatsApp, payment gateway, analytics, bucket storage)
-  are provisioned for planned features and are not read by the code on this branch.
+- The remaining keys in `.env.example` (`REDIS_URL`, WhatsApp, payment gateway, analytics, bucket
+  storage) are provisioned for planned features and are not read by the code on this branch.
 
 ## Troubleshooting
 
 - **The app exits at startup with a configuration error mentioning `jwt.secret` or `mail.*`:** the
   variable in step 3 is missing from `.env`.
-- **`FATAL: role "..." does not exist` from `db`:** see the troubleshooting section of
+- **`FATAL: role "..." does not exist` from `postgres`:** see the troubleshooting section of
   [how to deploy](./how-to-deploy-app.md).
