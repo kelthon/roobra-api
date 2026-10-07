@@ -14,9 +14,9 @@ The base image is `node:${NODE_VERSION}-alpine` with `NODE_VERSION=24.14.0` and
 | Stage | Based on | What it does |
 | --- | --- | --- |
 | `base` | node alpine | Sets the working directory; shared by the others |
-| `deps` | `base` | `npm ci --omit=dev` then `npx prisma generate`, with `prisma/` bind-mounted |
-| `build` | `deps` | `npm ci` (all dependencies), `COPY . .`, `npm run build`. The target used for development |
-| `final` | `base` | `NODE_ENV=production`, runs as `node`, copies `node_modules` from `deps` and `dist` from `build`, exposes `3000`, runs `npm run start:prod`. The default target, used in production |
+| `deps` | `base` | `npm ci --omit=dev --ignore-scripts` (production dependencies, no install scripts) |
+| `build` | `deps` | `npm ci` (all dependencies), `COPY . .`, `npx prisma generate` with `prisma/` bind-mounted, `npm run build`. The target used for development |
+| `final` | `base` | `NODE_ENV=production`, runs as `node`, copies `package.json`, `node_modules` from `deps` and `dist` from `build`, all owned by `node`, exposes `3000`, runs `npm run start:prod`. The default target, used in production |
 
 Decisions: [Prisma CLI and generate step](../adr/2026-08-28-01-prisma-cli-as-dependency-and-generate-in-docker.md),
 [flat build output](../adr/2026-08-28-02-flat-build-output-and-pinned-tsbuildinfo.md).
