@@ -46,7 +46,7 @@ fixes its own permissions.
 
 ## Troubleshooting
 
-### `FATAL: role "..." does not exist` From `db`
+### `FATAL: role "..." does not exist` From `postgres`
 
 Postgres only runs `initdb` the first time its data directory is used. If `DATABASE_USER` was empty
 in `.env` on that first run, the image created a `postgres` superuser instead, and every later deploy
@@ -58,10 +58,10 @@ database is a bind mount, and `-v` only removes named volumes. Deleting that dir
 production database.
 
 1. Make sure `.env` has the correct `DATABASE_USER`, `DATABASE_PASSWORD` and `DATABASE_NAME`.
-2. Make sure the `db` service is running:
+2. Make sure the `postgres` service is running:
 
    ```sh
-   docker compose -f compose.yaml -f compose.prod.yaml up -d db
+   docker compose -f compose.yaml -f compose.prod.yaml up -d postgres
    ```
 
 3. Run the repair script:

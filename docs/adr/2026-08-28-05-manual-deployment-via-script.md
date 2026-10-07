@@ -28,7 +28,7 @@ forever if `DATABASE_USER` was empty on the first run of an empty data directory
 3. `.env` is neither committed nor managed by the script; it is created and maintained on the
    server.
 4. Recovery from a wrong Postgres role uses `scripts/ensure-db-user.sh`, which connects to the
-   **running** `db` service with whichever role works and creates or refreshes the role from `.env`.
+   **running** `postgres` service with whichever role works and creates or refreshes the role from `.env`.
    It never drops a role, a database or data, and is safe to run twice. Wiping the production bind
    mount is never the first move.
 5. The GitHub Actions workflow `deploy.yml` runs `build`, `lint` and `test` (unit and e2e) on pushes

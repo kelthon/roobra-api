@@ -5,6 +5,6 @@ name: roobra-api
 services:
   server:
     restart: unless-stopped
-  db:
+  postgres:
     volumes:
       - /var/lib/repositories/roobra-api/postgresql:/var/lib/postgresql

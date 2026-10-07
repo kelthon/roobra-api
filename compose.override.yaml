@@ -7,7 +7,9 @@ services:
     build:
       target: build
     restart: unless-stopped
-    user: node
+    # Your user and group ids, so files written into the bind mount stay yours (HOST_UID and
+    # HOST_GID in .env; 1000 is the first user on most Linux machines).
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     environment:
       NODE_ENV: development
     # The bind mount below replaces /usr/src/app with the host repo at container start,
@@ -21,7 +23,11 @@ services:
       - "/usr/src/app/node_modules"
   # Published to the host only in dev (this file is never loaded in prod), so tools like
   # DBeaver/psql can connect via DATABASE_HOST/DATABASE_PORT from .env. The app itself keeps
-  # using DATABASE_URL's `db:5432` (the Compose service name) from compose.yaml.
-  db:
+  # using DATABASE_URL's `postgres:5432` (the Compose service name) from compose.yaml.
+  postgres:
     ports:
       - "${DATABASE_PORT:-5432}:5432"
+
+  redis:
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
