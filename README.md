@@ -82,8 +82,8 @@ recover a misconfigured database role without losing data, and
 - [docs/README.md](docs/README.md) — index of this repository's documentation:
   [decisions](docs/adr/) (why), [guides](docs/guides/) (how to), and
   [reference](docs/reference/) (how it works today) for auth, notifications, Prisma and Docker.
-- [AGENTS.md](AGENTS.md) and [.github/instructions/](.github/instructions/) — contribution
-  guidelines, coding standards, and architecture, including team culture and values.
+- [AGENTS.md](AGENTS.md) — instructions for AI agents: where the coding, testing, git and
+  documentation guidelines live, and the rules of this repository that are easy to miss.
 - Cross-service and business documentation: the `roobra-docs` repository.
 
 ## License
