@@ -17,7 +17,7 @@ model Media {
   genres        MediaGenre[]   @relation("media_to_media_genres")
   userReadLists UserReadList[]
 
-  searchableText Unsupported("tsvector")? @map("searchable_text")
+  searchableText Unsupported("tsvector")? @default(dbgenerated("((setweight(to_tsvector('simple'::regconfig, (COALESCE(name, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, immutable_array_to_string(authors, ' '::text)), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, COALESCE(description, ''::text)), 'C'::\"char\"))")) @map("searchable_text")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
@@ -42,7 +42,7 @@ model MediaVolume {
   media    Media          @relation(fields: [mediaId], references: [id])
   chapters MediaChapter[]
 
-  searchableText Unsupported("tsvector")? @map("searchable_text")
+  searchableText Unsupported("tsvector")? @default(dbgenerated("((setweight(to_tsvector('simple'::regconfig, (COALESCE(title, ''::character varying))::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, immutable_array_to_string(authors, ' '::text)), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, COALESCE(description, ''::text)), 'C'::\"char\"))")) @map("searchable_text")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
