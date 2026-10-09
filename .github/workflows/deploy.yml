@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v7
+
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
 
@@ -22,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v7
+
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
 
@@ -35,6 +41,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v7
+
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
 

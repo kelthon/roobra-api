@@ -1,12 +1,11 @@
 name: "Setup node dependencies"
-description: "Checks out the repository, sets up Node.js, installs dependencies via npm ci and generates the Prisma client"
+# The workflow checks out the repository before calling this action: GitHub reads a local action
+# from the workspace, so it cannot be the one to check it out.
+description: "Sets up Node.js, installs dependencies via npm ci and generates the Prisma client"
 
 runs:
   using: "composite"
   steps:
-    - name: "Checkout repository"
-      uses: actions/checkout@v7
-
     - name: "Set up Node.js"
       uses: actions/setup-node@v7
       with:
