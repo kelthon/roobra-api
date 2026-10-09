@@ -13,9 +13,9 @@ conventions and best practices (not specific to this repo), see `roobra-docs`'s
 ## Prerequisites
 
 - Node.js 24 and dependencies installed with `npm ci`.
-- A `.env` that passes the startup validation (see
-  [how to configure the environment](./how-to-configure-environment.md)). The e2e specs boot the whole
-  `AppModule`, which validates every variable before anything else runs.
+- The generated Prisma client (`npx prisma generate`); specs import its types and enums.
+- No `.env`. The e2e specs boot the whole `AppModule`, which validates the environment at startup;
+  `vitest.config.e2e.ts` sets placeholder values that pass the validation and override a local `.env`.
 - No database is needed. Unit specs replace `PrismaService` with a mock, and the e2e specs never reach
   a query, so the Prisma client is created but never connects.
 
@@ -65,5 +65,6 @@ conventions and best practices (not specific to this repo), see `roobra-docs`'s
 - **A spec fails with a `Cannot find module 'src/...'` error:** run Vitest from the repository root,
   through the npm scripts or `npx vitest`, so it picks up `vitest.config.ts`; the `src/` alias comes
   from `resolve.tsconfigPaths`. If the path is right, check that the import ends in `.js`.
-- **An e2e spec fails with `Config validation error`:** the error lists each invalid variable; fix
-  them in `.env`, see the prerequisites.
+- **An e2e spec fails with `Config validation error`:** a variable was added to
+  `src/common/schemas/env.schema.ts` but not to the `env` block of `vitest.config.e2e.ts`; the error
+  names it.
