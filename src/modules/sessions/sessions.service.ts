@@ -85,7 +85,8 @@ export class SessionsService {
    *
    * @param refreshToken The raw refresh token
    * @throws BadRequestException When the token is unknown, expired or revoked
-   * @throws NotFoundException When the user of the token no longer exists
+   * @throws NotFoundException When the user of the token no longer exists or
+   *   is deleted
    */
   async refresh(refreshToken: string): Promise<AuthTokensResponse> {
     const token = await this.prisma.refreshToken.findFirst({
@@ -116,7 +117,7 @@ export class SessionsService {
           username: true,
           role: true,
         },
-        where: { id: token.userId },
+        where: { id: token.userId, deletedAt: null },
       }),
       this.prisma.refreshToken.update({
         where: { id: token.id },
