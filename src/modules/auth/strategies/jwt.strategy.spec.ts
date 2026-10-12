@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtStrategy } from './jwt.strategy.js';
 
 describe('JwtStrategy', () => {
@@ -29,5 +30,13 @@ describe('JwtStrategy', () => {
     };
 
     expect(strategy.validate(payload)).toBe(payload);
+  });
+
+  it('should throw UnauthorizedException when the payload has no sub claim', () => {
+    const strategy = new JwtStrategy(configServiceMock);
+
+    expect(() => strategy.validate({ email: 'john.doe@example.com' })).toThrow(
+      UnauthorizedException,
+    );
   });
 });
