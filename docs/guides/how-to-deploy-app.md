@@ -28,7 +28,8 @@ Deploy `roobra-api` to the production server with the Compose production stack.
    `DATABASE_PASSWORD`, `DATABASE_NAME` and `DATABASE_URL` are non-empty, and then runs
    `docker compose -f compose.yaml -f compose.prod.yaml up -d --build`.
 
-3. Check that both containers are up and healthy:
+3. Check that the containers are up and healthy. `server` turns `healthy` once `GET /health`
+   answers 200, which means the application reaches the database:
 
    ```sh
    docker compose -f compose.yaml -f compose.prod.yaml ps
