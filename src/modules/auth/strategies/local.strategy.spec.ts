@@ -41,6 +41,6 @@ describe('LocalStrategy', () => {
 
     await expect(
       strategy.validate('john.doe@example.com', 'WrongPassword123!'),
-    ).rejects.toThrow(UnauthorizedException);
+    ).rejects.toThrow(new UnauthorizedException('Invalid credentials'));
   });
 });
