@@ -1,7 +1,7 @@
 # Notifications Module Reference
 
 **Location:** `src/modules/notifications/` and the `MailerModule` registration in `src/app.module.ts` —
-verified against branch `docs/restructure-documentation`, 2026-09-18.
+verified against branch `fix/email-delivery`, 2026-10-12.
 
 Transactional email for `roobra-api`. It does not cover push notifications or WhatsApp; the broader
 "notifications and background jobs" roadmap item is larger than this module.
@@ -11,6 +11,8 @@ Transactional email for `roobra-api`. It does not cover push notifications or Wh
 ```txt
 src/modules/notifications/
   notifications.module.ts          provides and exports the two mail services
+  config/
+    mailer-options.factory.ts      MailerModule options: transport, templates, i18n, preview
   services/
     password-reset-mail.service.ts
     email-verification-mail.service.ts
@@ -21,7 +23,8 @@ src/modules/notifications/
                                    reset-password, verify-email
 ```
 
-`MailerModule.forRootAsync` lives in `src/app.module.ts`, not in `notifications.module.ts`.
+`MailerModule.forRootAsync` is registered in `src/app.module.ts`, not in `notifications.module.ts`,
+with its options built by `mailerOptionsFactory` in `config/mailer-options.factory.ts`.
 
 ## Mailer Configuration
 
@@ -88,7 +91,7 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 ## Checking Templates
 
 - `src/modules/notifications/templates/render.spec.ts` renders every template through the real
-  `HandlebarsAdapter`, with the same directory, `strict` and layout options as `app.module.ts`, so a
+  `HandlebarsAdapter`, with the same directory, `strict` and layout options as `mailer-options.factory.ts`, so a
   syntax error or a missing variable fails the unit suite instead of a live send.
 - `npm run preview:email` (`scripts/preview-email.ts`) renders a template and opens it in the
   browser, without SMTP or a running app.

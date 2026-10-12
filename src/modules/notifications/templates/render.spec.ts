@@ -2,8 +2,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
 import { join } from 'node:path';
 
 /**
- * Mirrors the `template`/`options` block of `MailerModule.forRootAsync` in
- * `src/app.module.ts` (dir, strict mode, partials, layout). Keep the two in
+ * Mirrors the `template`/`options` block of `mailerOptionsFactory` in
+ * `../config/mailer-options.factory.ts` (dir, strict mode, partials, layout). Keep the two in
  * sync: this is what actually exercises Handlebars compilation, which
  * `*-mail.service.spec.ts` cannot do since it mocks `MailerService`.
  */
