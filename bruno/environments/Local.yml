@@ -1,6 +1,6 @@
 variables:
   - name: baseUrl
-    value: http://localhost:3000/v1
+    value: http://localhost:3000
   - name: mailpitUrl
     value: http://localhost:8025
   - name: email

@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from 'src/app.module.js';
+import { appOptions, configureApp } from 'src/app.setup.js';
 
 describe('Application config wiring (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let config: ConfigService;
 
   beforeAll(async () => {
@@ -12,7 +13,10 @@ describe('Application config wiring (e2e)', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app =
+      moduleFixture.createNestApplication<NestExpressApplication>(appOptions);
+    configureApp(app);
+
     await app.init();
     config = app.get(ConfigService);
   });

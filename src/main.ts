@@ -1,24 +1,15 @@
 import { AppModule } from 'src/app.module.js';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { appOptions, configureApp } from 'src/app.setup.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    routeConflictPolicy: { duplicate: 'error', shadow: 'warn' },
-    routeResolutionStrategy: 'specificity',
-  });
-
-  app.set('trust proxy', 1);
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      errorFormat: 'grouped',
-    }),
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    appOptions,
   );
+
+  configureApp(app);
 
   await app.listen(3000);
 }
