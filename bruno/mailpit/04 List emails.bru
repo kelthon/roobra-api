@@ -1,0 +1,21 @@
+meta {
+  name: List emails
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{mailpitUrl}}/api/v1/messages
+  body: none
+  auth: none
+}
+
+tests {
+  test("both emails arrived", () => {
+    const subjects = res.body.messages
+      .filter((m) => m.To[0].Address === bru.getEnvVar("email"))
+      .map((m) => m.Subject);
+    expect(subjects).to.include("Verify your Roobra email address");
+    expect(subjects).to.include("Reset your Roobra password");
+  });
+}

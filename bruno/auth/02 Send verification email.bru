@@ -1,0 +1,15 @@
+meta {
+  name: Send verification email
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/auth/verify-email
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

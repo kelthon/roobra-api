@@ -1,0 +1,31 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "username": "{{username}}",
+    "password": "{{password}}",
+    "confirmPassword": "{{password}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("accessToken", res.body.accessToken);
+}
+
+tests {
+  test("returns tokens", () => {
+    expect(res.status).to.equal(201);
+    expect(res.body.accessToken).to.be.a("string");
+  });
+}
