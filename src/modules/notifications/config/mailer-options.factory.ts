@@ -7,15 +7,15 @@ export const mailerOptionsFactory = (config: ConfigService): MailerOptions => ({
   defaults: {
     from: config.getOrThrow<string>('mail.from'),
   },
-  transports: {
-    smtp: {
-      host: config.getOrThrow<string>('mail.host'),
-      port: config.getOrThrow<number>('mail.port'),
-      secure: config.getOrThrow<boolean>('mail.secure'),
-      auth: {
-        user: config.getOrThrow<string>('mail.user'),
-        pass: config.getOrThrow<string>('mail.password'),
-      },
+  // The default transport: the mail services call sendMail without a
+  // transporterName, so a named entry of `transports` would never be used
+  transport: {
+    host: config.getOrThrow<string>('mail.host'),
+    port: config.getOrThrow<number>('mail.port'),
+    secure: config.getOrThrow<boolean>('mail.secure'),
+    auth: {
+      user: config.getOrThrow<string>('mail.user'),
+      pass: config.getOrThrow<string>('mail.password'),
     },
   },
   template: {
