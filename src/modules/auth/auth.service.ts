@@ -6,7 +6,7 @@ import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
 } from 'src/common/utils/database.util.js';
-import { AccessTokenService } from '../sessions/access-token.service.js';
+import { SessionsService } from '../sessions/sessions.service.js';
 import { LogoutDto } from './dto/logout.dto.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
@@ -42,7 +42,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashService: PasswordHashService,
-    private readonly accessTokenService: AccessTokenService,
+    private readonly sessionsService: SessionsService,
     private readonly simpleHashService: SimpleHashService,
     private readonly simpleTokenService: SimpleTokenService,
     private readonly configService: ConfigService,
@@ -143,7 +143,7 @@ export class AuthService {
           },
         });
 
-        const tokens = await this.accessTokenService.generate(newUser, tx);
+        const tokens = await this.sessionsService.generate(newUser, tx);
 
         return [newUser, tokens];
       });
@@ -188,7 +188,7 @@ export class AuthService {
         },
       });
 
-      const tokens = await this.accessTokenService.generate(user);
+      const tokens = await this.sessionsService.generate(user);
       const { role: _role, ...safeUser } = user;
 
       return {
@@ -206,16 +206,16 @@ export class AuthService {
 
   async logout(userId: string, logoutDto: LogoutDto) {
     const { refreshToken } = logoutDto;
-    return await this.accessTokenService.revoke(userId, refreshToken);
+    return await this.sessionsService.revoke(userId, refreshToken);
   }
 
   async logoutAllSessions(userId: string): Promise<InfoResponse> {
-    return await this.accessTokenService.revokeAll(userId);
+    return await this.sessionsService.revokeAll(userId);
   }
 
   async refreshSession(refreshTokenDto: RefreshTokenDto) {
     const { refreshToken } = refreshTokenDto;
-    return await this.accessTokenService.refresh(refreshToken);
+    return await this.sessionsService.refresh(refreshToken);
   }
 
   /**

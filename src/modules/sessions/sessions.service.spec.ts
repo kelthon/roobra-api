@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
-import { AccessTokenService } from './access-token.service.js';
+import { SessionsService } from './sessions.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
@@ -8,8 +8,8 @@ import { User } from 'src/generated/prisma/client.js';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { Mock } from 'vitest';
 
-describe('AccessTokenService', () => {
-  let accessTokenService: AccessTokenService;
+describe('SessionsService', () => {
+  let sessionsService: SessionsService;
   let prismaMock: PrismaService;
   let configServiceMock: ConfigService;
   let jwtServiceMock: JwtService;
@@ -55,7 +55,7 @@ describe('AccessTokenService', () => {
       generate: vi.fn(() => 'generated-refresh-token'),
     } as unknown as SimpleTokenService;
 
-    accessTokenService = new AccessTokenService(
+    sessionsService = new SessionsService(
       configServiceMock,
       prismaMock,
       jwtServiceMock,
@@ -77,7 +77,7 @@ describe('AccessTokenService', () => {
         'valid-access-token',
       );
 
-      const result = await accessTokenService.generate(user);
+      const result = await sessionsService.generate(user);
 
       expect(jwtServiceMock.signAsync).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -132,7 +132,7 @@ describe('AccessTokenService', () => {
         'new-valid-access-token',
       );
 
-      const result = await accessTokenService.refresh('valid-refresh-token');
+      const result = await sessionsService.refresh('valid-refresh-token');
 
       expect(prismaMock.refreshToken.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -160,7 +160,7 @@ describe('AccessTokenService', () => {
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue(null);
 
       await expect(
-        accessTokenService.refresh('unknown-refresh-token'),
+        sessionsService.refresh('unknown-refresh-token'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -170,7 +170,7 @@ describe('AccessTokenService', () => {
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue(null);
 
       await expect(
-        accessTokenService.refresh('expired-refresh-token'),
+        sessionsService.refresh('expired-refresh-token'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -189,7 +189,7 @@ describe('AccessTokenService', () => {
       });
 
       await expect(
-        accessTokenService.refresh('stolen-refresh-token'),
+        sessionsService.refresh('stolen-refresh-token'),
       ).rejects.toThrow(BadRequestException);
 
       expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith(
@@ -216,7 +216,7 @@ describe('AccessTokenService', () => {
       (prismaMock.user.findUnique as Mock).mockResolvedValue(null);
 
       await expect(
-        accessTokenService.refresh('valid-refresh-token'),
+        sessionsService.refresh('valid-refresh-token'),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -232,7 +232,7 @@ describe('AccessTokenService', () => {
         userId: 'user-id',
       });
 
-      const result = await accessTokenService.revoke(
+      const result = await sessionsService.revoke(
         'user-id',
         'valid-refresh-token',
       );
@@ -253,7 +253,7 @@ describe('AccessTokenService', () => {
       });
 
       await expect(
-        accessTokenService.revoke('user-id', 'invalid-refresh-token'),
+        sessionsService.revoke('user-id', 'invalid-refresh-token'),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -264,7 +264,7 @@ describe('AccessTokenService', () => {
         count: 3,
       });
 
-      const result = await accessTokenService.revokeAll('user-id');
+      const result = await sessionsService.revokeAll('user-id');
 
       expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -287,7 +287,7 @@ describe('AccessTokenService', () => {
         count: 0,
       });
 
-      await expect(accessTokenService.revokeAll('user-id')).rejects.toThrow(
+      await expect(sessionsService.revokeAll('user-id')).rejects.toThrow(
         NotFoundException,
       );
     });

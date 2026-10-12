@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule } from 'modules/database/database.module.js';
-import { AccessTokenService } from './access-token.service.js';
+import { SessionsService } from './sessions.service.js';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { AccessTokenService } from './access-token.service.js';
       inject: [ConfigService],
     }),
   ],
-  providers: [AccessTokenService],
-  exports: [AccessTokenService],
+  providers: [SessionsService],
+  exports: [SessionsService],
 })
 export class SessionsModule {}
