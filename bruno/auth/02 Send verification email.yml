@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/auth/verify-email"
+  url: "{{baseUrl}}/v1/auth/verify-email"
   auth:
     type: bearer
     token: "{{accessToken}}"

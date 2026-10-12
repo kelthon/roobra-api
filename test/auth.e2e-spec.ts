@@ -1,25 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types.js';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from 'src/app.module.js';
+import { appOptions, configureApp } from 'src/app.setup.js';
 
 describe('Auth (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestExpressApplication;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
+    app =
+      moduleFixture.createNestApplication<NestExpressApplication>(appOptions);
+    configureApp(app);
+
     await app.init();
   });
 
@@ -29,12 +25,12 @@ describe('Auth (e2e)', () => {
 
   describe('protected routes', () => {
     it.each([
-      ['get', '/users/me'],
-      ['delete', '/users/me'],
-      ['post', '/auth/logout'],
-      ['post', '/auth/logout/all'],
-      ['post', '/auth/change-password'],
-      ['get', '/auth/verify-email'],
+      ['get', '/v1/users/me'],
+      ['delete', '/v1/users/me'],
+      ['post', '/v1/auth/logout'],
+      ['post', '/v1/auth/logout/all'],
+      ['post', '/v1/auth/change-password'],
+      ['get', '/v1/auth/verify-email'],
     ] as const)(
       '%s %s should return 401 without a token',
       async (method, url) => {
@@ -44,23 +40,23 @@ describe('Auth (e2e)', () => {
 
     it('should return 401 for a malformed bearer token', async () => {
       await request(app.getHttpServer())
-        .get('/users/me')
+        .get('/v1/users/me')
         .set('Authorization', 'Bearer not-a-jwt')
         .expect(401);
     });
   });
 
   describe('request validation', () => {
-    it('POST /auth/register should return 400 for an invalid body', async () => {
+    it('POST /v1/auth/register should return 400 for an invalid body', async () => {
       await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({ email: 'not-an-email' })
         .expect(400);
     });
 
-    it('POST /auth/register should reject mismatched password confirmation', async () => {
+    it('POST /v1/auth/register should reject mismatched password confirmation', async () => {
       await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({
           email: 'john.doe@example.com',
           username: 'john_doe',
@@ -70,16 +66,16 @@ describe('Auth (e2e)', () => {
         .expect(400);
     });
 
-    it('POST /auth/verify-email should return 400 when the token is missing', async () => {
+    it('POST /v1/auth/verify-email should return 400 when the token is missing', async () => {
       await request(app.getHttpServer())
-        .post('/auth/verify-email')
+        .post('/v1/auth/verify-email')
         .send({})
         .expect(400);
     });
 
-    it('POST /auth/reset-password should return 400 when passwords do not match', async () => {
+    it('POST /v1/auth/reset-password should return 400 when passwords do not match', async () => {
       await request(app.getHttpServer())
-        .post('/auth/reset-password')
+        .post('/v1/auth/reset-password')
         .send({
           resetToken: 'a'.repeat(64),
           newPassword: 'NewPassword123!',
@@ -88,16 +84,16 @@ describe('Auth (e2e)', () => {
         .expect(400);
     });
 
-    it('POST /auth/forgot-password should return 400 for an invalid email', async () => {
+    it('POST /v1/auth/forgot-password should return 400 for an invalid email', async () => {
       await request(app.getHttpServer())
-        .post('/auth/forgot-password')
+        .post('/v1/auth/forgot-password')
         .send({ email: 'nope' })
         .expect(400);
     });
 
-    it('POST /auth/refresh-token should return 400 for an empty token', async () => {
+    it('POST /v1/auth/refresh-token should return 400 for an empty token', async () => {
       await request(app.getHttpServer())
-        .post('/auth/refresh-token')
+        .post('/v1/auth/refresh-token')
         .send({ refreshToken: '' })
         .expect(400);
     });

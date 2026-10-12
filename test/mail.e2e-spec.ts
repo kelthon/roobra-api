@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplicationContext } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import type { Transporter } from 'nodemailer';
 import type { MockInstance } from 'vitest';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from 'src/app.module.js';
+import { appOptions, configureApp } from 'src/app.setup.js';
 import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service.js';
 import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
 
 describe('Mail sending (e2e)', () => {
-  let app: INestApplicationContext;
+  let app: NestExpressApplication;
   let sendMail: MockInstance;
 
   beforeAll(async () => {
@@ -16,7 +17,10 @@ describe('Mail sending (e2e)', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app =
+      moduleFixture.createNestApplication<NestExpressApplication>(appOptions);
+    configureApp(app);
+
     await app.init();
 
     // The services send through the default transporter. Stubbing it keeps
