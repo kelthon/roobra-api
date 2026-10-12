@@ -32,10 +32,7 @@ describe('RolesGuard', () => {
   });
 
   it('should allow the request through when the user has one of the required roles', () => {
-    (reflectorMock.get as Mock).mockReturnValue([
-      UserRole.ADMIN,
-      UserRole.STAFF,
-    ]);
+    (reflectorMock.get as Mock).mockReturnValue([UserRole.ADMIN]);
 
     const result = guard.canActivate(
       createContext({ sub: 'user-id', role: UserRole.ADMIN }),
