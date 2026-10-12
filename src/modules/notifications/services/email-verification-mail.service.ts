@@ -48,7 +48,7 @@ export class EmailVerificationMailService {
         categoryBadge: 'Verification',
         preheaderText: 'Confirm your email to finish setting up your account.',
         appUrl,
-        // TODO: When fronend is finally ready change this mock url
+        // TODO: When frontend is finally ready change this mock url
         verifyEmailUrl: `${appUrl}/verify-email/${verificationToken}`,
         expiresInLabel: `${expiresInHours} hour${expiresInHours === 1 ? '' : 's'}`,
       },

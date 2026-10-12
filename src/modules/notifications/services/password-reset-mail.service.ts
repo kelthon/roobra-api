@@ -45,7 +45,7 @@ export class PasswordResetMailService {
         categoryBadge: 'Security',
         preheaderText: 'Use this link to reset your password.',
         appUrl,
-        // TODO: When fronend is finally ready change this mock url
+        // TODO: When frontend is finally ready change this mock url
         resetPasswordUrl: `${appUrl}/reset-password/${resetToken}`,
         expiresIn: Math.round(
           Duration.fromObject({ seconds: expiresInSeconds }).as('minutes'),
