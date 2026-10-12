@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import { InfoResponse } from 'src/shared/interfaces/info-response.js';
+import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
 import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
@@ -36,16 +37,18 @@ export class SessionsService {
     user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
     tx?: Prisma.TransactionClient,
   ): Promise<AuthTokensResponse> {
+    // Typed so the claims stay in line with what JwtStrategy hands to the guards
+    const payload: JWTAuthPayload = {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
+
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        {
-          sub: user.id,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        },
-        { expiresIn: this.config.get<number>('jwt.expiresIn') },
-      ),
+      this.jwtService.signAsync(payload, {
+        expiresIn: this.config.get<number>('jwt.expiresIn'),
+      }),
       this.generateRefreshToken(user.id, tx),
     ]);
 
