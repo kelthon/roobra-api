@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
@@ -209,8 +213,20 @@ export class AuthService {
     return await this.sessionsService.revoke(userId, refreshToken);
   }
 
+  /**
+   * Signs the user out of every session.
+   *
+   * @param userId The user nano id
+   * @throws NotFoundException When the user has no active session
+   */
   async logoutAllSessions(userId: string): Promise<InfoResponse> {
-    return await this.sessionsService.revokeAll(userId);
+    const count = await this.sessionsService.revokeAll(userId);
+
+    if (count === 0) {
+      throw new NotFoundException('No valid refresh tokens found for the user');
+    }
+
+    return { message: 'All refresh tokens revoked successfully' };
   }
 
   async refreshSession(refreshTokenDto: RefreshTokenDto) {

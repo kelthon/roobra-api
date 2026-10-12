@@ -203,6 +203,25 @@ describe('SessionsService', () => {
       expect(jwtServiceMock.signAsync).not.toHaveBeenCalled();
     });
 
+    it('should report token reuse even when the user has no other active session', async () => {
+      (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue({
+        id: 'token-id',
+        hashedToken: 'hashed(stolen-refresh-token)',
+        isRevoked: true,
+        expiresAt: new Date(Date.now() + 60 * 1000),
+        createdAt: new Date(),
+        userId: 'user-id',
+      });
+
+      (prismaMock.refreshToken.updateMany as Mock).mockResolvedValue({
+        count: 0,
+      });
+
+      await expect(
+        sessionsService.refresh('stolen-refresh-token'),
+      ).rejects.toThrow('Refresh token rotation with reuse detected');
+    });
+
     it('should throw NotFoundException if no user is found for the token', async () => {
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue({
         id: 'token-id',
@@ -259,7 +278,7 @@ describe('SessionsService', () => {
   });
 
   describe('revokeAll', () => {
-    it('should revoke all refresh tokens for a user', async () => {
+    it('should revoke all active refresh tokens of a user and return how many', async () => {
       (prismaMock.refreshToken.updateMany as Mock).mockResolvedValue({
         count: 3,
       });
@@ -277,19 +296,26 @@ describe('SessionsService', () => {
         }),
       );
 
-      expect(result).toEqual({
-        message: 'All refresh tokens revoked successfully',
-      });
+      expect(result).toBe(3);
     });
 
-    it('should throw NotFoundException if no valid refresh tokens are found for the user', async () => {
+    it('should return 0 instead of throwing when the user has no active token', async () => {
       (prismaMock.refreshToken.updateMany as Mock).mockResolvedValue({
         count: 0,
       });
 
-      await expect(sessionsService.revokeAll('user-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(sessionsService.revokeAll('user-id')).resolves.toBe(0);
+    });
+
+    it('should run in the transaction it is given', async () => {
+      const txMock = {
+        refreshToken: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+      };
+
+      await sessionsService.revokeAll('user-id', txMock as never);
+
+      expect(txMock.refreshToken.updateMany).toHaveBeenCalled();
+      expect(prismaMock.refreshToken.updateMany).not.toHaveBeenCalled();
     });
   });
 });
