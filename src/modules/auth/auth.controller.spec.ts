@@ -17,7 +17,6 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 
 const mockAuthService = {
-  getMe: vi.fn(),
   register: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
@@ -54,7 +53,6 @@ describe('AuthController', () => {
   describe('Guards', () => {
     describe('@UserOnly() routes', () => {
       it.each([
-        'getMe',
         'logout',
         'logoutAllSessions',
         'getActiveSessions',
@@ -101,18 +99,6 @@ describe('AuthController', () => {
         AuthController.prototype.login,
       );
       expect(guards).toContain(AuthGuard('local'));
-    });
-  });
-
-  describe('getMe', () => {
-    it('should call authService.getMe with the user id and return the result', async () => {
-      const serviceResult = { id: mockUser.id, email: mockUser.email };
-      mockAuthService.getMe.mockResolvedValue(serviceResult);
-
-      const result = await controller.getMe(mockUser);
-
-      expect(mockAuthService.getMe).toHaveBeenCalledWith(mockUser.id);
-      expect(result).toBe(serviceResult);
     });
   });
 

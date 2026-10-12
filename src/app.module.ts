@@ -18,6 +18,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
 import { join } from 'node:path';
 import { EnvSchema } from 'common/schemas/env.schema.js';
 import databaseConfig from 'config/database.config.js';
+import { UsersModule } from './modules/users/users.module.js';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import databaseConfig from 'config/database.config.js';
     CommonModule,
     AuthModule,
     NotificationsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

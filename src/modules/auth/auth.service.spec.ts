@@ -111,36 +111,6 @@ describe('AuthService', () => {
     );
   });
 
-  describe('getMe', () => {
-    it('should return the user profile for a given id', async () => {
-      const profile = {
-        id: 'user-id',
-        email: 'john.doe@example.com',
-        username: 'john.doe',
-      };
-      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue(profile);
-
-      const result = await authService.getMe('user-id');
-
-      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
-        }),
-      );
-      expect(result).toBe(profile);
-    });
-
-    it('should throw BadRequestException if no user is found', async () => {
-      (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
-        code: 'P2025',
-      });
-
-      await expect(authService.getMe('missing-id')).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-  });
-
   describe('validateUser', () => {
     it('should return the auth payload for valid credentials', async () => {
       (prismaMock.user.findUnique as Mock).mockResolvedValue({
