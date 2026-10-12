@@ -22,12 +22,6 @@ const AUTH_THROTTLE = { default: { limit: 5, ttl: 60_000 } };
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UserOnly()
-  @Get('me')
-  async getMe(@User() user: UserDto) {
-    return await this.authService.getMe(user.id);
-  }
-
   @Throttle(AUTH_THROTTLE)
   @GuestOnly()
   @Post('register')

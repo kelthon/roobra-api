@@ -29,7 +29,7 @@ describe('Auth (e2e)', () => {
 
   describe('protected routes', () => {
     it.each([
-      ['get', '/auth/me'],
+      ['get', '/users/me'],
       ['post', '/auth/logout'],
       ['post', '/auth/logout/all'],
       ['post', '/auth/change-password'],
@@ -43,7 +43,7 @@ describe('Auth (e2e)', () => {
 
     it('should return 401 for a malformed bearer token', async () => {
       await request(app.getHttpServer())
-        .get('/auth/me')
+        .get('/users/me')
         .set('Authorization', 'Bearer not-a-jwt')
         .expect(401);
     });
