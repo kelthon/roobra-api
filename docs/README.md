@@ -34,6 +34,7 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 - [how-to-run-tests.md](./guides/how-to-run-tests.md) — Unit and end-to-end tests.
 - [how-to-deploy-app.md](./guides/how-to-deploy-app.md) — Production deploy and recovery from a wrong Postgres role.
 - [how-to-add-an-email-template.md](./guides/how-to-add-an-email-template.md) — New transactional email or language.
+- [how-to-test-email.md](./guides/how-to-test-email.md) — Read the emails the app sends, with Mailpit or a real provider.
 
 ## Reference
 
