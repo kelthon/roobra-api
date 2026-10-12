@@ -1,10 +1,16 @@
+---
+doc-status: draft
+---
+
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `docs/restructure-documentation`, 2026-09-18.
+**Location:** `src/modules/auth/` — verified against branch `fix/GH-2-revoke-sessions-of-deleted-users`, 2026-10-12.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
-This page describes how the module is implemented.
+This page describes how the module is implemented. Sessions (refresh tokens) are in the
+[sessions module](./sessions-module.md) and the profile and account deletion in the
+[users module](./users-module.md).
 
 ## Endpoints
 
@@ -13,11 +19,11 @@ Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 
 
 | Method and path | Access | Rate limit | Body | Purpose |
 | --- | --- | --- | --- | --- |
-| `GET /auth/me` | Authenticated | global | — | Current user profile |
 | `POST /auth/register` | Guests only | strict | `RegisterUserDto` | Create account and issue tokens |
 | `POST /auth/login` | Guests only, local strategy | strict | `LoginDto` | Issue tokens |
 | `POST /auth/logout` | Authenticated | global | `refreshToken` | Revoke one refresh token |
-| `POST /auth/logout/all` | Authenticated | global | — | Revoke all active refresh tokens |
+| `POST /auth/logout/all` | Authenticated | global | — | Revoke all active refresh tokens; 404 when there is none |
+| `GET /auth/sessions` | Authenticated | global | — | List the active sessions, newest first, without their tokens |
 | `POST /auth/refresh-token` | Public | strict | `refreshToken` | Rotate tokens |
 | `POST /auth/forgot-password` | Public | strict | `email` | Create reset token and email it. Always answers the same, whether or not the email is registered |
 | `POST /auth/reset-password` | Public | strict | `resetToken`, `newPassword`, `confirmNewPassword` | Consume reset token, set password |
@@ -56,19 +62,21 @@ Why: [refresh tokens](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-
 | Piece | File | Notes |
 | --- | --- | --- |
 | `AuthService` | `auth.service.ts` | Register, login, password flows, email verification |
-| `AccessTokenService` | `services/access-token/` | Generate, refresh, revoke, revoke all |
 | `PasswordHashService` | `services/password-hash/` | Argon2 |
 | `SimpleHashService`, `SimpleTokenService` | `src/common/services/` | SHA-256 and random hex; provided globally by `CommonModule` |
 | `JwtStrategy`, `LocalStrategy` | `strategies/` | Bearer JWT; email and password |
 | Guards | `guards/` | `jwt-auth`, `optional-jwt`, `forbid-authenticated`, `roles` |
 
-`AuthModule` imports `DatabaseModule`, `NotificationsModule`, `PassportModule` and a `JwtModule`
-configured from `jwt.secret` and `jwt.expiresIn`. It exports `AuthService` and `JwtModule`.
+`AuthModule` imports `DatabaseModule`, `NotificationsModule`, `PassportModule` and `SessionsModule`,
+which signs the tokens. It exports `AuthService`. `JwtStrategy` verifies access tokens with the same
+`jwt.secret`; it is registered here and applies to every route that uses `@UserOnly()`, in any module.
 
 ## Behavior Notes
 
 - Registration creates the user and the first token pair in one database transaction.
 - Lookups by user filter `deletedAt: null` at the call site; nothing enforces it globally.
-- `JwtStrategy.validate` returns the payload without checking the database; a `TODO` notes that
-  deleted or blocked users are not rejected.
-- Roles: `subscriber` (default), `admin`, `content_manager`, `support_agent`, `staff`.
+- `JwtStrategy.validate` rejects a token without a `sub` claim and otherwise returns the payload
+  without checking the database. Deleting a user revokes their refresh tokens, so an access token
+  already issued stays valid until it expires (`jwt.expiresIn`, 15 minutes). Blocking a user does not
+  exist yet ([why](../adr/2026-10-11-02-end-deleted-users-sessions-by-revoking-refresh-tokens.md)).
+- Roles: `subscriber` (default), `admin`, `content_manager`, `support_agent`.

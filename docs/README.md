@@ -38,6 +38,8 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 ## Reference
 
 - [reference/auth-module.md](./reference/auth-module.md) — Endpoints, guards, tokens.
+- [reference/sessions-module.md](./reference/sessions-module.md) — Issuing, refreshing and revoking sessions.
+- [reference/users-module.md](./reference/users-module.md) — Profile and account deletion.
 - [reference/notifications-module.md](./reference/notifications-module.md) — Mailer setup, templates, locales.
 - [reference/prisma-setup.md](./reference/prisma-setup.md) — Schema layout, ID types, client options.
 - [reference/data-model.md](./reference/data-model.md) — Every table, column and relationship, one diagram per schema file.
