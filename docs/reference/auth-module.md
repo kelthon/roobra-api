@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `fix/GH-2-revoke-sessions-of-deleted-users`, 2026-10-12.
+**Location:** `src/modules/auth/` — verified against branch `feat/api-versioning`, 2026-10-12.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -14,24 +14,28 @@ This page describes how the module is implemented. Sessions (refresh tokens) are
 
 ## Endpoints
 
+Every route is under `/v1`: `configureApp` in `src/app.setup.ts` enables URI versioning with `1` as
+the default version, for `main.ts` and the e2e specs alike.
+
 Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 20 per 60 seconds
 (see [the rate limiting ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-01-rate-limit-auth-endpoints.md)).
 
 | Method and path | Access | Rate limit | Body | Purpose |
 | --- | --- | --- | --- | --- |
-| `POST /auth/register` | Guests only | strict | `RegisterUserDto` | Create account and issue tokens |
-| `POST /auth/login` | Guests only, local strategy | strict | `LoginDto` | Issue tokens |
-| `POST /auth/logout` | Authenticated | global | `refreshToken` | Revoke one refresh token |
-| `POST /auth/logout/all` | Authenticated | global | — | Revoke all active refresh tokens; 404 when there is none |
-| `GET /auth/sessions` | Authenticated | global | — | List the active sessions, newest first, without their tokens |
-| `POST /auth/refresh-token` | Public | strict | `refreshToken` | Rotate tokens |
-| `POST /auth/forgot-password` | Public | strict | `email` | Create reset token and email it. Always answers the same, whether or not the email is registered |
-| `POST /auth/reset-password` | Public | strict | `resetToken`, `newPassword`, `confirmNewPassword` | Consume reset token, set password |
-| `POST /auth/change-password` | Authenticated | global | current and new password | Change password |
-| `GET /auth/verify-email` | Authenticated | global | — | Create verification token and email it |
-| `POST /auth/verify-email` | Public | global | `token` | Consume token, set `emailVerifiedAt` |
+| `POST /v1/auth/register` | Guests only | strict | `RegisterUserDto` | Create account and issue tokens |
+| `POST /v1/auth/login` | Guests only, local strategy | strict | `LoginDto` | Issue tokens |
+| `POST /v1/auth/logout` | Authenticated | global | `refreshToken` | Revoke one refresh token |
+| `POST /v1/auth/logout/all` | Authenticated | global | — | Revoke all active refresh tokens; 404 when there is none |
+| `GET /v1/auth/sessions` | Authenticated | global | — | List the active sessions, newest first, without their tokens |
+| `POST /v1/auth/refresh-token` | Public | strict | `refreshToken` | Rotate tokens |
+| `POST /v1/auth/forgot-password` | Public | strict | `email` | Create reset token and email it. Always answers the same, whether or not the email is registered |
+| `POST /v1/auth/reset-password` | Public | strict | `resetToken`, `newPassword`, `confirmNewPassword` | Consume reset token, set password |
+| `POST /v1/auth/change-password` | Authenticated | global | current and new password | Change password |
+| `GET /v1/auth/verify-email` | Authenticated | global | — | Create verification token and email it |
+| `POST /v1/auth/verify-email` | Public | global | `token` | Consume token, set `emailVerifiedAt` |
 
-A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) validates every body.
+A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`, `errorFormat: 'grouped'`),
+also set by `configureApp`, validates every body.
 
 ## Route Access Decorators
 
