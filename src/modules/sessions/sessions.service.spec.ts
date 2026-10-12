@@ -222,7 +222,7 @@ describe('SessionsService', () => {
       ).rejects.toThrow('Refresh token rotation with reuse detected');
     });
 
-    it('should throw NotFoundException if no user is found for the token', async () => {
+    it('should throw NotFoundException if the user of the token is missing or deleted', async () => {
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue({
         id: 'token-id',
         hashedToken: 'hashed(valid-refresh-token)',
@@ -237,6 +237,14 @@ describe('SessionsService', () => {
       await expect(
         sessionsService.refresh('valid-refresh-token'),
       ).rejects.toThrow(NotFoundException);
+
+      // a deleted user is filtered out like a missing one
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id', deletedAt: null },
+        }),
+      );
+      expect(jwtServiceMock.signAsync).not.toHaveBeenCalled();
     });
   });
 
