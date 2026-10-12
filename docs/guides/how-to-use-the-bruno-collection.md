@@ -10,14 +10,18 @@ Call the API from the Bruno collection in `bruno/` instead of typing `curl` comm
 time or as a whole flow with its checks.
 
 [Bruno](https://www.usebruno.com/) is an open-source API client, like Postman or Insomnia, that keeps
-each request as a plain-text `.bru` file. The collection is versioned with the code, so a changed
-route and its request change in the same pull request, and nothing is stored in a cloud account.
+each request as a plain-text file. This collection uses Bruno's YAML format (OpenCollection): the
+collection is described by `bruno/opencollection.yml`, each request is a `.yml` file and the
+environment is `bruno/environments/Local.yml`. The collection is versioned with the code, so a
+changed route and its request change in the same pull request, and nothing is stored in a cloud
+account.
 
 ## Prerequisites
 
 - The development stack runs, with Mailpit (see [how to run with Docker](./how-to-run-with-docker.md)).
 - `.env` points the mailer at Mailpit (see [how to test email](./how-to-test-email.md), step 1).
-- The Bruno desktop app, or Node.js for the command line (`npx @usebruno/cli`).
+- A Bruno desktop app that opens YAML (OpenCollection) collections, or Node.js for the command line
+  (`npx @usebruno/cli`).
 
 ## Steps
 
@@ -29,7 +33,7 @@ route and its request change in the same pull request, and nothing is stored in 
 
    | Variable | Value | Used for |
    | --- | --- | --- |
-   | `baseUrl` | `http://localhost:3000` | The API |
+   | `baseUrl` | `http://localhost:3000` | The API, without the version: each request adds `/v1` |
    | `mailpitUrl` | `http://localhost:8025` | Mailpit's API |
    | `email`, `username`, `password` | A test account | The account the flow creates |
 
@@ -42,11 +46,11 @@ route and its request change in the same pull request, and nothing is stored in 
 
    | Request | Does | Checks |
    | --- | --- | --- |
-   | `auth/01 Register` | `POST /auth/register`, keeps the access token | 201 and an access token |
-   | `auth/02 Send verification email` | `GET /auth/verify-email` | — |
-   | `auth/03 Forgot password` | `POST /auth/forgot-password` | — |
+   | `auth/01 Register` | `POST /v1/auth/register`, keeps the access token | 201 and an access token |
+   | `auth/02 Send verification email` | `GET /v1/auth/verify-email` | — |
+   | `auth/03 Forgot password` | `POST /v1/auth/forgot-password` | — |
    | `mailpit/04 List emails` | Reads Mailpit's inbox | Both emails reached the account's address |
-   | `users/05 Delete account` | `DELETE /users/me` | — |
+   | `users/05 Delete account` | `DELETE /v1/users/me` | — |
 
 5. Or run it from the command line, from the repository root:
 
@@ -68,7 +72,10 @@ route and its request change in the same pull request, and nothing is stored in 
 
 - `register` and `forgot-password` accept 5 requests per minute; running the flow more often than
   that answers `429`.
-- Never put a real secret in a `.bru` file: the files are committed. A secret for a future
+- To add a request, copy one of the `.yml` files and change `info` (name and `seq`, the run order),
+  `http` (method, URL as `{{baseUrl}}/v1/...`, body, auth) and `runtime.scripts` (an
+  `after-response` script to keep a value, a `tests` script to check the response).
+- Never put a real secret in a request or environment file: the files are committed. A secret for a future
   environment goes in a `bruno/.env` file, added to `.gitignore`, and is read with
   `{{process.env.NAME}}`.
 - A new or changed route gets its request in the same pull request. `bruno/` is excluded from the

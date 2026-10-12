@@ -4,7 +4,7 @@ doc-status: draft
 
 # Users Module Reference
 
-**Location:** `src/modules/users/` — verified against branch `fix/GH-2-revoke-sessions-of-deleted-users`, 2026-10-12.
+**Location:** `src/modules/users/` — verified against branch `feat/api-versioning`, 2026-10-12.
 
 The user's profile and account. Sign-up, sign-in and the password flows stay in the
 [auth module](./auth-module.md); sessions are in the [sessions module](./sessions-module.md).
@@ -15,8 +15,8 @@ Both routes use `@UserOnly()` and the global rate limit (20 requests per 60 seco
 
 | Method and path | Response | Purpose |
 | --- | --- | --- |
-| `GET /users/me` | 200 with the profile; 400 when the user does not exist or is deleted | Current user profile: id, email, username, birthdate, photo URL, `emailVerifiedAt`, `createdAt`, `updatedAt` |
-| `DELETE /users/me` | 204; 404 when the user does not exist or is already deleted | Soft-deletes the account and revokes every session |
+| `GET /v1/users/me` | 200 with the profile; 400 when the user does not exist or is deleted | Current user profile: id, email, username, birthdate, photo URL, `emailVerifiedAt`, `createdAt`, `updatedAt` |
+| `DELETE /v1/users/me` | 204; 404 when the user does not exist or is already deleted | Soft-deletes the account and revokes every session |
 
 ## Account Deletion
 

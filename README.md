@@ -48,7 +48,9 @@ permissions for the Roobra website.
    [Docker reference](docs/reference/docker-setup.md) for what each Compose file does.
 
 4. Call the API with your HTTP client of choice (Postman, Insomnia, curl, ...) at
-   `http://localhost:3000` (or whichever `PORT` you set in `.env`).
+   `http://localhost:3000/v1` (or whichever `PORT` you set in `.env`): every route is under `/v1`. The
+   [Bruno collection](docs/guides/how-to-use-the-bruno-collection.md) has the auth and email flows
+   ready to run.
 
 The database is not exposed to the host in production (`expose`, not `ports`, in `compose.yaml`).
 In dev, `compose.override.yaml` publishes it at `DATABASE_HOST`:`DATABASE_PORT` from `.env` (default

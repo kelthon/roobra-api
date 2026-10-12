@@ -4,7 +4,7 @@ doc-status: draft
 
 # Sessions Module Reference
 
-**Location:** `src/modules/sessions/` — verified against branch `fix/GH-2-revoke-sessions-of-deleted-users`, 2026-10-12.
+**Location:** `src/modules/sessions/` — verified against branch `feat/api-versioning`, 2026-10-12.
 
 Issues, rotates and revokes the tokens of a signed-in user. A session is one row of `refresh_tokens`:
 it starts at sign-in and ends when its refresh token is revoked or expires. The module has no
@@ -16,10 +16,10 @@ controller; its routes are under `/auth` (see the [auth module](./auth-module.md
 | Method | Does | Used by |
 | --- | --- | --- |
 | `generate(user, tx?)` | Signs an access token and stores a new refresh token, optionally in the caller's transaction | Register, login, `refresh` |
-| `getActive(userId)` | Lists the active sessions (user agent, operating system, `createdAt`, `expiresAt`), newest first, without their tokens | `GET /auth/sessions` |
-| `refresh(refreshToken)` | Revokes the presented token and issues a new pair. A revoked token is treated as reuse and revokes every session of its user. A user who is missing or soft-deleted gets a 404 | `POST /auth/refresh-token` |
-| `revoke(userId, refreshToken)` | Revokes one active token of the user; 404 when none matches | `POST /auth/logout` |
-| `revokeAll(userId, tx?)` | Revokes every active token of the user, optionally in the caller's transaction, and returns how many. Revoking none is not an error | `POST /auth/logout/all`, reuse detection, account deletion |
+| `getActive(userId)` | Lists the active sessions (user agent, operating system, `createdAt`, `expiresAt`), newest first, without their tokens | `GET /v1/auth/sessions` |
+| `refresh(refreshToken)` | Revokes the presented token and issues a new pair. A revoked token is treated as reuse and revokes every session of its user. A user who is missing or soft-deleted gets a 404 | `POST /v1/auth/refresh-token` |
+| `revoke(userId, refreshToken)` | Revokes one active token of the user; 404 when none matches | `POST /v1/auth/logout` |
+| `revokeAll(userId, tx?)` | Revokes every active token of the user, optionally in the caller's transaction, and returns how many. Revoking none is not an error | `POST /v1/auth/logout/all`, reuse detection, account deletion |
 
 Token formats, lifetimes and config keys are listed in the
 [auth module's token table](./auth-module.md#tokens).

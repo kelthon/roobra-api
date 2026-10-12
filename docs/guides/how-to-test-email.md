@@ -38,15 +38,15 @@ first with Mailpit on your machine, then once with a real provider before a rele
    [how to use the Bruno collection](./how-to-use-the-bruno-collection.md)):
 
    ```sh
-   curl -s -X POST localhost:3000/auth/register -H 'Content-Type: application/json' \
+   curl -s -X POST localhost:3000/v1/auth/register -H 'Content-Type: application/json' \
      -d '{"email":"test@roobra.test","username":"tester","password":"Password123!","confirmPassword":"Password123!"}'
    ```
 
 4. Ask for the verification email, and for a password reset:
 
    ```sh
-   curl -s localhost:3000/auth/verify-email -H "Authorization: Bearer <accessToken>"
-   curl -s -X POST localhost:3000/auth/forgot-password -H 'Content-Type: application/json' \
+   curl -s localhost:3000/v1/auth/verify-email -H "Authorization: Bearer <accessToken>"
+   curl -s -X POST localhost:3000/v1/auth/forgot-password -H 'Content-Type: application/json' \
      -d '{"email":"test@roobra.test"}'
    ```
 
@@ -65,7 +65,7 @@ first with Mailpit on your machine, then once with a real provider before a rele
   ([open ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-11-02-email-transport-provider.md)).
 - Outside `production`, the mailer also opens each email in a browser (`preview`). It does nothing
   inside the container, which has no browser.
-- The test account stays in the development database. Delete it with `DELETE /users/me`, or drop the
+- The test account stays in the development database. Delete it with `DELETE /v1/users/me`, or drop the
   data with `docker compose down -v`.
 - The unit and e2e suites never send email: `render.spec.ts` renders every template, and
   `test/mail.e2e-spec.ts` stubs the transport.
