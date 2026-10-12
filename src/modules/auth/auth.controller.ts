@@ -4,7 +4,7 @@ import { LoginDto } from './dto/login.dto.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { LogoutDto } from './dto/logout.dto.js';
 import { User } from 'src/common/decorators/user.decorator.js';
-import { UserOnly } from 'src/common/decorators/auth-users-only.decorator.js';
+import { UserOnly } from 'src/common/decorators/user-only.decorator.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { GuestOnly } from 'src/common/decorators/guest-only.decorator.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
