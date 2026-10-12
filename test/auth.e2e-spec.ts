@@ -30,6 +30,7 @@ describe('Auth (e2e)', () => {
   describe('protected routes', () => {
     it.each([
       ['get', '/users/me'],
+      ['delete', '/users/me'],
       ['post', '/auth/logout'],
       ['post', '/auth/logout/all'],
       ['post', '/auth/change-password'],
