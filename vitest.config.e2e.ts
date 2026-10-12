@@ -9,7 +9,8 @@ export default defineConfig({
     // The e2e specs boot AppModule, which validates the environment at
     // startup. These values pass that validation without a .env file (CI has
     // none) and win over a local one, so every run sees the same config. The
-    // specs never reach a query or send an email, so nothing here is contacted.
+    // specs never reach a query, and the mail spec stubs the transporter, so
+    // nothing here is contacted.
     env: {
       DATABASE_USER: 'roobra',
       DATABASE_PASSWORD: 'roobra',
