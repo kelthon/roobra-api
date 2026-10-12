@@ -62,6 +62,12 @@ export class AuthController {
     return await this.authService.logoutAllSessions(user.id);
   }
 
+  @UserOnly()
+  @Get('sessions')
+  async getActiveSessions(@User() user: UserDto) {
+    return await this.authService.getActiveSessions(user.id);
+  }
+
   @Throttle(AUTH_THROTTLE)
   @Post('refresh-token')
   async refreshSession(@Body() refreshTokenDto: RefreshTokenDto) {

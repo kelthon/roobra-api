@@ -22,6 +22,7 @@ const mockAuthService = {
   login: vi.fn(),
   logout: vi.fn(),
   logoutAllSessions: vi.fn(),
+  getActiveSessions: vi.fn(),
   refreshSession: vi.fn(),
   forgotPassword: vi.fn(),
   resetPassword: vi.fn(),
@@ -56,6 +57,7 @@ describe('AuthController', () => {
         'getMe',
         'logout',
         'logoutAllSessions',
+        'getActiveSessions',
         'changePassword',
         'sendVerificationEmail',
       ])('should apply JwtAuthGuard to %s', (methodName) => {
@@ -157,6 +159,20 @@ describe('AuthController', () => {
       const result = await controller.logout(mockUser, dto);
 
       expect(mockAuthService.logout).toHaveBeenCalledWith(mockUser.id, dto);
+      expect(result).toBe(serviceResult);
+    });
+  });
+
+  describe('getActiveSessions', () => {
+    it('should call authService.getActiveSessions with the user id and return the result', async () => {
+      const serviceResult = [{ userAgent: 'agent' }];
+      mockAuthService.getActiveSessions.mockResolvedValue(serviceResult);
+
+      const result = await controller.getActiveSessions(mockUser);
+
+      expect(mockAuthService.getActiveSessions).toHaveBeenCalledWith(
+        mockUser.id,
+      );
       expect(result).toBe(serviceResult);
     });
   });

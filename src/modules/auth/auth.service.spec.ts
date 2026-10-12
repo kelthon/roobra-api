@@ -67,6 +67,7 @@ describe('AuthService', () => {
       refresh: vi.fn(),
       revoke: vi.fn(),
       revokeAll: vi.fn(),
+      getActive: vi.fn(),
     } as unknown as SessionsService;
 
     simpleHashServiceMock = {
@@ -335,6 +336,18 @@ describe('AuthService', () => {
       await expect(authService.logoutAllSessions('user-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('getActiveSessions', () => {
+    it('should delegate to sessionsService.getActive with the user id', async () => {
+      const sessions = [{ userAgent: 'agent' }];
+      (sessionsServiceMock.getActive as Mock).mockResolvedValue(sessions);
+
+      const result = await authService.getActiveSessions('user-id');
+
+      expect(sessionsServiceMock.getActive).toHaveBeenCalledWith('user-id');
+      expect(result).toBe(sessions);
     });
   });
 
