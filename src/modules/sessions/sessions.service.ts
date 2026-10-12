@@ -170,8 +170,21 @@ export class SessionsService {
     }
   }
 
-  async revokeAll(userId: string): Promise<InfoResponse> {
-    const count = await this.prisma.refreshToken.updateMany({
+  /**
+   * Revokes every active refresh token of the user. Revoking none is not an
+   * error: the caller decides whether it is.
+   *
+   * @param userId The user nano id
+   * @param tx The transaction to run in, when the caller has one
+   * @returns How many tokens were revoked
+   */
+  async revokeAll(
+    userId: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<number> {
+    const prisma = tx ?? this.prisma;
+
+    const { count } = await prisma.refreshToken.updateMany({
       where: {
         userId,
         isRevoked: false,
@@ -180,12 +193,6 @@ export class SessionsService {
       data: { isRevoked: true },
     });
 
-    if (count.count === 0) {
-      throw new NotFoundException('No valid refresh tokens found for the user');
-    }
-
-    return {
-      message: 'All refresh tokens revoked successfully',
-    };
+    return count;
   }
 }

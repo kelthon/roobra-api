@@ -3,7 +3,7 @@ import { AuthService } from './auth.service.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
 import { SessionsService } from '../sessions/sessions.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
 import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
@@ -319,9 +319,7 @@ describe('AuthService', () => {
 
   describe('logoutAllSessions', () => {
     it('should revoke every refresh token for the user', async () => {
-      (sessionsServiceMock.revokeAll as Mock).mockResolvedValue({
-        message: 'All refresh tokens revoked successfully',
-      });
+      (sessionsServiceMock.revokeAll as Mock).mockResolvedValue(2);
 
       const result = await authService.logoutAllSessions('user-id');
 
@@ -329,6 +327,14 @@ describe('AuthService', () => {
       expect(result).toEqual({
         message: 'All refresh tokens revoked successfully',
       });
+    });
+
+    it('should throw NotFoundException when the user has no active session', async () => {
+      (sessionsServiceMock.revokeAll as Mock).mockResolvedValue(0);
+
+      await expect(authService.logoutAllSessions('user-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
