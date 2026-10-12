@@ -46,6 +46,7 @@ account.
 
    | Request | Does | Checks |
    | --- | --- | --- |
+   | `health/00 Health check` | `GET /health` | 200 and the database up |
    | `auth/01 Register` | `POST /v1/auth/register`, keeps the access token | 201 and an access token |
    | `auth/02 Send verification email` | `GET /v1/auth/verify-email` | — |
    | `auth/03 Forgot password` | `POST /v1/auth/forgot-password` | — |

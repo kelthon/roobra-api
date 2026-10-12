@@ -1,5 +1,3 @@
-import { AppController } from 'src/app.controller.js';
-import { AppService } from 'src/app.service.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CommonModule } from './common/common.module.js';
 import { APP_GUARD } from '@nestjs/core';
@@ -19,6 +17,7 @@ import databaseConfig from 'config/database.config.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { mailerOptionsFactory } from './modules/notifications/config/mailer-options.factory.js';
 import { LoggerModule } from 'nestjs-pino';
+import { HealthModule } from './modules/health/health.module.js';
 import { loggerOptionsFactory } from './common/logger/logger-options.factory.js';
 
 @Module({
@@ -58,8 +57,8 @@ import { loggerOptionsFactory } from './common/logger/logger-options.factory.js'
     AuthModule,
     NotificationsModule,
     UsersModule,
+    HealthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
