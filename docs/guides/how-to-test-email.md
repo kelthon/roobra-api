@@ -33,7 +33,9 @@ first with Mailpit on your machine, then once with a real provider before a rele
    docker compose up -d
    ```
 
-3. Create an account and keep the `accessToken` from the response:
+3. Create an account and keep the `accessToken` from the response. Steps 3 to 5 are also the
+   Bruno collection's flow, if you prefer it to `curl` (see
+   [how to use the Bruno collection](./how-to-use-the-bruno-collection.md)):
 
    ```sh
    curl -s -X POST localhost:3000/auth/register -H 'Content-Type: application/json' \
