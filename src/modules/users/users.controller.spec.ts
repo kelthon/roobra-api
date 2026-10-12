@@ -6,6 +6,7 @@ import { UsersService } from './users.service.js';
 
 const mockUsersService = {
   getMe: vi.fn(),
+  delete: vi.fn(),
 };
 
 const mockUser: UserDto = {
@@ -29,13 +30,16 @@ describe('UsersController', () => {
   });
 
   describe('Guards', () => {
-    it.each(['getMe'])('should apply JwtAuthGuard to %s', (methodName) => {
-      const guards = Reflect.getMetadata(
-        '__guards__',
-        UsersController.prototype[methodName as keyof UsersController],
-      );
-      expect(guards).toContain(JwtAuthGuard);
-    });
+    it.each(['getMe', 'delete'])(
+      'should apply JwtAuthGuard to %s',
+      (methodName) => {
+        const guards = Reflect.getMetadata(
+          '__guards__',
+          UsersController.prototype[methodName as keyof UsersController],
+        );
+        expect(guards).toContain(JwtAuthGuard);
+      },
+    );
   });
 
   describe('getMe', () => {
@@ -47,6 +51,16 @@ describe('UsersController', () => {
 
       expect(mockUsersService.getMe).toHaveBeenCalledWith(mockUser.id);
       expect(result).toBe(serviceResult);
+    });
+  });
+
+  describe('delete', () => {
+    it('should call usersService.delete with the user id', async () => {
+      mockUsersService.delete.mockResolvedValue(undefined);
+
+      await controller.delete(mockUser);
+
+      expect(mockUsersService.delete).toHaveBeenCalledWith(mockUser.id);
     });
   });
 });
