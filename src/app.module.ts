@@ -18,9 +18,23 @@ import { EnvSchema } from 'common/schemas/env.schema.js';
 import databaseConfig from 'config/database.config.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { mailerOptionsFactory } from './modules/notifications/config/mailer-options.factory.js';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        pinoHttp: {
+          transport:
+            config.getOrThrow('app.mode') !== 'production'
+              ? { target: 'pino-pretty', options: { colorize: true } }
+              : undefined,
+          level: config.getOrThrow('app.mode') !== 'production' ? 'debug' : 'info',
+        },
+      }),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.development', '.env'],
