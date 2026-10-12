@@ -80,6 +80,28 @@ export class SessionsService {
   }
 
   /**
+   * Lists the active sessions of the user, newest first, without their tokens.
+   *
+   * @param userId The user nano id
+   */
+  async getActive(userId: string) {
+    return await this.prisma.refreshToken.findMany({
+      select: {
+        userAgent: true,
+        operatingSystem: true,
+        expiresAt: true,
+        createdAt: true,
+      },
+      where: {
+        userId,
+        isRevoked: false,
+        expiresAt: { gt: DateTime.now().toJSDate() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /**
    * Exchanges a refresh token for a new access and refresh token. Presenting a
    * revoked token is treated as reuse: every session of its user is revoked.
    *

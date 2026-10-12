@@ -36,6 +36,7 @@ describe('SessionsService', () => {
         updateMany: vi.fn(),
         findFirst: vi.fn(),
         findFirstOrThrow: vi.fn(),
+        findMany: vi.fn(),
       },
       user: {
         findUnique: vi.fn(),
@@ -245,6 +246,31 @@ describe('SessionsService', () => {
         }),
       );
       expect(jwtServiceMock.signAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getActive', () => {
+    it('should list the active sessions of the user, newest first, without tokens', async () => {
+      const sessions = [{ userAgent: 'agent', createdAt: new Date() }];
+      (prismaMock.refreshToken.findMany as Mock).mockResolvedValue(sessions);
+
+      const result = await sessionsService.getActive('user-id');
+
+      expect(prismaMock.refreshToken.findMany).toHaveBeenCalledWith({
+        select: {
+          userAgent: true,
+          operatingSystem: true,
+          expiresAt: true,
+          createdAt: true,
+        },
+        where: {
+          userId: 'user-id',
+          isRevoked: false,
+          expiresAt: { gt: expect.any(Date) },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      expect(result).toBe(sessions);
     });
   });
 

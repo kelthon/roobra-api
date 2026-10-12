@@ -229,6 +229,10 @@ export class AuthService {
     return { message: 'All refresh tokens revoked successfully' };
   }
 
+  async getActiveSessions(userId: string) {
+    return await this.sessionsService.getActive(userId);
+  }
+
   async refreshSession(refreshTokenDto: RefreshTokenDto) {
     const { refreshToken } = refreshTokenDto;
     return await this.sessionsService.refresh(refreshToken);
