@@ -19,21 +19,14 @@ import databaseConfig from 'config/database.config.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { mailerOptionsFactory } from './modules/notifications/config/mailer-options.factory.js';
 import { LoggerModule } from 'nestjs-pino';
+import { loggerOptionsFactory } from './common/logger/logger-options.factory.js';
 
 @Module({
   imports: [
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        pinoHttp: {
-          transport:
-            config.getOrThrow('app.mode') !== 'production'
-              ? { target: 'pino-pretty', options: { colorize: true } }
-              : undefined,
-          level: config.getOrThrow('app.mode') !== 'production' ? 'debug' : 'info',
-        },
-      }),
+      useFactory: loggerOptionsFactory,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
