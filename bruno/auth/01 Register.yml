@@ -1,0 +1,35 @@
+info:
+  name: Register
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email}}",
+        "username": "{{username}}",
+        "password": "{{password}}",
+        "confirmPassword": "{{password}}"
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setVar("accessToken", res.body.accessToken);
+    - type: tests
+      code: |-
+        test("returns tokens", () => {
+          expect(res.status).to.equal(201);
+          expect(res.body.accessToken).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
