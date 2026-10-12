@@ -6,7 +6,7 @@ import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
 } from 'src/common/utils/database.util.js';
-import { AccessTokenService } from './services/access-token/access-token.service.js';
+import { AccessTokenService } from '../sessions/access-token.service.js';
 import { LogoutDto } from './dto/logout.dto.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';

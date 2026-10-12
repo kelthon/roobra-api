@@ -1,7 +1,7 @@
 import { PrismaService } from '../database/prisma.service.js';
 import { AuthService } from './auth.service.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
-import { AccessTokenService } from './services/access-token/access-token.service.js';
+import { AccessTokenService } from '../sessions/access-token.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import { BadRequestException } from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
