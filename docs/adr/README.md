@@ -27,12 +27,14 @@ in `roobra-docs`, where every template for every repository is kept.
 | --- | --- | --- |
 | `Draft` | Written but not merged into `main`. | Yes |
 | `Proposed` | Merged, decision still open. | Yes |
-| `Accepted` | Merged and in force. | No, except typo fixes |
+| `Accepted` | Merged and in force. | Only typo fixes and the Implementation Status section |
 | `Rejected` | Merged and explicitly not adopted. | No |
 | `Superseded` | Replaced by a newer ADR (`superseded-by` points to it). | No |
 
 To change an accepted decision, write a new ADR with `supersedes: <old file>` and mark the old one
-`Superseded`. Never rewrite history in an accepted ADR.
+`Superseded`. Never rewrite history in an accepted ADR. The one exception is its Implementation
+Status, which is kept current as the code changes
+([why](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-10-12-keep-the-implementation-status-of-an-adr-current.md)).
 
 ### Draft Until Merge
 
