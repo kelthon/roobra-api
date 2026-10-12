@@ -1,7 +1,7 @@
 import { PrismaService } from '../database/prisma.service.js';
 import { AuthService } from './auth.service.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
-import { AccessTokenService } from '../sessions/access-token.service.js';
+import { SessionsService } from '../sessions/sessions.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import { BadRequestException } from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
@@ -13,7 +13,7 @@ import type { Mock } from 'vitest';
 describe('AuthService', () => {
   let prismaMock: PrismaService;
   let hashServiceMock: PasswordHashService;
-  let accessTokenServiceMock: AccessTokenService;
+  let sessionsServiceMock: SessionsService;
   let simpleHashServiceMock: SimpleHashService;
   let simpleTokenServiceMock: SimpleTokenService;
   let configServiceMock: ConfigService;
@@ -62,12 +62,12 @@ describe('AuthService', () => {
       verify: vi.fn(),
     } as unknown as PasswordHashService;
 
-    accessTokenServiceMock = {
+    sessionsServiceMock = {
       generate: vi.fn().mockResolvedValue(tokens),
       refresh: vi.fn(),
       revoke: vi.fn(),
       revokeAll: vi.fn(),
-    } as unknown as AccessTokenService;
+    } as unknown as SessionsService;
 
     simpleHashServiceMock = {
       hash: vi.fn((raw: string) => `hashed(${raw})`),
@@ -101,7 +101,7 @@ describe('AuthService', () => {
     authService = new AuthService(
       prismaMock,
       hashServiceMock,
-      accessTokenServiceMock,
+      sessionsServiceMock,
       simpleHashServiceMock,
       simpleTokenServiceMock,
       configServiceMock,
@@ -228,7 +228,7 @@ describe('AuthService', () => {
         }),
       );
       // tokens must be generated inside the same transaction as user creation
-      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(
+      expect(sessionsServiceMock.generate).toHaveBeenCalledWith(
         createdUser,
         expect.anything(),
       );
@@ -280,7 +280,7 @@ describe('AuthService', () => {
           where: { id: 'user-id', deletedAt: null },
         }),
       );
-      expect(accessTokenServiceMock.generate).toHaveBeenCalledWith(user);
+      expect(sessionsServiceMock.generate).toHaveBeenCalledWith(user);
       // role is fetched for token generation but stripped from the public response
       const { role: _role, ...publicUser } = user;
       expect(result).toEqual({ ...tokens, user: publicUser });
@@ -299,7 +299,7 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('should revoke the given refresh token for the user', async () => {
-      (accessTokenServiceMock.revoke as Mock).mockResolvedValue({
+      (sessionsServiceMock.revoke as Mock).mockResolvedValue({
         message: 'Refresh token revoked successfully',
       });
 
@@ -307,7 +307,7 @@ describe('AuthService', () => {
         refreshToken: 'refresh-token',
       });
 
-      expect(accessTokenServiceMock.revoke).toHaveBeenCalledWith(
+      expect(sessionsServiceMock.revoke).toHaveBeenCalledWith(
         'user-id',
         'refresh-token',
       );
@@ -319,13 +319,13 @@ describe('AuthService', () => {
 
   describe('logoutAllSessions', () => {
     it('should revoke every refresh token for the user', async () => {
-      (accessTokenServiceMock.revokeAll as Mock).mockResolvedValue({
+      (sessionsServiceMock.revokeAll as Mock).mockResolvedValue({
         message: 'All refresh tokens revoked successfully',
       });
 
       const result = await authService.logoutAllSessions('user-id');
 
-      expect(accessTokenServiceMock.revokeAll).toHaveBeenCalledWith('user-id');
+      expect(sessionsServiceMock.revokeAll).toHaveBeenCalledWith('user-id');
       expect(result).toEqual({
         message: 'All refresh tokens revoked successfully',
       });
@@ -333,16 +333,14 @@ describe('AuthService', () => {
   });
 
   describe('refreshSession', () => {
-    it('should delegate straight to accessTokenService.refresh using the raw token', async () => {
-      (accessTokenServiceMock.refresh as Mock).mockResolvedValue(tokens);
+    it('should delegate straight to sessionsService.refresh using the raw token', async () => {
+      (sessionsServiceMock.refresh as Mock).mockResolvedValue(tokens);
 
       const result = await authService.refreshSession({
         refreshToken: 'refresh-token',
       });
 
-      expect(accessTokenServiceMock.refresh).toHaveBeenCalledWith(
-        'refresh-token',
-      );
+      expect(sessionsServiceMock.refresh).toHaveBeenCalledWith('refresh-token');
       expect(result).toBe(tokens);
     });
   });

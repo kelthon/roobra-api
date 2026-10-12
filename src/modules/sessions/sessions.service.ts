@@ -15,14 +15,15 @@ import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 
 /**
- * Access tokens are short-lived JWTs. Refresh tokens are opaque, stored only as
+ * A session is one row of `refresh_tokens`: it starts at sign-in and ends when
+ * its refresh token is revoked or expires. Access tokens are short-lived JWTs. Refresh tokens are opaque, stored only as
  * a hash, single-use and rotated on every refresh.
  *
  * @see https://github.com/kelthon/roobra-docs/blob/main/adr/2026-04-14-stateless-jwt-access-tokens.md
  * @see https://github.com/kelthon/roobra-docs/blob/main/adr/2026-09-07-refresh-token-rotation-with-reuse-detection.md
  */
 @Injectable()
-export class AccessTokenService {
+export class SessionsService {
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
