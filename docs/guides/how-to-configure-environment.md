@@ -41,7 +41,7 @@ app needs to start.
    | `COOKIE_SECRET` | Base64, at least 44 characters (`openssl rand -base64 32`) | Validated only; not read by the code yet |
    | `REDIS_URL` | `redis://` or `rediss://` URL | Validated only; not read by the code yet |
    | `REDIS_PASSWORD` | Non-blank | The Compose `redis` service's password; the `server` waits for Redis to be healthy |
-   | `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASSWORD` | Non-blank | SMTP server and credentials for the mailer |
+   | `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASSWORD` | Non-blank | SMTP server and credentials for the mailer; in development, Mailpit (see [how to test email](./how-to-test-email.md)) |
    | `EMAIL_FROM` | An address, bare (`no-reply@roobra.com`) or with a display name (`"Roobra" <no-reply@roobra.com>`) | Sender address |
    | `FRONTEND_URL` | `http://` or `https://` URL | Base URL of links sent in emails |
 
@@ -53,7 +53,7 @@ app needs to start.
    | `NODE_ENV` | `development` | `development`, `test` or `production`; `production` stops logging Prisma queries |
    | `PORT` | `3000` | Published port in Compose; must be between `1024` and `49151` |
    | `DATABASE_PORT` | `5432` | Postgres port published to the host in development |
-   | `EMAIL_PORT` | `587` | SMTP port; `465` enables implicit TLS |
+   | `EMAIL_PORT` | `587` | SMTP port; `465` uses implicit TLS, any other port STARTTLS when offered |
    | `REDIS_PORT` | `6379` | Redis port published to the host in development; not validated by the app |
    | `HOST_UID`, `HOST_GID` | `1000`, `1000` | User and group the development container runs as (`id -u`, `id -g`); not validated by the app |
 

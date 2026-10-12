@@ -27,7 +27,7 @@ src/modules/notifications/
 
 | Option | Value |
 | --- | --- |
-| Transport | SMTP, transport name `smtp`, from `mail.host`, `mail.port`, `mail.secure`, `mail.user`, `mail.password` |
+| Transport | One default SMTP `transport` from `mail.host`, `mail.port`, `mail.secure`, `mail.user`, `mail.password`. The services call `sendMail` without a `transporterName`, so it must not be a named entry of `transports` |
 | `defaults.from` | `mail.from` |
 | Template adapter | `HandlebarsAdapter` with `inlineCssEnabled: true` |
 | Template and partial options | `strict: true` |
@@ -60,12 +60,12 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
 
 | Key | Source | Default |
 | --- | --- | --- |
-| `mail.host` | `EMAIL_HOST` | `localhost` |
+| `mail.host` | `EMAIL_HOST` | none, required at startup |
 | `mail.port` | `EMAIL_PORT` | `587` |
 | `mail.secure` | `EMAIL_PORT === 465` | derived |
 | `mail.user`, `mail.password` | `EMAIL_USER`, `EMAIL_PASSWORD` | none, required at startup |
-| `mail.from` | `EMAIL_FROM` | `"Roobra" <no-reply@roobra.com>` |
-| `app.frontendUrl` | `FRONTEND_URL` | `http://localhost:5173` |
+| `mail.from` | `EMAIL_FROM` | none, required at startup |
+| `app.frontendUrl` | `FRONTEND_URL` | none, required at startup |
 
 ## Use Case Status
 
@@ -92,3 +92,7 @@ picks the first supported tag (exact, then primary subtag) and falls back to `DE
   syntax error or a missing variable fails the unit suite instead of a live send.
 - `npm run preview:email` (`scripts/preview-email.ts`) renders a template and opens it in the
   browser, without SMTP or a running app.
+- `test/mail.e2e-spec.ts` boots `AppModule`, stubs the default transporter and checks that both
+  services reach it with their links.
+- Sending through SMTP for real, with Mailpit or a provider: see
+  [how to test email](../guides/how-to-test-email.md).
