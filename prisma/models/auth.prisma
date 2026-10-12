@@ -24,7 +24,7 @@ model User {
 
   refreshTokens           RefreshToken[]
   passwordResetTokens     PasswordResetToken[]
-  emailVerificationToknes EmailVerificationToken[]
+  emailVerificationTokens EmailVerificationToken[]
   logs                    AuditLog[]
   subscriber              Subscriber?
   staffMember             StaffMember?
@@ -79,7 +79,7 @@ model EmailVerificationToken {
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  @@map("email_verification_token")
+  @@map("email_verification_tokens")
 }
 
 model Key {

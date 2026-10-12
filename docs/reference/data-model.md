@@ -16,7 +16,7 @@ How the schema files, ID types and client options are set up is in
 [prisma-setup.md](./prisma-setup.md).
 
 Only four tables are read or written by application code today: `users`, `refresh_tokens`,
-`password_reset_tokens` and `email_verification_token`. Every other table is filled only by the
+`password_reset_tokens` and `email_verification_tokens`. Every other table is filled only by the
 development seed (`prisma/seeds/`).
 
 ## How To Read The Diagrams
@@ -99,7 +99,7 @@ erDiagram
     USER ||--o{ AUDIT_LOG : "logs"
     USER ||--o{ REFRESH_TOKEN : "refreshTokens"
     USER ||--o{ PASSWORD_RESET_TOKEN : "passwordResetTokens"
-    USER ||--o{ EMAIL_VERIFICATION_TOKEN : "emailVerificationToknes"
+    USER ||--o{ EMAIL_VERIFICATION_TOKEN : "emailVerificationTokens"
     USER ||--o| STAFF_MEMBER : "staffMember"
     USER ||--o| SUBSCRIBER : "subscriber"
 ```
@@ -109,7 +109,7 @@ erDiagram
 | `USER` | `users` |
 | `REFRESH_TOKEN` | `refresh_tokens` |
 | `PASSWORD_RESET_TOKEN` | `password_reset_tokens` |
-| `EMAIL_VERIFICATION_TOKEN` | `email_verification_token` |
+| `EMAIL_VERIFICATION_TOKEN` | `email_verification_tokens` |
 | `KEY` | `keys` |
 | `STAFF_MEMBER` | `staff_members` |
 
@@ -365,8 +365,6 @@ erDiagram
 
 - `medias` and `media_volumes` have a `searchable_text` `tsvector` column with a GIN index, and
   `users` has trigram GIN indexes on `username` and `email`.
-- The `email_verification_token` table name is singular, unlike every other table, and the relation
-  field on `User` is spelled `emailVerificationToknes`. Both are as in the schema.
 - Foreign keys to `users.id` are `text` while `users.id` is `char(21)`: the foreign key columns
   have no `@db` attribute.
 - These diagrams were generated once from the schema; until a generator is committed, a schema
