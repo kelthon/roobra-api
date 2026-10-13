@@ -1,4 +1,4 @@
-import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import { Controller, Get, UseFilters, VERSION_NEUTRAL } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
@@ -6,9 +6,11 @@ import {
 } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaService } from 'modules/database/prisma.service.js';
+import { HealthCheckFilter } from './health-check.filter.js';
 
 @Controller({ path: 'health', version: VERSION_NEUTRAL })
 @SkipThrottle()
+@UseFilters(HealthCheckFilter)
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
