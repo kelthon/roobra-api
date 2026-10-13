@@ -91,6 +91,27 @@ describe('Error responses (e2e)', () => {
     expect(response.body).not.toHaveProperty('requestId');
   });
 
+  it('should answer a taken email with an email-in-use problem', async () => {
+    mockUserCreate.mockRejectedValueOnce({
+      code: 'P2002',
+      meta: { target: ['email'] },
+    });
+
+    const response = await request(app.getHttpServer())
+      .post('/v1/auth/register')
+      .send(validRegistration)
+      .expect(409);
+
+    expectProblem(response);
+    expect(response.body).toEqual({
+      type: 'https://api.roobra.com/problems/email-in-use',
+      title: 'Email already in use',
+      status: 409,
+      instance: '/v1/auth/register',
+      requestId: response.headers['x-request-id'],
+    });
+  });
+
   it('should answer a missing token with an about:blank 401', async () => {
     const response = await request(app.getHttpServer())
       .get('/v1/users/me')

@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ProblemException } from 'src/common/problems/problem.js';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
@@ -95,8 +97,7 @@ export class AuthService {
    * Creates an account and signs the user in.
    *
    * @param registerDto The account data
-   * @throws BadRequestException When the email or the username is already in
-   *   use
+   * @throws ProblemException `email-in-use` or `username-in-use` (409)
    */
   async register(
     registerDto: RegisterUserDto,
@@ -132,14 +133,14 @@ export class AuthService {
         const targets = error.meta?.target;
 
         if (targets?.includes('email')) {
-          throw new BadRequestException('Email already in use');
+          throw new ProblemException('email-in-use');
         }
 
         if (targets?.includes('username')) {
-          throw new BadRequestException('Username already in use');
+          throw new ProblemException('username-in-use');
         }
 
-        throw new BadRequestException('Conflict data already in use');
+        throw new ConflictException('Conflict data already in use');
       }
       throw error;
     }
@@ -269,8 +270,8 @@ export class AuthService {
    * Sets a new password using a reset token.
    *
    * @param resetPasswordDto The reset token and the new password
-   * @throws BadRequestException When the token does not exist, was used or has
-   *   expired
+   * @throws ProblemException `invalid-token` (400) when the token does not
+   *   exist, was used or has expired
    */
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { resetToken, newPassword } = resetPasswordDto;
@@ -300,7 +301,7 @@ export class AuthService {
       });
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found with the provided token');
+        throw new ProblemException('invalid-token');
       }
       throw error;
     }
@@ -311,8 +312,9 @@ export class AuthService {
    *
    * @param userId The user nano id
    * @param changePasswordDto The current and the new password
-   * @throws BadRequestException When the current password is wrong or the user
-   *   does not exist
+   * @throws ProblemException `incorrect-password` (400) when the current
+   *   password is wrong
+   * @throws BadRequestException When the user does not exist
    */
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
     const { currentPassword, newPassword } = changePasswordDto;
@@ -326,7 +328,7 @@ export class AuthService {
       if (
         !(await this.hashService.verify(currentPassword, hashedPassword || ''))
       ) {
-        throw new BadRequestException('Incorrect password');
+        throw new ProblemException('incorrect-password');
       }
 
       return this.updatePassword(userId, newPassword);
@@ -422,8 +424,8 @@ export class AuthService {
    * Marks the user's email as verified.
    *
    * @param token The raw token from the verification link
-   * @throws BadRequestException When the token does not exist, was used or has
-   *   expired
+   * @throws ProblemException `invalid-token` (400) when the token does not
+   *   exist, was used or has expired
    */
   async verifyEmail(token: string) {
     try {
@@ -452,7 +454,7 @@ export class AuthService {
       return { message: 'Email was verified susscefully' };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found');
+        throw new ProblemException('invalid-token');
       }
       throw error;
     }

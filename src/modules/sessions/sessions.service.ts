@@ -1,8 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ProblemException } from 'src/common/problems/problem.js';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from 'src/generated/prisma/client.js';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
@@ -109,7 +106,8 @@ export class SessionsService {
    * revoked token is treated as reuse: every session of its user is revoked.
    *
    * @param refreshToken The raw refresh token
-   * @throws BadRequestException When the token is unknown, expired or revoked
+   * @throws ProblemException `invalid-token` (400) when the token is unknown,
+   *   expired or revoked
    * @throws NotFoundException When the user of the token no longer exists or
    *   is deleted
    */
@@ -122,14 +120,16 @@ export class SessionsService {
     });
 
     if (!token) {
-      throw new BadRequestException(
+      throw new ProblemException(
+        'invalid-token',
         'Invalid refresh token provided or token has been revoked',
       );
     }
 
     if (token.isRevoked) {
       await this.revokeAll(token.userId);
-      throw new BadRequestException(
+      throw new ProblemException(
+        'invalid-token',
         'Refresh token rotation with reuse detected, all sessions revoked',
       );
     }
