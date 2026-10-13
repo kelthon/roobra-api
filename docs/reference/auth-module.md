@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `feat/api-versioning`, 2026-10-12.
+**Location:** `src/modules/auth/` — verified against branch `feat/exception-filter`, 2026-10-13.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -34,8 +34,18 @@ Rate limit "strict" means 5 requests per 60 seconds; "global" means the default 
 | `GET /v1/auth/verify-email` | Authenticated | global | — | Create verification token and email it |
 | `POST /v1/auth/verify-email` | Public | global | `token` | Consume token, set `emailVerifiedAt` |
 
-A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`, `errorFormat: 'grouped'`),
-also set by `configureApp`, validates every body.
+A global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`), also set by
+`configureApp`, validates every body and answers an invalid one with a `validation-failed` problem.
+
+Errors are problem details ([error responses](./error-responses.md)). The routes of this module raise
+these types:
+
+| Route | Problem type |
+| --- | --- |
+| `POST /v1/auth/register` | `email-in-use` or `username-in-use` (409) |
+| `POST /v1/auth/login` | `invalid-credentials` (401) |
+| `POST /v1/auth/reset-password`, `POST /v1/auth/verify-email` | `invalid-token` (400) when the token does not exist, was used or has expired |
+| `POST /v1/auth/change-password` | `incorrect-password` (400) |
 
 ## Route Access Decorators
 

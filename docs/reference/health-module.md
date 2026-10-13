@@ -4,7 +4,7 @@ doc-status: draft
 
 # Health Module Reference
 
-**Location:** `src/modules/health/` — verified against branch `feat/healthcheck`, 2026-10-12.
+**Location:** `src/modules/health/` — verified against branch `feat/exception-filter`, 2026-10-13.
 
 One route that tells Docker, a load balancer or an uptime monitor whether the API can serve
 requests. Built on `@nestjs/terminus`.
@@ -14,6 +14,10 @@ requests. Built on `@nestjs/terminus`.
 | Method and path | Response | Purpose |
 | --- | --- | --- |
 | `GET /health` | 200 when every check passes; 503 when one fails | Reports the database's state |
+
+Unlike every other route, a failed check is not answered as [problem details](./error-responses.md):
+`HealthCheckFilter`, applied to the controller, answers Terminus's 503 with Terminus's report, the
+format monitors and load balancers read.
 
 The route is public and differs from every other route in two ways:
 
@@ -70,4 +74,5 @@ first 60 seconds (`start_period`) do not count, which covers the development con
 
 ## Structure
 
-`HealthModule` imports `TerminusModule` and `DatabaseModule`, and declares `HealthController`.
+`HealthModule` imports `TerminusModule` and `DatabaseModule`, and declares `HealthController`, with
+`HealthCheckFilter` (`health-check.filter.ts`) applied to it.
