@@ -5,7 +5,7 @@ import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.s
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/generated/prisma/client.js';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import type { Mock } from 'vitest';
 
 describe('SessionsService', () => {
@@ -157,22 +157,22 @@ describe('SessionsService', () => {
       });
     });
 
-    it('should throw BadRequestException for a refresh token that does not match any record', async () => {
+    it('should throw an invalid-token problem for a refresh token that does not match any record', async () => {
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue(null);
 
       await expect(
         sessionsService.refresh('unknown-refresh-token'),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toMatchObject({ type: 'invalid-token' });
     });
 
-    it('should throw BadRequestException for an expired refresh token', async () => {
+    it('should throw an invalid-token problem for an expired refresh token', async () => {
       // an expired token is simply excluded by the expiresAt filter, so
       // Prisma returns null just like an unknown token
       (prismaMock.refreshToken.findFirst as Mock).mockResolvedValue(null);
 
       await expect(
         sessionsService.refresh('expired-refresh-token'),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toMatchObject({ type: 'invalid-token' });
     });
 
     it('should detect reuse of an already-revoked token and revoke all sessions for that user', async () => {
@@ -191,7 +191,7 @@ describe('SessionsService', () => {
 
       await expect(
         sessionsService.refresh('stolen-refresh-token'),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toMatchObject({ type: 'invalid-token' });
 
       expect(prismaMock.refreshToken.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({

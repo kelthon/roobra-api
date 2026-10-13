@@ -3,7 +3,11 @@ import { AuthService } from './auth.service.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
 import { SessionsService } from '../sessions/sessions.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
 import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
@@ -208,27 +212,39 @@ describe('AuthService', () => {
       expect(result).toEqual({ ...tokens, user: publicUser });
     });
 
-    it('should throw BadRequestException when the email is already in use', async () => {
+    it('should throw an email-in-use problem when the email is already in use', async () => {
       (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
       (prismaMock.user.create as Mock).mockRejectedValue({
         code: 'P2002',
         meta: { target: ['email'] },
       });
 
-      await expect(authService.register(dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(authService.register(dto)).rejects.toMatchObject({
+        type: 'email-in-use',
+      });
     });
 
-    it('should throw BadRequestException when the username is already in use', async () => {
+    it('should throw a username-in-use problem when the username is already in use', async () => {
       (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
       (prismaMock.user.create as Mock).mockRejectedValue({
         code: 'P2002',
         meta: { target: ['username'] },
       });
 
+      await expect(authService.register(dto)).rejects.toMatchObject({
+        type: 'username-in-use',
+      });
+    });
+
+    it('should throw ConflictException when another unique field is already in use', async () => {
+      (hashServiceMock.hash as Mock).mockResolvedValue('hashed-password');
+      (prismaMock.user.create as Mock).mockRejectedValue({
+        code: 'P2002',
+        meta: { target: ['google_id'] },
+      });
+
       await expect(authService.register(dto)).rejects.toThrow(
-        BadRequestException,
+        ConflictException,
       );
     });
   });
@@ -465,7 +481,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw BadRequestException for an invalid, used or expired reset token', async () => {
+    it('should throw an invalid-token problem for an invalid, used or expired reset token', async () => {
       (
         prismaMock.passwordResetToken.findUniqueOrThrow as Mock
       ).mockRejectedValue({ code: 'P2025' });
@@ -476,7 +492,7 @@ describe('AuthService', () => {
           newPassword: 'NewPassword123!',
           confirmNewPassword: 'NewPassword123!',
         }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toMatchObject({ type: 'invalid-token' });
     });
   });
 
@@ -508,7 +524,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw BadRequestException when the current password is wrong', async () => {
+    it('should throw an incorrect-password problem when the current password is wrong', async () => {
       (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
         hashedPassword: 'old-hashed-password',
       });
@@ -519,7 +535,7 @@ describe('AuthService', () => {
           currentPassword: 'WrongPassword123!',
           newPassword: 'NewPassword123!',
         }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toMatchObject({ type: 'incorrect-password' });
 
       expect(prismaMock.user.update).not.toHaveBeenCalled();
     });
@@ -672,14 +688,14 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw BadRequestException for an invalid, used or expired verification token', async () => {
+    it('should throw an invalid-token problem for an invalid, used or expired verification token', async () => {
       (
         prismaMock.emailVerificationToken.findUniqueOrThrow as Mock
       ).mockRejectedValue({ code: 'P2025' });
 
-      await expect(authService.verifyEmail('invalid-token')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        authService.verifyEmail('invalid-token'),
+      ).rejects.toMatchObject({ type: 'invalid-token' });
 
       expect(prismaMock.user.update).not.toHaveBeenCalled();
     });

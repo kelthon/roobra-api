@@ -1,4 +1,3 @@
-import { UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service.js';
 import { LocalStrategy } from './local.strategy.js';
 import type { Mock } from 'vitest';
@@ -36,11 +35,11 @@ describe('LocalStrategy', () => {
     expect(result).toBe(payload);
   });
 
-  it('should throw UnauthorizedException for invalid credentials', async () => {
+  it('should throw an invalid-credentials problem for invalid credentials', async () => {
     (authServiceMock.validateUser as Mock).mockResolvedValue(null);
 
     await expect(
       strategy.validate('john.doe@example.com', 'WrongPassword123!'),
-    ).rejects.toThrow(new UnauthorizedException('Invalid credentials'));
+    ).rejects.toMatchObject({ type: 'invalid-credentials' });
   });
 });
