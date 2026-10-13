@@ -451,7 +451,7 @@ export class AuthService {
         }),
       ]);
 
-      return { message: 'Email was verified susscefully' };
+      return { message: 'Email was verified successfully' };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
         throw new ProblemException('invalid-token');
