@@ -64,7 +64,7 @@ account.
 
 - A deleted account keeps its email and username
   ([issue 17](https://github.com/kelthon/roobra-api/issues/17)), so a second run fails at
-  **Register** with `Email already in use`. Change `email` and `username` in the environment, or
+  **Register** with a 409 `email-in-use` problem. Change `email` and `username` in the environment, or
   override them for one run from the command line:
 
   ```sh
