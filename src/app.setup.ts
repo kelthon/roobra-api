@@ -4,6 +4,7 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { validationProblemFactory } from 'src/common/problems/validation-problem.js';
 
 /**
  * Options for creating the application. The e2e specs pass them too, so they
@@ -16,7 +17,8 @@ export const appOptions: NestApplicationOptions = {
 
 /**
  * Applies what every running instance needs and `AppModule` cannot declare:
- * the proxy setting, URI versioning (`/v1/...`) and request validation.
+ * the proxy setting, URI versioning (`/v1/...`) and request validation, which
+ * answers an invalid request as a `validation-failed` problem.
  * Called by `main.ts` and by every e2e spec, so the specs test the same app.
  *
  * @param app The application, created but not initialized
@@ -31,7 +33,7 @@ export function configureApp(app: NestExpressApplication): void {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      errorFormat: 'grouped',
+      exceptionFactory: validationProblemFactory,
     }),
   );
 }
