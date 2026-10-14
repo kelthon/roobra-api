@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { PasswordHashService } from './password-hash.service.js';
 
 describe('HashService', () => {
@@ -16,8 +16,12 @@ describe('HashService', () => {
       expect(hashed).not.toBe(raw);
     });
 
-    it('should throw an error when hashing an empty string', async () => {
-      await expect(hashService.hash('')).rejects.toThrow(BadRequestException);
+    it('should throw a plain error, not an HTTP one, when hashing an empty string', async () => {
+      const error: unknown = await hashService.hash('').catch((e) => e);
+
+      expect(error).toBeInstanceOf(Error);
+      expect(error).not.toBeInstanceOf(HttpException);
+      expect((error as Error).message).toBe('Raw string must not be empty');
     });
   });
 
@@ -36,17 +40,22 @@ describe('HashService', () => {
       expect(isValid).toBe(false);
     });
 
-    it('should throw an error when verifying with an invalid argument', async () => {
-      await expect(
-        hashService.verify(
-          'my_secret_password',
-          undefined as unknown as string,
-        ),
-      ).rejects.toThrow(BadRequestException);
+    it.each([
+      ['an empty hash', 'my_secret_password', undefined],
+      ['an empty password', undefined, 'some-hash'],
+    ])(
+      'should throw a plain error, not an HTTP one, when verifying %s',
+      async (_case, raw, hash) => {
+        const error: unknown = await hashService
+          .verify(raw as unknown as string, hash as unknown as string)
+          .catch((e) => e);
 
-      await expect(
-        hashService.verify(undefined as unknown as string, 'some-hash'),
-      ).rejects.toThrow(BadRequestException);
-    });
+        expect(error).toBeInstanceOf(Error);
+        expect(error).not.toBeInstanceOf(HttpException);
+        expect((error as Error).message).toBe(
+          'Raw string and hash must not be empty',
+        );
+      },
+    );
   });
 });
