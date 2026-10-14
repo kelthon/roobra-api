@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `feat/exception-filter`, 2026-10-13.
+**Location:** `src/modules/auth/` — verified against branch `fix/user-no-longer-exists`, 2026-10-14.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -46,6 +46,10 @@ these types:
 | `POST /v1/auth/login` | `invalid-credentials` (401) |
 | `POST /v1/auth/reset-password`, `POST /v1/auth/verify-email` | `invalid-token` (400) when the token does not exist, was used or has expired |
 | `POST /v1/auth/change-password` | `incorrect-password` (400) |
+
+A signed-in user deleted while their access token is still valid gets a 401 `about:blank` problem from
+`POST /v1/auth/change-password` and `GET /v1/auth/verify-email`, and `invalid-credentials` from
+`POST /v1/auth/login` when the account is deleted between the password check and the token issue.
 
 ## Route Access Decorators
 

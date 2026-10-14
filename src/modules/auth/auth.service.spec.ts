@@ -4,9 +4,9 @@ import { PasswordHashService } from './services/password-hash/password-hash.serv
 import { SessionsService } from '../sessions/sessions.service.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import {
-  BadRequestException,
   ConflictException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
@@ -273,14 +273,15 @@ describe('AuthService', () => {
       expect(result).toEqual({ ...tokens, user: publicUser });
     });
 
-    it('should throw BadRequestException if the user no longer exists', async () => {
+    it('should throw an invalid-credentials problem if the user no longer exists', async () => {
       (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
-      await expect(authService.login('missing-id')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(authService.login('missing-id')).rejects.toMatchObject({
+        type: 'invalid-credentials',
+      });
+      expect(sessionsServiceMock.generate).not.toHaveBeenCalled();
     });
   });
 
@@ -475,7 +476,7 @@ describe('AuthService', () => {
       );
       expect(prismaMock.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id' },
+          where: { id: 'user-id', deletedAt: null },
           data: { hashedPassword: 'new-hashed-password' },
         }),
       );
@@ -489,6 +490,25 @@ describe('AuthService', () => {
       await expect(
         authService.resetPassword({
           resetToken: 'invalid-token',
+          newPassword: 'NewPassword123!',
+          confirmNewPassword: 'NewPassword123!',
+        }),
+      ).rejects.toMatchObject({ type: 'invalid-token' });
+    });
+
+    it('should throw an invalid-token problem when the user of the reset token no longer exists', async () => {
+      (
+        prismaMock.passwordResetToken.findUniqueOrThrow as Mock
+      ).mockResolvedValue({
+        id: 'reset-token-id',
+        userId: 'deleted-user-id',
+      });
+      (hashServiceMock.hash as Mock).mockResolvedValue('new-hashed-password');
+      (prismaMock.user.update as Mock).mockRejectedValue({ code: 'P2025' });
+
+      await expect(
+        authService.resetPassword({
+          resetToken: 'raw-reset-token',
           newPassword: 'NewPassword123!',
           confirmNewPassword: 'NewPassword123!',
         }),
@@ -512,13 +532,18 @@ describe('AuthService', () => {
         newPassword: 'NewPassword123!',
       });
 
+      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'user-id', deletedAt: null },
+        }),
+      );
       expect(hashServiceMock.verify).toHaveBeenCalledWith(
         'OldPassword123!',
         'old-hashed-password',
       );
       expect(prismaMock.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id' },
+          where: { id: 'user-id', deletedAt: null },
           data: { hashedPassword: 'new-hashed-password' },
         }),
       );
@@ -540,7 +565,23 @@ describe('AuthService', () => {
       expect(prismaMock.user.update).not.toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException if the user no longer exists', async () => {
+    it('should throw UnauthorizedException if the user is deleted between the check and the update', async () => {
+      (prismaMock.user.findUniqueOrThrow as Mock).mockResolvedValue({
+        hashedPassword: 'old-hashed-password',
+      });
+      (hashServiceMock.verify as Mock).mockResolvedValue(true);
+      (hashServiceMock.hash as Mock).mockResolvedValue('new-hashed-password');
+      (prismaMock.user.update as Mock).mockRejectedValue({ code: 'P2025' });
+
+      await expect(
+        authService.changePassword('user-id', {
+          currentPassword: 'OldPassword123!',
+          newPassword: 'NewPassword123!',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw UnauthorizedException if the user no longer exists', async () => {
       (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
@@ -550,7 +591,8 @@ describe('AuthService', () => {
           currentPassword: 'OldPassword123!',
           newPassword: 'NewPassword123!',
         }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(UnauthorizedException);
+      expect(prismaMock.user.update).not.toHaveBeenCalled();
     });
   });
 
@@ -628,15 +670,21 @@ describe('AuthService', () => {
       expect(emailVerificationMailServiceMock.send).not.toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException if the user no longer exists', async () => {
+    it('should throw UnauthorizedException if the user no longer exists', async () => {
       (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
       await expect(
         authService.sendVerificationEmail('missing-id'),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(UnauthorizedException);
 
+      expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'missing-id', deletedAt: null },
+        }),
+      );
+      expect(prismaMock.emailVerificationToken.create).not.toHaveBeenCalled();
       expect(emailVerificationMailServiceMock.send).not.toHaveBeenCalled();
     });
   });

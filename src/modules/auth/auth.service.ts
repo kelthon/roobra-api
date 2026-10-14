@@ -1,8 +1,8 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ProblemException } from 'src/common/problems/problem.js';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
@@ -150,7 +150,8 @@ export class AuthService {
    * Signs in a user the local strategy already authenticated.
    *
    * @param userId The user nano id
-   * @throws BadRequestException When the user no longer exists
+   * @throws ProblemException `invalid-credentials` (401) when the user was
+   *   deleted after the local strategy checked them
    */
   async login(userId: string): Promise<SuccessAuthenticationResponse> {
     try {
@@ -171,7 +172,7 @@ export class AuthService {
       };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found with the provided email');
+        throw new ProblemException('invalid-credentials');
       }
 
       throw error;
@@ -314,14 +315,14 @@ export class AuthService {
    * @param changePasswordDto The current and the new password
    * @throws ProblemException `incorrect-password` (400) when the current
    *   password is wrong
-   * @throws BadRequestException When the user does not exist
+   * @throws UnauthorizedException When the signed-in user no longer exists
    */
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
     const { currentPassword, newPassword } = changePasswordDto;
 
     try {
       const { hashedPassword } = await this.prisma.user.findUniqueOrThrow({
-        where: { id: userId },
+        where: { id: userId, deletedAt: null },
         select: { hashedPassword: true },
       });
 
@@ -331,10 +332,10 @@ export class AuthService {
         throw new ProblemException('incorrect-password');
       }
 
-      return this.updatePassword(userId, newPassword);
+      return await this.updatePassword(userId, newPassword);
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found');
+        throw new UnauthorizedException('The signed-in user no longer exists');
       }
       throw error;
     }
@@ -346,7 +347,8 @@ export class AuthService {
    * @param userId The user nano id
    * @param newPassword The plain new password
    * @param tx The transaction to run in, when called inside one
-   * @throws BadRequestException When the user does not exist
+   * @throws The Prisma `P2025` error when the user does not exist or is
+   *   deleted; each caller answers it in its own terms
    */
   async updatePassword(
     userId: string,
@@ -355,32 +357,24 @@ export class AuthService {
   ) {
     const prisma = tx ?? this.prisma;
 
-    try {
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          hashedPassword: await this.hashService.hash(newPassword),
-        },
-      });
-
-      return user;
-    } catch (error: unknown) {
-      if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found');
-      }
-      throw error;
-    }
+    return await prisma.user.update({
+      where: { id: userId, deletedAt: null },
+      data: {
+        hashedPassword: await this.hashService.hash(newPassword),
+      },
+    });
   }
 
   /**
    * Creates an email verification token and emails the link.
    *
    * @param userId The user nano id
-   * @throws BadRequestException When the user does not exist
+   * @throws UnauthorizedException When the signed-in user no longer exists
    */
   async sendVerificationEmail(userId: string) {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
+        select: { id: true, email: true, username: true },
         where: { id: userId, deletedAt: null },
       });
       const token = this.simpleTokenService.generate(
@@ -414,7 +408,7 @@ export class AuthService {
       };
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user found');
+        throw new UnauthorizedException('The signed-in user no longer exists');
       }
       throw error;
     }
@@ -429,8 +423,12 @@ export class AuthService {
    */
   async verifyEmail(token: string) {
     try {
-      const verificationEmailToken =
+      const { id, userId } =
         await this.prisma.emailVerificationToken.findUniqueOrThrow({
+          select: {
+            id: true,
+            userId: true,
+          },
           where: {
             hashedToken: this.simpleHashService.hash(token),
             expiresAt: { gt: DateTime.now().toJSDate() },
@@ -440,11 +438,11 @@ export class AuthService {
 
       await this.prisma.$transaction([
         this.prisma.user.update({
-          where: { id: verificationEmailToken.userId, deletedAt: null },
+          where: { id: userId, deletedAt: null },
           data: { emailVerifiedAt: DateTime.now().toJSDate() },
         }),
         this.prisma.emailVerificationToken.update({
-          where: { id: verificationEmailToken.id },
+          where: { id },
           data: {
             usedAt: DateTime.now().toJSDate(),
           },

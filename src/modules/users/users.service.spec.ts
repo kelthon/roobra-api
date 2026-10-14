@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import type { Mock } from 'vitest';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
 import { SessionsService } from 'src/modules/sessions/sessions.service.js';
@@ -43,16 +43,16 @@ describe('UsersService', () => {
           where: { id: 'user-id', deletedAt: null },
         }),
       );
-      expect(result).toBe(profile);
+      expect(result).toStrictEqual(profile);
     });
 
-    it('should throw BadRequestException if no user is found', async () => {
+    it('should throw UnauthorizedException if the user no longer exists', async () => {
       (prismaMock.user.findUniqueOrThrow as Mock).mockRejectedValue({
         code: 'P2025',
       });
 
       await expect(usersService.getMe('missing-id')).rejects.toThrow(
-        BadRequestException,
+        UnauthorizedException,
       );
     });
   });
@@ -77,11 +77,11 @@ describe('UsersService', () => {
       await expect(usersService.delete('user-id')).resolves.toBeUndefined();
     });
 
-    it('should throw NotFoundException when the user is missing or already deleted', async () => {
+    it('should throw UnauthorizedException when the user is missing or already deleted', async () => {
       txMock.user.update.mockRejectedValue({ code: 'P2025' });
 
       await expect(usersService.delete('user-id')).rejects.toThrow(
-        NotFoundException,
+        UnauthorizedException,
       );
       expect(sessionsServiceMock.revokeAll).not.toHaveBeenCalled();
     });
