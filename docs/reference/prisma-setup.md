@@ -28,8 +28,12 @@ generated client is gitignored and produced by `npx prisma generate`, see
 | `Int` autoincrement | `Key`, `StaffMember`, `MediaGenre` |
 | `BigInt` autoincrement | every other model |
 
-`BigInt` values cannot be serialized by `JSON.stringify`. Nothing on this branch converts them, so an
-endpoint that returns one directly would fail. This is tracked in [issue #9](https://github.com/kelthon/roobra-api/issues/9).
+`JSON.stringify` refuses a `bigint`, so `configureApp` calls `serializeBigIntAsString`
+(`src/common/serialization/bigint-json.ts`), which writes every `BigInt` as a string: a client
+receives `"id": "42"`, like the nano id of `User`
+([ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-10-14-send-bigint-ids-as-strings.md)).
+A route that takes such an id from the path or the query receives a string and converts it with
+`BigInt()`.
 
 ## Soft Delete
 
@@ -59,6 +63,6 @@ level (Postgres `Read Committed`).
 
 ## Not Implemented Yet
 
-Soft-delete enforcement ([#10](https://github.com/kelthon/roobra-api/issues/10)), `BigInt` serialization ([#9](https://github.com/kelthon/roobra-api/issues/9)), connection pool
+Soft-delete enforcement ([#10](https://github.com/kelthon/roobra-api/issues/10)), connection pool
 tuning ([#11](https://github.com/kelthon/roobra-api/issues/11)) and explicit isolation levels for money-touching transactions ([#12](https://github.com/kelthon/roobra-api/issues/12))
 are proposals only, tracked as issues. The audit log is `roobra-docs`'s backlog task 5.1.1.

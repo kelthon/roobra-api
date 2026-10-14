@@ -25,6 +25,10 @@ describe('Application config wiring (e2e)', () => {
     await app.close();
   });
 
+  it('should write BigInt ids as strings in JSON', () => {
+    expect(JSON.stringify({ id: 42n })).toBe('{"id":"42"}');
+  });
+
   it.each([
     'jwt.expiresIn',
     'refreshToken.length',
