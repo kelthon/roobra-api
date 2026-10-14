@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
@@ -19,7 +15,7 @@ export class UsersService {
    * Gets the profile of a user.
    *
    * @param userId The user nano id
-   * @throws BadRequestException When the user does not exist
+   * @throws UnauthorizedException When the signed-in user no longer exists
    */
   async getMe(userId: string) {
     try {
@@ -40,7 +36,7 @@ export class UsersService {
       return user;
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new BadRequestException('No user was found with provided id');
+        throw new UnauthorizedException('The signed-in user no longer exists');
       }
       throw error;
     }
@@ -51,7 +47,7 @@ export class UsersService {
    * An access token already issued stays valid until it expires.
    *
    * @param userId The user nano id
-   * @throws NotFoundException When the user does not exist or is already deleted
+   * @throws UnauthorizedException When the signed-in user no longer exists
    */
   async delete(userId: string): Promise<void> {
     try {
@@ -65,7 +61,7 @@ export class UsersService {
       });
     } catch (error: unknown) {
       if (isRecordNotFoundError(error)) {
-        throw new NotFoundException('No user was found with provided id');
+        throw new UnauthorizedException('The signed-in user no longer exists');
       }
 
       throw error;
