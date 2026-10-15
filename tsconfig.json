@@ -27,21 +27,24 @@
       "supertest"
     ],
     "paths": {
-      "common/*": [
+      "@app/common/*": [
         "./src/common/*"
       ],
-      "config/*": [
+      "@app/config/*": [
         "./src/config/*"
       ],
-      "modules/*": [
+      "@app/db/*": [
+        "./src/generated/*"
+      ],
+      "@app/modules/*": [
         "./src/modules/*"
       ],
-      "shared/*": [
+      "@app/shared/*": [
         "./src/shared/*"
       ],
-      "src/*": [
+      "@app/*": [
         "./src/*"
-      ],
+      ]
     }
   }
 }
