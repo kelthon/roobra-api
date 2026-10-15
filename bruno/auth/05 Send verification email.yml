@@ -1,7 +1,7 @@
 info:
   name: Send verification email
   type: http
-  seq: 2
+  seq: 5
 
 http:
   method: GET
@@ -9,6 +9,14 @@ http:
   auth:
     type: bearer
     token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("sends the email", () => {
+          expect(res.status).to.equal(200);
+        });
 
 settings:
   encodeUrl: true

@@ -1,0 +1,35 @@
+info:
+  name: Login
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/v1/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{email}}",
+        "password": "{{password}}"
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        bru.setVar("accessToken", res.body.accessToken);
+        bru.setVar("refreshToken", res.body.refreshToken);
+    - type: tests
+      code: |-
+        test("signs in with the password", () => {
+          expect(res.status).to.equal(201);
+          expect(res.body.accessToken).to.be.a("string");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
