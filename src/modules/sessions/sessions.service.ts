@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProblemException } from 'src/common/problems/problem.js';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma, User } from 'src/generated/prisma/client.js';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
+import { User } from 'src/generated/prisma/client.js';
+import {
+  PrismaService,
+  PrismaTransaction,
+} from 'src/modules/database/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
 import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses.js';
 import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
@@ -32,7 +35,7 @@ export class SessionsService {
 
   async generate(
     user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
-    tx?: Prisma.TransactionClient,
+    tx?: PrismaTransaction,
   ): Promise<AuthTokensResponse> {
     // Typed so the claims stay in line with what JwtStrategy hands to the guards
     const payload: JWTAuthPayload = {
@@ -56,10 +59,7 @@ export class SessionsService {
     };
   }
 
-  private async generateRefreshToken(
-    userId: string,
-    tx?: Prisma.TransactionClient,
-  ) {
+  private async generateRefreshToken(userId: string, tx?: PrismaTransaction) {
     const prisma = tx ?? this.prisma;
 
     const refreshToken = this.simpleTokenService.generate(
@@ -204,10 +204,7 @@ export class SessionsService {
    * @param tx The transaction to run in, when the caller has one
    * @returns How many tokens were revoked
    */
-  async revokeAll(
-    userId: string,
-    tx?: Prisma.TransactionClient,
-  ): Promise<number> {
+  async revokeAll(userId: string, tx?: PrismaTransaction): Promise<number> {
     const prisma = tx ?? this.prisma;
 
     const { count } = await prisma.refreshToken.updateMany({

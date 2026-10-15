@@ -5,7 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ProblemException } from 'src/common/problems/problem.js';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
+import {
+  PrismaService,
+  PrismaTransaction,
+} from 'src/modules/database/prisma.service.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { PasswordHashService } from './services/password-hash/password-hash.service.js';
 import {
@@ -27,7 +30,6 @@ import { ConfigService } from '@nestjs/config';
 import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
 import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
 import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service.js';
-import { Prisma } from 'src/generated/prisma/client.js';
 
 /**
  * Reset and verification links carry one-time opaque tokens, stored only as
@@ -353,7 +355,7 @@ export class AuthService {
   async updatePassword(
     userId: string,
     newPassword: string,
-    tx?: Prisma.TransactionClient,
+    tx?: PrismaTransaction,
   ) {
     const prisma = tx ?? this.prisma;
 
