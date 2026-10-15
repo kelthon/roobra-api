@@ -52,6 +52,6 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 ## Open Proposals
 
 Undecided proposals are GitHub issues, not files; each becomes an ADR when it is decided:
-soft delete ([#10](https://github.com/kelthon/roobra-api/issues/10)), connection pool tuning
+connection pool tuning
 ([#11](https://github.com/kelthon/roobra-api/issues/11)) and transaction isolation ([#12](https://github.com/kelthon/roobra-api/issues/12)). Audit logging is `roobra-docs`'s backlog
 task 5.1.1.

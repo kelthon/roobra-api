@@ -2,14 +2,17 @@ import { ConfigService } from '@nestjs/config';
 import { Provider } from '@nestjs/common';
 import { PrismaClient } from 'src/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { softDeleteExtension } from './soft-delete.extension.js';
 
 /**
  * Builds the client every service uses: it omits credential hashes from every
- * query unless the query asks for them, and logs queries outside production.
+ * query unless the query asks for them, logs queries outside production, and
+ * soft-deletes the models with a `deletedAt` column.
  *
  * @param config The application config, for `database.url` and `app.mode`
  * @see docs/adr/2026-09-04-01-global-omit-for-credential-hashes.md
  * @see docs/adr/2026-09-04-02-environment-based-prisma-query-logging.md
+ * @see docs/adr/2026-10-14-enforce-soft-delete-with-a-prisma-extension.md
  */
 export function createPrismaClient(config: ConfigService) {
   const connectionString = `${config.get<string>('database.url')}`;
@@ -36,7 +39,7 @@ export function createPrismaClient(config: ConfigService) {
       emailVerificationToken: { hashedToken: true },
       key: { hashedKey: true },
     },
-  });
+  }).$extends(softDeleteExtension);
 }
 
 export type ExtendedPrismaClient = ReturnType<typeof createPrismaClient>;
