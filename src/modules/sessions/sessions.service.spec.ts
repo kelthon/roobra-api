@@ -1,10 +1,10 @@
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
+import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { SessionsService } from './sessions.service.js';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
+import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
+import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/generated/prisma/client.js';
+import { User } from '@app/db/prisma/client.js';
 import { NotFoundException } from '@nestjs/common';
 import type { Mock } from 'vitest';
 

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseModule } from 'modules/database/database.module.js';
+import { DatabaseModule } from '@app/modules/database/database.module.js';
 import { SessionsService } from './sessions.service.js';
 
 @Module({

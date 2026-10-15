@@ -1,4 +1,4 @@
-import { UserRole } from 'src/generated/prisma/enums.js';
+import { UserRole } from '@app/db/prisma/enums.js';
 
 export interface JWTAuthPayload {
   /** The user's nano id */

@@ -42,6 +42,9 @@
       "@app/shared/*": [
         "./src/shared/*"
       ],
+      "@app/validators/*": [
+        "./src/common/decorators/validators/*"
+      ],
       "@app/*": [
         "./src/*"
       ]

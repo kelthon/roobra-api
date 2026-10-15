@@ -1,7 +1,7 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from './roles.guard.js';
-import { UserRole } from 'src/generated/prisma/enums.js';
+import { UserRole } from '@app/db/prisma/enums.js';
 import type { Mock } from 'vitest';
 
 describe('RolesGuard', () => {

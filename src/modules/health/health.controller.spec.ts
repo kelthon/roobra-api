@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
+import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { HealthController } from './health.controller.js';
 
 type HealthIndicatorFunction = () => Promise<unknown>;

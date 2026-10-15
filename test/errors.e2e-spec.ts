@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import request, { Response } from 'supertest';
-import { AppModule } from 'src/app.module.js';
-import { appOptions, configureApp } from 'src/app.setup.js';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
+import { AppModule } from '@app/app.module.js';
+import { appOptions, configureApp } from '@app/app.setup.js';
+import { PrismaService } from '@app/modules/database/prisma.service.js';
 
 // The e2e specs run without a database: the Prisma calls these routes make
 // are stubbed to fail the way Postgres would.

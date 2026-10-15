@@ -1,5 +1,5 @@
 import { Reflector } from '@nestjs/core';
-import { UserRole } from 'src/generated/prisma/enums.js';
+import { UserRole } from '@app/db/prisma/enums.js';
 
 /**
  * Roles allowed on a route, checked by `RolesGuard`.

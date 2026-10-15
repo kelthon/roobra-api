@@ -13,11 +13,11 @@ import {
   PROBLEM_TYPES,
   ProblemDetails,
   ProblemException,
-} from 'src/common/problems/problem.js';
+} from '@app/common/problems/problem.js';
 import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
-} from 'src/common/utils/database.util.js';
+} from '@app/common/utils/database/database.util.js';
 
 /**
  * Answers every error as RFC 9457 problem details

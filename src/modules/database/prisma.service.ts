@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Provider } from '@nestjs/common';
-import { PrismaClient } from 'src/generated/prisma/client.js';
+import { PrismaClient } from '@app/db/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { softDeleteExtension } from './soft-delete.extension.js';
 

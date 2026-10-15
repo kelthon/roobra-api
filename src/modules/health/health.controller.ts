@@ -5,7 +5,7 @@ import {
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
-import { PrismaService } from 'modules/database/prisma.service.js';
+import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { HealthCheckFilter } from './health-check.filter.js';
 
 @Controller({ path: 'health', version: VERSION_NEUTRAL })

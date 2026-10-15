@@ -3,10 +3,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 import type { Transporter } from 'nodemailer';
 import type { MockInstance } from 'vitest';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from 'src/app.module.js';
-import { appOptions, configureApp } from 'src/app.setup.js';
-import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service.js';
-import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
+import { AppModule } from '@app/app.module.js';
+import { appOptions, configureApp } from '@app/app.setup.js';
+import { EmailVerificationMailService } from '@app/modules/notifications/services/email-verification-mail.service.js';
+import { PasswordResetMailService } from '@app/modules/notifications/services/password-reset-mail.service.js';
 
 describe('Mail sending (e2e)', () => {
   let app: NestExpressApplication;

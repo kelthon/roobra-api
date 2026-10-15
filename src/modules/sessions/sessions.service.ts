@@ -1,19 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ProblemException } from 'src/common/problems/problem.js';
+import { ProblemException } from '@app/common/problems/problem.js';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/generated/prisma/client.js';
+import { User } from '@app/db/prisma/client.js';
 import {
   PrismaService,
   PrismaTransaction,
-} from 'src/modules/database/prisma.service.js';
+} from '@app/modules/database/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokensResponse } from 'src/shared/interfaces/auth-responses.js';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
-import { InfoResponse } from 'src/shared/interfaces/info-response.js';
-import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
+import { AuthTokensResponse } from '@app/shared/interfaces/auth-response.js';
+import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
+import { InfoResponse } from '@app/shared/interfaces/info-response.js';
+import { JWTAuthPayload } from '@app/shared/interfaces/jwt-auth-payload.js';
 import { DateTime } from 'luxon';
-import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
+import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
+import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
 
 /**
  * A session is one row of `refresh_tokens`: it starts at sign-in and ends when

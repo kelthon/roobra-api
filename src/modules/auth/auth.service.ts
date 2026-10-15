@@ -1,35 +1,35 @@
+import { ChangePasswordDto } from './dto/change-password.dto.js';
+import { ConfigService } from '@nestjs/config';
 import {
   ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ProblemException } from 'src/common/problems/problem.js';
-import {
-  PrismaService,
-  PrismaTransaction,
-} from 'src/modules/database/prisma.service.js';
-import { RegisterUserDto } from './dto/register-user.dto.js';
-import { PasswordHashService } from './services/password-hash/password-hash.service.js';
+import { DateTime } from 'luxon';
+import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service.js';
+import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
+import { InfoResponse } from '@app/shared/interfaces/info-response.js';
 import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
-} from 'src/common/utils/database.util.js';
-import { SessionsService } from '../sessions/sessions.service.js';
+} from '@app/common/utils/database/database.util.js';
+import { JWTAuthPayload } from '@app/shared/interfaces/jwt-auth-payload.js';
 import { LogoutDto } from './dto/logout.dto.js';
+import { PasswordHashService } from './services/password-hash/password-hash.service.js';
+import { PasswordResetMailService } from '@app/modules/notifications/services/password-reset-mail.service.js';
+import {
+  PrismaService,
+  PrismaTransaction,
+} from '@app/modules/database/prisma.service.js';
+import { ProblemException } from '@app/common/problems/problem.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { RegisterUserDto } from './dto/register-user.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
-import { ChangePasswordDto } from './dto/change-password.dto.js';
-import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
-import { InfoResponse } from 'src/shared/interfaces/info-response.js';
-import { DateTime } from 'luxon';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
-import { SuccessAuthenticationResponse } from 'src/shared/interfaces/auth-responses.js';
-import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
-import { ConfigService } from '@nestjs/config';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
-import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
-import { EmailVerificationMailService } from '../notifications/services/email-verification-mail.service.js';
+import { SessionsService } from '../sessions/sessions.service.js';
+import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
+import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
+import { SuccessAuthenticationResponse } from '@app/shared/interfaces/auth-response.js';
 
 /**
  * Reset and verification links carry one-time opaque tokens, stored only as

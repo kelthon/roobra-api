@@ -12,8 +12,8 @@ import emailVerificationTokenConfig from './config/email-verification-token.conf
 import mailConfig from './config/mail.config.js';
 import appConfig from './config/app.config.js';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { EnvSchema } from 'common/schemas/env.schema.js';
-import databaseConfig from 'config/database.config.js';
+import { EnvSchema } from '@app/common/schemas/env.schema.js';
+import databaseConfig from '@app/config/database.config.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { mailerOptionsFactory } from './modules/notifications/config/mailer-options.factory.js';
 import { LoggerModule } from 'nestjs-pino';

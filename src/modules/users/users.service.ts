@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
-import { PrismaService } from 'src/modules/database/prisma.service.js';
-import { SessionsService } from 'src/modules/sessions/sessions.service.js';
+import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
+import { PrismaService } from '@app/modules/database/prisma.service.js';
+import { SessionsService } from '@app/modules/sessions/sessions.service.js';
 
 @Injectable()
 export class UsersService {

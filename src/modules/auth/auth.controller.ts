@@ -3,16 +3,16 @@ import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { LogoutDto } from './dto/logout.dto.js';
-import { User } from 'src/common/decorators/user.decorator.js';
-import { UserOnly } from 'src/common/decorators/user-only.decorator.js';
+import { User } from '@app/common/decorators/user-param/user-param.decorator.js';
+import { UserOnly } from '@app/common/decorators/auth/user-only.decorator.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
-import { GuestOnly } from 'src/common/decorators/guest-only.decorator.js';
+import { GuestOnly } from '@app/common/decorators/auth/guest-only.decorator.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { VerifyEmailDto } from './dto/verify-email.dto.js';
-import { type UserDto } from 'src/common/dto/user-dto.js';
-import { LoginWith } from 'src/common/decorators/login-with.decorator.js';
+import { type UserDto } from '@app/common/dto/user-dto.js';
+import { LoginWith } from '@app/common/decorators/auth/login-with.decorator.js';
 import { Throttle } from '@nestjs/throttler';
 
 // Shared limit for auth endpoints sensitive to brute-forcing/enumeration

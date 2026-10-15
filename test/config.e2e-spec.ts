@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from 'src/app.module.js';
-import { appOptions, configureApp } from 'src/app.setup.js';
+import { AppModule } from '@app/app.module.js';
+import { appOptions, configureApp } from '@app/app.setup.js';
 
 describe('Application config wiring (e2e)', () => {
   let app: NestExpressApplication;
