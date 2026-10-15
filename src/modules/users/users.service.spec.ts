@@ -8,10 +8,10 @@ describe('UsersService', () => {
   let usersService: UsersService;
   let prismaMock: PrismaService;
   let sessionsServiceMock: SessionsService;
-  let txMock: { user: { update: Mock } };
+  let txMock: { user: { softDelete: Mock } };
 
   beforeEach(() => {
-    txMock = { user: { update: vi.fn() } };
+    txMock = { user: { softDelete: vi.fn() } };
 
     prismaMock = {
       user: { findUniqueOrThrow: vi.fn() },
@@ -40,7 +40,7 @@ describe('UsersService', () => {
 
       expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
         }),
       );
       expect(result).toStrictEqual(profile);
@@ -61,10 +61,7 @@ describe('UsersService', () => {
     it('should soft-delete the user and revoke its sessions in one transaction', async () => {
       await usersService.delete('user-id');
 
-      expect(txMock.user.update).toHaveBeenCalledWith({
-        where: { id: 'user-id', deletedAt: null },
-        data: { deletedAt: expect.any(Date) },
-      });
+      expect(txMock.user.softDelete).toHaveBeenCalledWith({ id: 'user-id' });
       expect(sessionsServiceMock.revokeAll).toHaveBeenCalledWith(
         'user-id',
         txMock,
@@ -78,7 +75,7 @@ describe('UsersService', () => {
     });
 
     it('should throw UnauthorizedException when the user is missing or already deleted', async () => {
-      txMock.user.update.mockRejectedValue({ code: 'P2025' });
+      txMock.user.softDelete.mockRejectedValue({ code: 'P2025' });
 
       await expect(usersService.delete('user-id')).rejects.toThrow(
         UnauthorizedException,
@@ -88,7 +85,7 @@ describe('UsersService', () => {
 
     it('should rethrow any other database error', async () => {
       const error = new Error('connection lost');
-      txMock.user.update.mockRejectedValue(error);
+      txMock.user.softDelete.mockRejectedValue(error);
 
       await expect(usersService.delete('user-id')).rejects.toBe(error);
     });

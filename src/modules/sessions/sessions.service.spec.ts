@@ -242,7 +242,7 @@ describe('SessionsService', () => {
       // a deleted user is filtered out like a missing one
       expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
         }),
       );
       expect(jwtServiceMock.signAsync).not.toHaveBeenCalled();

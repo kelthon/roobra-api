@@ -65,8 +65,9 @@ A unit test parses the schema and fails when a model with `deletedAt` is missing
 
 - A query of these models cannot forget the filter, and a hard delete fails loudly.
 - Reading deleted rows is explicit: a `where` that sets `deletedAt`.
-- The filters already written by hand (`deletedAt: null` in the auth and users services) are
-  harmless: the extension leaves a `where` that sets `deletedAt` as it is.
+- The filters written by hand before (`deletedAt: null` in the auth, sessions and users services)
+  are removed: kept, they would read like the explicit `deletedAt` that asks for deleted rows. A
+  query that sets `deletedAt` is now always a deliberate exception.
 - Relations stay unfiltered, so a query that loads them must filter them itself.
 - Removing a row for good, as the anonymization of issue #17 may need, goes through raw SQL or a
   client without the extension.

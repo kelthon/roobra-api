@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from 'src/common/utils/database.util.js';
 import { PrismaService } from 'src/modules/database/prisma.service.js';
 import { SessionsService } from 'src/modules/sessions/sessions.service.js';
@@ -30,7 +29,7 @@ export class UsersService {
           createdAt: true,
           updatedAt: true,
         },
-        where: { id: userId, deletedAt: null },
+        where: { id: userId },
       });
 
       return user;
@@ -52,10 +51,7 @@ export class UsersService {
   async delete(userId: string): Promise<void> {
     try {
       await this.prisma.$transaction(async (tx) => {
-        await tx.user.update({
-          where: { id: userId, deletedAt: null },
-          data: { deletedAt: DateTime.now().toJSDate() },
-        });
+        await tx.user.softDelete({ id: userId });
 
         await this.sessionsService.revokeAll(userId, tx);
       });

@@ -4,7 +4,7 @@ doc-status: draft
 
 # Users Module Reference
 
-**Location:** `src/modules/users/` — verified against branch `fix/user-no-longer-exists`, 2026-10-14.
+**Location:** `src/modules/users/` — verified against branch `feat/GH-10-soft-delete`, 2026-10-14.
 
 The user's profile and account. Sign-up, sign-in and the password flows stay in the
 [auth module](./auth-module.md); sessions are in the [sessions module](./sessions-module.md).
@@ -20,8 +20,8 @@ Both routes use `@UserOnly()` and the global rate limit (20 requests per 60 seco
 
 ## Account Deletion
 
-`UsersService.delete` sets `deletedAt` and calls `SessionsService.revokeAll` in one database
-transaction, so either both happen or neither does. After it:
+`UsersService.delete` calls `softDelete`, which sets `deletedAt`, and `SessionsService.revokeAll` in
+one database transaction, so either both happen or neither does. After it:
 
 - the user can no longer refresh: every refresh token is revoked, and `refresh` also ignores deleted
   users;

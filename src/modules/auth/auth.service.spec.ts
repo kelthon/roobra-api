@@ -133,7 +133,7 @@ describe('AuthService', () => {
 
       expect(prismaMock.user.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { email: 'john.doe@example.com', deletedAt: null },
+          where: { email: 'john.doe@example.com' },
         }),
       );
       expect(result).toEqual({
@@ -264,7 +264,7 @@ describe('AuthService', () => {
 
       expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
         }),
       );
       expect(sessionsServiceMock.generate).toHaveBeenCalledWith(user);
@@ -421,7 +421,7 @@ describe('AuthService', () => {
       await authService.forgotPassword({ email: 'deleted@example.com' });
 
       expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith({
-        where: { email: 'deleted@example.com', deletedAt: null },
+        where: { email: 'deleted@example.com' },
       });
     });
 
@@ -476,7 +476,7 @@ describe('AuthService', () => {
       );
       expect(prismaMock.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
           data: { hashedPassword: 'new-hashed-password' },
         }),
       );
@@ -534,7 +534,7 @@ describe('AuthService', () => {
 
       expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
         }),
       );
       expect(hashServiceMock.verify).toHaveBeenCalledWith(
@@ -543,7 +543,7 @@ describe('AuthService', () => {
       );
       expect(prismaMock.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
           data: { hashedPassword: 'new-hashed-password' },
         }),
       );
@@ -681,7 +681,7 @@ describe('AuthService', () => {
 
       expect(prismaMock.user.findUniqueOrThrow).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'missing-id', deletedAt: null },
+          where: { id: 'missing-id' },
         }),
       );
       expect(prismaMock.emailVerificationToken.create).not.toHaveBeenCalled();
@@ -721,7 +721,7 @@ describe('AuthService', () => {
       );
       expect(prismaMock.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: 'user-id', deletedAt: null },
+          where: { id: 'user-id' },
           data: { emailVerifiedAt: expect.any(Date) },
         }),
       );

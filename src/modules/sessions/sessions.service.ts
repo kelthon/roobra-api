@@ -142,7 +142,7 @@ export class SessionsService {
           username: true,
           role: true,
         },
-        where: { id: token.userId, deletedAt: null },
+        where: { id: token.userId },
       }),
       this.prisma.refreshToken.update({
         where: { id: token.id },
