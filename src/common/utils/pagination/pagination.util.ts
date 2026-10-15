@@ -1,9 +1,9 @@
-import { OrderParams } from '@app/shared/types/order-params.type.js';
+import { OrderParams } from '@app/types/order-params.type.js';
 import {
   DefaultCursor,
   PaginationArgs,
   PaginationParams,
-} from '@app/shared/types/pagination-params.type.js';
+} from '@app/types/pagination-params.type.js';
 
 export function encodeCursor<T = DefaultCursor>(data: T) {
   return Buffer.from(JSON.stringify(data)).toString('base64url');

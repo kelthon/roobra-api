@@ -36,6 +36,9 @@
       "@app/db/*": [
         "./src/generated/*"
       ],
+      "@app/interfaces/*": [
+        "./src/shared/interfaces/*"
+      ],
       "@app/modules/*": [
         "./src/modules/*"
       ],
@@ -44,6 +47,9 @@
       ],
       "@app/validators/*": [
         "./src/common/decorators/validators/*"
+      ],
+      "@app/types/*": [
+        "./src/shared/types/*"
       ],
       "@app/*": [
         "./src/*"
