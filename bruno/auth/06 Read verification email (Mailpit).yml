@@ -1,0 +1,34 @@
+info:
+  name: Read verification email (Mailpit)
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{mailpitUrl}}/api/v1/message/latest"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const message = res.body;
+        const token = (message.Text.match(/verify-email\/([0-9a-f]{64})/) || [])[1];
+        bru.setVar("verificationToken", token);
+    - type: tests
+      code: |-
+        test("is the email just sent to the account", () => {
+          expect(res.status).to.equal(200);
+          expect(res.body.To[0].Address).to.equal(bru.getVar("email"));
+          expect(res.body.Subject).to.equal("Verify your Roobra email address");
+        });
+
+        test("has the token in its link", () => {
+          expect(bru.getVar("verificationToken")).to.match(/^[0-9a-f]{64}$/);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

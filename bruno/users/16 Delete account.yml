@@ -1,7 +1,7 @@
 info:
   name: Delete account
   type: http
-  seq: 5
+  seq: 16
 
 http:
   method: DELETE
@@ -9,6 +9,14 @@ http:
   auth:
     type: bearer
     token: "{{accessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("deletes the account", () => {
+          expect(res.status).to.equal(204);
+        });
 
 settings:
   encodeUrl: true

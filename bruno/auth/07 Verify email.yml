@@ -1,0 +1,29 @@
+info:
+  name: Verify email
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{baseUrl}}/v1/auth/verify-email"
+  body:
+    type: json
+    data: |-
+      {
+        "token": "{{verificationToken}}"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("verifies the email", () => {
+          expect(res.status).to.equal(201);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

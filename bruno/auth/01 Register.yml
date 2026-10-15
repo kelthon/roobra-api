@@ -18,13 +18,24 @@ http:
 
 runtime:
   scripts:
+    - type: before-request
+      code: |-
+        // A new account on every run: a deleted account keeps its email and username
+        const id = Date.now().toString(36);
+        bru.setVar("email", `test-${id}@roobra.test`);
+        bru.setVar("username", `tester_${id}`);
+        bru.setVar("password", bru.getEnvVar("password"));
     - type: after-response
-      code: bru.setVar("accessToken", res.body.accessToken);
+      code: |-
+        bru.setVar("accessToken", res.body.accessToken);
+        bru.setVar("refreshToken", res.body.refreshToken);
     - type: tests
       code: |-
-        test("returns tokens", () => {
+        test("creates the account and signs it in", () => {
           expect(res.status).to.equal(201);
           expect(res.body.accessToken).to.be.a("string");
+          expect(res.body.refreshToken).to.be.a("string");
+          expect(res.body.user.email).to.equal(bru.getVar("email"));
         });
 
 settings:

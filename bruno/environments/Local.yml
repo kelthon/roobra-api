@@ -1,11 +1,8 @@
+name: Local
 variables:
   - name: baseUrl
     value: http://localhost:3000
   - name: mailpitUrl
     value: http://localhost:8025
-  - name: email
-    value: test@roobra.test
-  - name: username
-    value: tester
   - name: password
     value: Password123!
