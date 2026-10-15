@@ -28,7 +28,7 @@ deployment and less code now than it would later.
 Upgrade to NestJS 12 and run the project as ES modules, test with Vitest and lint with oxlint:
 
 - `package.json` declares `"type": "module"`, and `tsconfig.json` uses `module` and
-  `moduleResolution` `nodenext`. Relative and alias imports (`src/...`, `common/...`) end in `.js`.
+  `moduleResolution` `nodenext`. Relative and alias imports (`@app/...`) end in `.js`.
   Code that needs its own directory uses `import.meta.dirname`, since `__dirname` does not exist in
   an ES module.
 - Vitest runs the unit specs (`vitest.config.ts`) and the e2e specs (`vitest.config.e2e.ts`), with

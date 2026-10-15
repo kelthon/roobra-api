@@ -38,7 +38,7 @@ split by domain in `prisma/models/`.
 ## Rules That Are Easy To Miss
 
 - **ES modules.** Local imports end in `.js`, even from a `.ts` file
-  (`import { AppModule } from 'src/app.module.js'`), and code that needs its own folder uses
+  (`import { AppModule } from '@app/app.module.js'`), and code that needs its own folder uses
   `import.meta.dirname`, since `__dirname` does not exist.
 - **Tests run on Vitest** with globals: `vi` replaces `jest`, and types such as `Mock` are imported
   from `vitest`.

@@ -32,7 +32,7 @@ Add a new transactional email, or a new language for an existing one, to the not
 ### Add A New Language
 
 1. Add the tag to `LocaleType` in `src/shared/types/locale.type.ts` and to `SUPPORTED_LOCALES` in
-   `src/common/utils/locale.util.ts`.
+   `src/common/utils/locale/locale.util.ts`.
 2. Create `src/modules/notifications/templates/locales/<tag>/` with a translation of each template.
    Any template missing there falls back to the default locale (`en`).
 3. Pass any locale-specific text that lives in the shared layout or footer through `context` instead

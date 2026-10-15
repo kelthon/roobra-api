@@ -47,7 +47,7 @@ always available. A locale must also be an honest, storable preference.
 
 ## Implementation Status
 
-**Partial.** The column and migration exist, and `resolveLocale` in `src/common/utils/locale.util.ts`
+**Partial.** The column and migration exist, and `resolveLocale` in `src/common/utils/locale/locale.util.ts`
 implements the header parsing. Nothing calls `resolveLocale` outside its own spec: `register()`
 does not store `preferredLang`, and the mail services take a `locale` parameter that defaults to
 `'en'` instead of reading `user.preferredLang`. The spec already classed that wiring as follow-up
