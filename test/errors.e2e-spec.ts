@@ -15,6 +15,7 @@ const mockPrismaService = {
     fn({ user: { create: mockUserCreate } }),
   ),
   user: { findUniqueOrThrow: mockUserFindUniqueOrThrow },
+  $disconnect: vi.fn(),
 };
 
 const validRegistration = {

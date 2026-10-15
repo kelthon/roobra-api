@@ -22,6 +22,7 @@ const mockPrismaService = {
     findUniqueOrThrow: vi.fn().mockResolvedValue(user),
   },
   refreshToken: { create: vi.fn().mockResolvedValue({}) },
+  $disconnect: vi.fn(),
 };
 
 describe('Login (e2e)', () => {
