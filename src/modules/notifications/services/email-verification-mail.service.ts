@@ -2,7 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Duration } from 'luxon';
-import { LocaleType } from '@app/shared/types/locale.type.js';
+import { LocaleType } from '@app/types/locale.type.js';
 
 @Injectable()
 export class EmailVerificationMailService {

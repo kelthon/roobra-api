@@ -1,4 +1,4 @@
-import { DefaultCursor } from '@app/shared/types/pagination-params.type.js';
+import { DefaultCursor } from '@app/types/pagination-params.type.js';
 import {
   cursorBasedPagination,
   decodeCursor,

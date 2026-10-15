@@ -1,6 +1,6 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { JWTAuthPayload } from '@app/shared/interfaces/jwt-auth-payload.js';
+import { JWTAuthPayload } from '@app/interfaces/jwt-auth-payload.js';
 
 /**
  * Reads the payload Passport attached to `request.user`, if any. Guards and
