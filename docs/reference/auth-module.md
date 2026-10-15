@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `fix/user-no-longer-exists`, 2026-10-14.
+**Location:** `src/modules/auth/` — verified against branch `feat/GH-10-soft-delete`, 2026-10-14.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -92,7 +92,8 @@ which signs the tokens. It exports `AuthService`. `JwtStrategy` verifies access 
 ## Behavior Notes
 
 - Registration creates the user and the first token pair in one database transaction.
-- Lookups by user filter `deletedAt: null` at the call site; nothing enforces it globally.
+- Lookups by user skip deleted users through the soft delete extension of the Prisma client (see
+  the [Prisma setup](./prisma-setup.md#soft-delete)); no call site filters `deletedAt` itself.
 - `JwtStrategy.validate` rejects a token without a `sub` claim and otherwise returns the payload
   without checking the database. Deleting a user revokes their refresh tokens, so an access token
   already issued stays valid until it expires (`jwt.expiresIn`, 15 minutes). Blocking a user does not

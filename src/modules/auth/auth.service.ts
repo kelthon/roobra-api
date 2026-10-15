@@ -70,7 +70,7 @@ export class AuthService {
     password: string,
   ): Promise<JWTAuthPayload | null> {
     const user = await this.prisma.user.findUnique({
-      where: { email, deletedAt: null },
+      where: { email },
       omit: { hashedPassword: false },
     });
 
@@ -159,10 +159,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
         select: this.AUTH_USER_SELECT,
-        where: {
-          id: userId,
-          deletedAt: null,
-        },
+        where: { id: userId },
       });
 
       const tokens = await this.sessionsService.generate(user);
@@ -232,7 +229,7 @@ export class AuthService {
 
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
-        where: { email, deletedAt: null },
+        where: { email },
       });
 
       const token = this.simpleTokenService.generate(
@@ -324,7 +321,7 @@ export class AuthService {
 
     try {
       const { hashedPassword } = await this.prisma.user.findUniqueOrThrow({
-        where: { id: userId, deletedAt: null },
+        where: { id: userId },
         select: { hashedPassword: true },
       });
 
@@ -360,7 +357,7 @@ export class AuthService {
     const prisma = tx ?? this.prisma;
 
     return await prisma.user.update({
-      where: { id: userId, deletedAt: null },
+      where: { id: userId },
       data: {
         hashedPassword: await this.hashService.hash(newPassword),
       },
@@ -377,7 +374,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findUniqueOrThrow({
         select: { id: true, email: true, username: true },
-        where: { id: userId, deletedAt: null },
+        where: { id: userId },
       });
       const token = this.simpleTokenService.generate(
         this.configService.getOrThrow<number>('emailVerificationToken.length'),
@@ -440,7 +437,7 @@ export class AuthService {
 
       await this.prisma.$transaction([
         this.prisma.user.update({
-          where: { id: userId, deletedAt: null },
+          where: { id: userId },
           data: { emailVerifiedAt: DateTime.now().toJSDate() },
         }),
         this.prisma.emailVerificationToken.update({
