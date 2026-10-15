@@ -1,5 +1,6 @@
 import { ValidationError } from '@nestjs/common';
-import { FieldError, ProblemException } from './problem.js';
+import { ProblemException } from '@app/common/exceptions/problem.exception.js';
+import { FieldError } from '@app/interfaces/problem.interface.js';
 
 /**
  * Flattens class-validator errors into one entry per field, naming a nested

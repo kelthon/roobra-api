@@ -24,7 +24,7 @@ The API runs in Docker, where a container writes to stdout and the platform coll
 
 Log with pino through `nestjs-pino`, as JSON lines on stdout.
 
-- `loggerOptionsFactory` (`src/common/logger/logger-options.factory.ts`) configures `pino-http`,
+- `loggerOptionsFactory` (`src/common/factories/logger/logger-options.factory.ts`) configures `pino-http`,
   which logs every completed request with its method, URL, headers, body, status and duration.
   `main.ts` creates the app with `bufferLogs: true` and replaces Nest's logger with pino's, so the
   startup logs go through it too.

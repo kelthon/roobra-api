@@ -4,7 +4,8 @@ doc-status: draft
 
 # Error Responses Reference
 
-**Location:** `src/common/filters/all-exceptions/` and `src/common/problems/` — verified against
+**Location:** `src/common/filters/all-exceptions/`, `src/common/exceptions/`,
+`src/shared/types/problem.type.ts` and `src/shared/interfaces/problem.interface.ts` — verified against
 branch `feat/exception-filter`, 2026-10-13.
 
 Every error is answered as problem details ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)),
@@ -68,9 +69,9 @@ Any other error is `about:blank`:
   the e2e specs, which import `AppModule`, test it too.
 - A service raises a typed problem with `throw new ProblemException('email-in-use')`, and an
   optional `detail` for the occurrence. The status and the title come from `PROBLEM_TYPES` in
-  `src/common/problems/problem.ts`.
+  `src/shared/types/problem.type.ts`.
 - The global `ValidationPipe` builds its error with `validationProblemFactory`
-  (`src/common/problems/validation-problem.ts`), set as its `exceptionFactory` in `configureApp`.
+  (`src/common/utils/validation-problem/validation-problem.ts`), set as its `exceptionFactory` in `configureApp`.
 
 To add a type, add an entry to `PROBLEM_TYPES` and to the table above. Give a type to an error only
 when a client must react to it differently from the other errors with the same status.

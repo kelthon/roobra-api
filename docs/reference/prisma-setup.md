@@ -29,7 +29,7 @@ generated client is gitignored and produced by `npx prisma generate`, see
 | `BigInt` autoincrement | every other model |
 
 `JSON.stringify` refuses a `bigint`, so `configureApp` calls `serializeBigIntAsString`
-(`src/common/serialization/bigint-json.ts`), which writes every `BigInt` as a string: a client
+(`src/common/utils/serialization/bigint-json.ts`), which writes every `BigInt` as a string: a client
 receives `"id": "42"`, like the nano id of `User`
 ([ADR](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-10-14-send-bigint-ids-as-strings.md)).
 A route that takes such an id from the path or the query receives a string and converts it with

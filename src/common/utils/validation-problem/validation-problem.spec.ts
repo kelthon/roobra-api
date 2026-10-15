@@ -1,5 +1,5 @@
 import { ValidationError } from '@nestjs/common';
-import { ProblemException } from './problem.js';
+import { ProblemException } from '@app/common/exceptions/problem.exception.js';
 import {
   toFieldErrors,
   validationProblemFactory,

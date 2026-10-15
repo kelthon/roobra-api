@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ProblemException } from '@app/common/problems/problem.js';
+import { ProblemException } from '@app/common/exceptions/problem.exception.js';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@app/db/prisma/client.js';
 import {
@@ -7,10 +7,10 @@ import {
   PrismaTransaction,
 } from '@app/modules/database/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokensResponse } from '@app/shared/interfaces/auth-response.js';
+import { AuthTokensResponse } from '@app/interfaces/auth-response.js';
 import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
-import { InfoResponse } from '@app/shared/interfaces/info-response.js';
-import { JWTAuthPayload } from '@app/shared/interfaces/jwt-auth-payload.js';
+import { InfoResponse } from '@app/interfaces/info-response.js';
+import { JWTAuthPayload } from '@app/interfaces/jwt-auth-payload.js';
 import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
 import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
