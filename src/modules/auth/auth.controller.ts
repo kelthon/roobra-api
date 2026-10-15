@@ -36,9 +36,11 @@ export class AuthController {
    * @param user The user the local strategy accepted
    * @param _loginDto The credentials, only declared so the body is validated
    */
+  // Guards run bottom-up: GuestOnly must run before LoginWith, or its
+  // OptionalJwtAuthGuard overwrites the user LoginWith put on the request
   @Throttle(AUTH_THROTTLE)
-  @GuestOnly()
   @LoginWith('local')
+  @GuestOnly()
   @Post('login')
   async login(@User() user: UserDto, @Body() _loginDto: LoginDto) {
     return await this.authService.login(user.id);
