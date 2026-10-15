@@ -83,6 +83,7 @@ their real decision date in `date`, and the day they were documented goes in `re
 | [2026-10-11-01-split-auth-users-and-sessions-modules](./2026-10-11-01-split-auth-users-and-sessions-modules.md) | Split Authentication, Users And Sessions Into Three Modules | `Draft` → `Accepted` |
 | [2026-10-11-02-end-deleted-users-sessions-by-revoking-refresh-tokens](./2026-10-11-02-end-deleted-users-sessions-by-revoking-refresh-tokens.md) | End A Deleted User's Sessions By Revoking Their Refresh Tokens | `Draft` → `Accepted` |
 | [2026-10-12-structured-logging-with-pino](./2026-10-12-structured-logging-with-pino.md) | Log Structured JSON To Stdout With Pino | `Draft` → `Accepted` |
+| [2026-10-14-enforce-soft-delete-with-a-prisma-extension](./2026-10-14-enforce-soft-delete-with-a-prisma-extension.md) | Enforce Soft Delete With A Prisma Client Extension | `Draft` → `Accepted` |
 
 ## Decisions Kept In `roobra-docs`
 
