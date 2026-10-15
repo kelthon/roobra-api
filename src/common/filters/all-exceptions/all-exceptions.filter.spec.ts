@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
-import { ProblemException } from '@app/common/problems/problem.js';
+import { ProblemException } from '@app/common/exceptions/problem.exception.js';
 import { AllExceptionsFilter } from './all-exceptions.filter.js';
 
 const mockLogger = { error: vi.fn() };

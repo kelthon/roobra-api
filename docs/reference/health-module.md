@@ -27,7 +27,7 @@ The route is public and differs from every other route in two ways:
 - **Not rate limited.** `@SkipThrottle()` keeps a probe every few seconds from using up the global
   limit (20 requests per 60 seconds) and receiving 429.
 
-`loggerOptionsFactory` (`src/common/logger/logger-options.factory.ts`) tells `pino-http` not to
+`loggerOptionsFactory` (`src/common/factories/logger/logger-options.factory.ts`) tells `pino-http` not to
 log a completed request to `/health` (`autoLogging.ignore`), so the probes do not fill the log. A
 failed check is still logged, by Terminus's `HealthCheckService`.
 

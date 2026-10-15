@@ -4,8 +4,8 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { validationProblemFactory } from '@app/common/problems/validation-problem.js';
-import { serializeBigIntAsString } from '@app/common/serialization/bigint-json.js';
+import { serializeBigIntAsString } from '@app/common/utils/serialization/bigint-json.js';
+import { validationProblemFactory } from '@app/common/utils/validation-problem/validation-problem.js';
 
 /**
  * Options for creating the application. The e2e specs pass them too, so they

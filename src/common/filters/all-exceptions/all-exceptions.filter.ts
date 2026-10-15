@@ -9,15 +9,12 @@ import { Request, Response } from 'express';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { STATUS_CODES } from 'node:http';
 import {
-  PROBLEM_TYPE_BASE,
-  PROBLEM_TYPES,
-  ProblemDetails,
-  ProblemException,
-} from '@app/common/problems/problem.js';
-import {
   isRecordNotFoundError,
   isUniqueConstraintViolationError,
 } from '@app/common/utils/database/database.util.js';
+import { ProblemDetails } from '@app/interfaces/problem.interface.js';
+import { ProblemException } from '@app/common/exceptions/problem.exception.js';
+import { PROBLEM_TYPE_BASE, PROBLEM_TYPES } from '@app/types/problem.type.js';
 
 /**
  * Answers every error as RFC 9457 problem details

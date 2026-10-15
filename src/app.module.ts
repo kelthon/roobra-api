@@ -18,7 +18,7 @@ import { UsersModule } from './modules/users/users.module.js';
 import { mailerOptionsFactory } from './modules/notifications/config/mailer-options.factory.js';
 import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from './modules/health/health.module.js';
-import { loggerOptionsFactory } from './common/logger/logger-options.factory.js';
+import { loggerOptionsFactory } from './common/factories/logger/logger-options.factory.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions/all-exceptions.filter.js';
 
 @Module({
