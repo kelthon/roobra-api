@@ -55,7 +55,7 @@ label (`expiresInLabel`, for example `2 hours`) instead of a number.
 
 ## Locales
 
-`LocaleType` is `'en' | 'pt'`. `resolveLocale(acceptLanguage)` in `src/common/utils/locale.util.ts`
+`LocaleType` is `'en' | 'pt'`. `resolveLocale(acceptLanguage)` in `src/common/utils/locale/locale.util.ts`
 picks the first supported tag (exact, then primary subtag) and falls back to `DEFAULT_LOCALE`
 (`'en'`). Only `locales/en/` has templates; `pt` falls back to English.
 
