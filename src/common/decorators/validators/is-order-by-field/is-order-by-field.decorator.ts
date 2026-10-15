@@ -1,10 +1,21 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
 
+/**
+ * Validates a sort expression in the `field:order` format, such as
+ * `createdAt:desc`. The field is case-sensitive, the order is not. Pass
+ * `{ each: true }` to validate every item of an array.
+ *
+ * @param allowedFields The fields that can be sorted by
+ * @param allowedOrders The accepted sort directions
+ * @param validationOptions Standard class-validator options
+ */
 export function IsOrderByField(
   allowedFields: string[],
   allowedOrders: string[] = ['asc', 'desc'],
   validationOptions?: ValidationOptions,
 ) {
+  const normalizedOrders = allowedOrders.map((o) => o.toLowerCase());
+
   return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'isOrderByField',
@@ -17,21 +28,21 @@ export function IsOrderByField(
             return false;
           }
 
-          const [field, order] = value.split(':');
+          const segments = value.split(':');
 
-          if (!field || !order) {
+          if (segments.length !== 2) {
             return false;
           }
 
+          const [field, order] = segments;
+
           return (
             allowedFields.includes(field) &&
-            allowedOrders
-              .map((o) => o.toLowerCase())
-              .includes(order.toLowerCase())
+            normalizedOrders.includes(order.toLowerCase())
           );
         },
         defaultMessage() {
-          return 'Each orderBy must be in the format field:asc|desc and use allowed fields.';
+          return `Each orderBy must be in the format field:${allowedOrders.join('|')} and use one of: ${allowedFields.join(', ')}.`;
         },
       },
     });
