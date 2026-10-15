@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `feat/GH-10-soft-delete`, 2026-10-14.
+**Location:** `src/modules/auth/` — verified against branch `fix/login-guard-order`, 2026-10-15.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -61,6 +61,10 @@ A signed-in user deleted while their access token is still valid gets a 401 `abo
 | `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Milestone 2 (`roobra-docs` `management/backlog.md`, tasks 1.2.1 and 1.2.3) |
 
 `@User()` injects the authenticated user as `UserDto`, mapping the JWT `sub` claim to `id`.
+
+Guards run in the reverse order of their decorators, bottom first. A route with both `@GuestOnly()`
+and `@LoginWith()` lists `@GuestOnly()` below: its `OptionalJwtAuthGuard` sets `request.user`, so run
+after `LoginWith` it would erase the user the local strategy found.
 
 ## Tokens
 
