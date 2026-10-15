@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
-import { IsOrderByField } from '../decorators/is-order-by-field.decorator.js';
+import { IsOrderByField } from '@app/validators/is-order-by-field/is-order-by-field.decorator.js';
 
 export class PaginationParamsDto {
   @IsOptional()

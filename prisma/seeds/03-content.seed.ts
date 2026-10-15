@@ -1,8 +1,4 @@
-import type {
-  PrismaClient,
-  Media,
-  MediaPage,
-} from '../../src/generated/prisma/client.js';
+import type { PrismaClient, Media, MediaPage } from '@app/db/prisma/client.js';
 
 // A fixed slug ensures the media can be found on re-runs without creating duplicates.
 const MEDIA_SLUG = 'future-samurai-seed';

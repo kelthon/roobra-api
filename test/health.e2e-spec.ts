@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaHealthIndicator } from '@nestjs/terminus';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import request from 'supertest';
-import { AppModule } from 'src/app.module.js';
-import { appOptions, configureApp } from 'src/app.setup.js';
+import { AppModule } from '@app/app.module.js';
+import { appOptions, configureApp } from '@app/app.setup.js';
 
 // The e2e specs run without a database, so the ping is stubbed: these specs
 // test the route, the status codes and the throttling, not Postgres itself.

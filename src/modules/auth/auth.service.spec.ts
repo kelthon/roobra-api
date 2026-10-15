@@ -1,17 +1,17 @@
-import { PrismaService } from '../database/prisma.service.js';
-import { AuthService } from './auth.service.js';
-import { PasswordHashService } from './services/password-hash/password-hash.service.js';
-import { SessionsService } from '../sessions/sessions.service.js';
-import { SimpleHashService } from 'src/common/services/simple-hash/simple-hash.service.js';
 import {
   ConflictException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SimpleTokenService } from 'src/common/services/simple-token/simple-token.service.js';
+import { AuthService } from './auth.service.js';
 import { ConfigService } from '@nestjs/config';
-import { PasswordResetMailService } from 'src/modules/notifications/services/password-reset-mail.service.js';
-import { EmailVerificationMailService } from 'src/modules/notifications/services/email-verification-mail.service.js';
+import { EmailVerificationMailService } from '@app/modules/notifications/services/email-verification-mail.service.js';
+import { PasswordHashService } from './services/password-hash/password-hash.service.js';
+import { PasswordResetMailService } from '@app/modules/notifications/services/password-reset-mail.service.js';
+import { PrismaService } from '../database/prisma.service.js';
+import { SessionsService } from '../sessions/sessions.service.js';
+import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
+import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
 import type { Mock } from 'vitest';
 
 describe('AuthService', () => {

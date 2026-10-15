@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { type UserDto } from 'src/common/dto/user-dto.js';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth/jwt-auth.guard.js';
+import { type UserDto } from '@app/common/dto/user-dto.js';
+import { JwtAuthGuard } from '@app/modules/auth/guards/jwt-auth/jwt-auth.guard.js';
 import { UsersController } from './users.controller.js';
 import { UsersService } from './users.service.js';
 

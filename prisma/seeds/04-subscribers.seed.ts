@@ -3,8 +3,8 @@ import type {
   PrismaClient,
   Subscriber,
   Subscription,
-} from '../../src/generated/prisma/client.js';
-import { PaymentMethod, GatewayStatus } from 'src/generated/prisma/enums.js';
+} from '@app/db/prisma/client.js';
+import { PaymentMethod, GatewayStatus } from '@app/db/prisma/enums.js';
 import { DateTime } from 'luxon';
 
 export async function seedSubscribers(

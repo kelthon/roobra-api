@@ -7,7 +7,7 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard.js';
 import { ForbidAuthenticatedGuard } from './guards/forbid-authenticated/forbid-authenticated.guard.js';
-import { type UserDto } from 'src/common/dto/user-dto.js';
+import { type UserDto } from '@app/common/dto/user-dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { LogoutDto } from './dto/logout.dto.js';

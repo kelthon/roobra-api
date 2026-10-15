@@ -1,4 +1,4 @@
-import { JWTAuthPayload } from 'src/shared/interfaces/jwt-auth-payload.js';
+import { JWTAuthPayload } from '@app/shared/interfaces/jwt-auth-payload.js';
 import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard.js';
 
 describe('OptionalJwtAuthGuard', () => {

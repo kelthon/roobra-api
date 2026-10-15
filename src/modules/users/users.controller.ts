@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
-import { User } from 'src/common/decorators/user.decorator.js';
-import { UserOnly } from 'src/common/decorators/user-only.decorator.js';
-import { type UserDto } from 'src/common/dto/user-dto.js';
+import { User } from '@app/common/decorators/user-param/user-param.decorator.js';
+import { UserOnly } from '@app/common/decorators/auth/user-only.decorator.js';
+import { type UserDto } from '@app/common/dto/user-dto.js';
 import { UsersService } from './users.service.js';
 
 @Controller('users')

@@ -3,8 +3,8 @@ import type {
   Media,
   MediaPage,
   Subscriber,
-} from '../../src/generated/prisma/client.js';
-import { ReadingProgressStatus } from '../../src/generated/prisma/client.js';
+} from '@app/db/prisma/client.js';
+import { ReadingProgressStatus } from '@app/db/prisma/client.js';
 
 export async function seedInteractions(
   prisma: PrismaClient,

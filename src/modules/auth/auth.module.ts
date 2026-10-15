@@ -1,14 +1,14 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PassportModule } from '@nestjs/passport';
-import { AuthService } from './auth.service.js';
-import { DatabaseModule } from '../database/database.module.js';
-import { PasswordHashService } from './services/password-hash/password-hash.service.js';
 import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from '../database/database.module.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { LocalStrategy } from './strategies/local.strategy.js';
-import { RolesGuard } from './guards/roles/roles.guard.js';
+import { Module } from '@nestjs/common';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { PassportModule } from '@nestjs/passport';
+import { PasswordHashService } from './services/password-hash/password-hash.service.js';
+import { RolesGuard } from './guards/roles/roles.guard.js';
 import { SessionsModule } from '../sessions/sessions.module.js';
 
 @Module({

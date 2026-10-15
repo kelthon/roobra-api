@@ -1,4 +1,4 @@
-import { Prisma } from 'src/generated/prisma/client.js';
+import { Prisma } from '@app/db/prisma/client.js';
 
 /**
  * The models with a `deletedAt` column. `soft-delete.extension.spec.ts` checks

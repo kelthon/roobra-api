@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsStrongPassword, IsString } from 'class-validator';
-import { IsConfirmPassword } from 'src/common/decorators/is-confirm-password.decorator.js';
+import { IsConfirmPassword } from '@app/validators/is-confirm-password/is-confirm-password.decorator.js';
 
 export class ResetPasswordDto {
   @IsStrongPassword()

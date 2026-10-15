@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from 'src/app.module.js';
-import { appOptions, configureApp } from 'src/app.setup.js';
+import { AppModule } from '@app/app.module.js';
+import { appOptions, configureApp } from '@app/app.setup.js';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;

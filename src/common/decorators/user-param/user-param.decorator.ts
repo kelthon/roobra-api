@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserDto } from '../dto/user-dto.js';
-import { getJwtPayload } from '../utils/jwt-payload.util.js';
+import { UserDto } from '@app/common/dto/user-dto.js';
+import { getJwtPayload } from '@app/common/utils/jwt/jwt.util.js';
 
 /**
  * Injects the authenticated user, with the token's `sub` claim as `id`.
