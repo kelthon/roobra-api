@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
 import { User } from '@app/common/decorators/user-param/user-param.decorator.js';
-import { UserOnly } from '@app/common/decorators/auth/user-only.decorator.js';
+import { Authenticated } from '@app/common/decorators/auth/authenticated.decorator.js';
 import { type UserDto } from '@app/common/dto/user-dto.js';
 import { UsersService } from './users.service.js';
 
@@ -8,7 +8,7 @@ import { UsersService } from './users.service.js';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UserOnly()
+  @Authenticated()
   @Get('me')
   async getMe(@User() user: UserDto) {
     return await this.usersService.getMe(user.id);
@@ -19,7 +19,7 @@ export class UsersController {
    *
    * @param user The signed-in user
    */
-  @UserOnly()
+  @Authenticated()
   @Delete('me')
   @HttpCode(204)
   async delete(@User() user: UserDto): Promise<void> {

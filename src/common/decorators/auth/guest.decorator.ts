@@ -6,7 +6,7 @@ import { OptionalJwtAuthGuard } from '@app/modules/auth/guards/optional-jwt/opti
  * Restricts a route to guests. A missing, invalid or expired access token
  * counts as a guest.
  */
-export function GuestOnly() {
+export function Guest() {
   return applyDecorators(
     UseGuards(OptionalJwtAuthGuard),
     UseGuards(ForbidAuthenticatedGuard),

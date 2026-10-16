@@ -51,7 +51,7 @@ describe('AuthController', () => {
   });
 
   describe('Guards', () => {
-    describe('@UserOnly() routes', () => {
+    describe('@Authenticated() routes', () => {
       it.each([
         'logout',
         'logoutAllSessions',
@@ -67,7 +67,7 @@ describe('AuthController', () => {
       });
     });
 
-    describe('@GuestOnly() routes', () => {
+    describe('@Guest() routes', () => {
       it.each(['register', 'login'])(
         'should apply ForbidAuthenticatedGuard to %s',
         (methodName) => {

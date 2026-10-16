@@ -4,9 +4,9 @@ import { LoginDto } from './dto/login.dto.js';
 import { RegisterUserDto } from './dto/register-user.dto.js';
 import { LogoutDto } from './dto/logout.dto.js';
 import { User } from '@app/common/decorators/user-param/user-param.decorator.js';
-import { UserOnly } from '@app/common/decorators/auth/user-only.decorator.js';
+import { Authenticated } from '@app/common/decorators/auth/authenticated.decorator.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
-import { GuestOnly } from '@app/common/decorators/auth/guest-only.decorator.js';
+import { Guest } from '@app/common/decorators/auth/guest.decorator.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
@@ -23,7 +23,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Throttle(AUTH_THROTTLE)
-  @GuestOnly()
+  @Guest()
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto) {
     return await this.authService.register(registerDto);
@@ -36,29 +36,29 @@ export class AuthController {
    * @param user The user the local strategy accepted
    * @param _loginDto The credentials, only declared so the body is validated
    */
-  // Guards run bottom-up: GuestOnly must run before LoginWith, or its
+  // Guards run bottom-up: Guest must run before LoginWith, or its
   // OptionalJwtAuthGuard overwrites the user LoginWith put on the request
   @Throttle(AUTH_THROTTLE)
   @LoginWith('local')
-  @GuestOnly()
+  @Guest()
   @Post('login')
   async login(@User() user: UserDto, @Body() _loginDto: LoginDto) {
     return await this.authService.login(user.id);
   }
 
-  @UserOnly()
+  @Authenticated()
   @Post('logout')
   async logout(@User() user: UserDto, @Body() logoutDto: LogoutDto) {
     return await this.authService.logout(user.id, logoutDto);
   }
 
-  @UserOnly()
+  @Authenticated()
   @Post('logout/all')
   async logoutAllSessions(@User() user: UserDto) {
     return await this.authService.logoutAllSessions(user.id);
   }
 
-  @UserOnly()
+  @Authenticated()
   @Get('sessions')
   async getActiveSessions(@User() user: UserDto) {
     return await this.authService.getActiveSessions(user.id);
@@ -82,7 +82,7 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  @UserOnly()
+  @Authenticated()
   @Post('change-password')
   changePassword(
     @User() user: UserDto,
@@ -91,7 +91,7 @@ export class AuthController {
     return this.authService.changePassword(user.id, changePasswordDto);
   }
 
-  @UserOnly()
+  @Authenticated()
   @Get('verify-email')
   async sendVerificationEmail(@User() user: UserDto) {
     return await this.authService.sendVerificationEmail(user.id);

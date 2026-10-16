@@ -21,7 +21,7 @@ describe('RolesGuard', () => {
     guard = new RolesGuard(reflectorMock);
   });
 
-  it('should allow the request through when the handler has no @Roles() metadata', () => {
+  it('should allow the request through when the handler has no @SetRoles() metadata', () => {
     (reflectorMock.get as Mock).mockReturnValue(undefined);
 
     const result = guard.canActivate(
