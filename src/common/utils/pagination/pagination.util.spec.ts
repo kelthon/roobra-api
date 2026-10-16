@@ -3,6 +3,7 @@ import {
   cursorBasedPagination,
   decodeCursor,
   encodeCursor,
+  isDefaultCursor,
   offsetBasedPagination,
   paginate,
   parseOrderByParams,
@@ -22,8 +23,55 @@ describe('pagination.util', () => {
       expect(encodeCursor(cursorData)).toMatch(/^[A-Za-z0-9_-]+$/);
     });
 
-    it('should throw when the cursor is not encoded JSON', () => {
-      expect(() => decodeCursor('not-a-cursor')).toThrow();
+    it('should keep only the fields of the key', () => {
+      const tampered = encodeCursor({
+        createdAt_id: { ...cursorData.createdAt_id, deletedAt: null },
+        where: {},
+      });
+
+      expect(decodeCursor(tampered)).toEqual(cursorData);
+    });
+
+    it.each([
+      ['not encoded JSON', 'not-a-cursor'],
+      ['JSON of another shape', encodeCursor({ foo: 1 })],
+      [
+        'a cursor without an id',
+        encodeCursor({ createdAt_id: { createdAt: '2026-01-01' } }),
+      ],
+      [
+        'a cursor with an invalid date',
+        encodeCursor({ createdAt_id: { createdAt: 'yesterday', id: '1' } }),
+      ],
+      [
+        'a cursor with an empty id',
+        encodeCursor({ createdAt_id: { createdAt: '2026-01-01', id: '' } }),
+      ],
+      [
+        'a cursor with a fractional id',
+        encodeCursor({ createdAt_id: { createdAt: '2026-01-01', id: 1.5 } }),
+      ],
+    ])('should answer invalid-cursor to %s', (_case, cursor) => {
+      expect(() => decodeCursor(cursor)).toThrow(
+        expect.objectContaining({ type: 'invalid-cursor' }),
+      );
+    });
+  });
+
+  describe('isDefaultCursor', () => {
+    it('should accept a string or an integer id', () => {
+      expect(isDefaultCursor(cursorData)).toBe(true);
+      expect(
+        isDefaultCursor({
+          createdAt_id: { createdAt: '2026-01-01T00:00:00Z', id: 42 },
+        }),
+      ).toBe(true);
+    });
+
+    it('should reject what is not an object', () => {
+      expect(isDefaultCursor(null)).toBe(false);
+      expect(isDefaultCursor('cursor')).toBe(false);
+      expect(isDefaultCursor({ createdAt_id: null })).toBe(false);
     });
   });
 

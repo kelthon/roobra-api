@@ -28,6 +28,10 @@ export const PROBLEM_TYPES = {
     status: HttpStatus.BAD_REQUEST,
     title: 'Invalid or expired token',
   },
+  'invalid-cursor': {
+    status: HttpStatus.BAD_REQUEST,
+    title: 'Invalid cursor',
+  },
   'incorrect-password': {
     status: HttpStatus.BAD_REQUEST,
     title: 'Incorrect password',
