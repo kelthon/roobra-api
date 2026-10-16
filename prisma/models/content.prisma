@@ -23,6 +23,7 @@ model Media {
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
   deletedAt DateTime? @map("deleted_at") @db.Timestamptz
 
+  @@unique([createdAt, id])
   @@index([searchableText], type: Gin)
   @@map("medias")
 }
