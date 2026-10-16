@@ -58,9 +58,9 @@ describe('Login (e2e)', () => {
       .send({ email: user.email, password: 'Password123!' })
       .expect(201);
 
-    expect(response.body.accessToken).toEqual(expect.any(String));
-    expect(response.body.refreshToken).toEqual(expect.any(String));
-    expect(response.body.user).toMatchObject({ id: user.id });
+    expect(response.body.data.accessToken).toEqual(expect.any(String));
+    expect(response.body.data.refreshToken).toEqual(expect.any(String));
+    expect(response.body.data.user).toMatchObject({ id: user.id });
   });
 
   it('should sign in when the request carries an invalid access token', async () => {

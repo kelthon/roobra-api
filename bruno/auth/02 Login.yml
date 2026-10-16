@@ -18,13 +18,13 @@ runtime:
   scripts:
     - type: after-response
       code: |-
-        bru.setVar("accessToken", res.body.accessToken);
-        bru.setVar("refreshToken", res.body.refreshToken);
+        bru.setVar("accessToken", res.body.data.accessToken);
+        bru.setVar("refreshToken", res.body.data.refreshToken);
     - type: tests
       code: |-
         test("signs in with the password", () => {
           expect(res.status).to.equal(201);
-          expect(res.body.accessToken).to.be.a("string");
+          expect(res.body.data.accessToken).to.be.a("string");
         });
 
 settings:

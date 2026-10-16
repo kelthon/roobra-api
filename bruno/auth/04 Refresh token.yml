@@ -20,13 +20,13 @@ runtime:
         bru.setVar("previousRefreshToken", bru.getVar("refreshToken"));
     - type: after-response
       code: |-
-        bru.setVar("accessToken", res.body.accessToken);
-        bru.setVar("refreshToken", res.body.refreshToken);
+        bru.setVar("accessToken", res.body.data.accessToken);
+        bru.setVar("refreshToken", res.body.data.refreshToken);
     - type: tests
       code: |-
         test("rotates the refresh token", () => {
           expect(res.status).to.equal(201);
-          expect(res.body.refreshToken).to.not.equal(bru.getVar("previousRefreshToken"));
+          expect(res.body.data.refreshToken).to.not.equal(bru.getVar("previousRefreshToken"));
         });
 
 settings:

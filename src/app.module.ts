@@ -1,6 +1,6 @@
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CommonModule } from './common/common.module.js';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -20,6 +20,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from './modules/health/health.module.js';
 import { loggerOptionsFactory } from './common/factories/logger/logger-options.factory.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions/all-exceptions.filter.js';
+import { ResponseInterceptor } from './common/interceptors/response/response.interceptor.js';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions/all-excepti
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
   ],
 })
 export class AppModule {}

@@ -27,15 +27,15 @@ runtime:
         bru.setVar("password", bru.getEnvVar("password"));
     - type: after-response
       code: |-
-        bru.setVar("accessToken", res.body.accessToken);
-        bru.setVar("refreshToken", res.body.refreshToken);
+        bru.setVar("accessToken", res.body.data.accessToken);
+        bru.setVar("refreshToken", res.body.data.refreshToken);
     - type: tests
       code: |-
         test("creates the account and signs it in", () => {
           expect(res.status).to.equal(201);
-          expect(res.body.accessToken).to.be.a("string");
-          expect(res.body.refreshToken).to.be.a("string");
-          expect(res.body.user.email).to.equal(bru.getVar("email"));
+          expect(res.body.data.accessToken).to.be.a("string");
+          expect(res.body.data.refreshToken).to.be.a("string");
+          expect(res.body.data.user.email).to.equal(bru.getVar("email"));
         });
 
 settings:

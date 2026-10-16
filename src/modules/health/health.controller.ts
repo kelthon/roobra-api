@@ -6,10 +6,12 @@ import {
 } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaService } from '@app/modules/database/prisma.service.js';
+import { RawResponse } from '@app/common/decorators/response/raw-response.decorator.js';
 import { HealthCheckFilter } from './health-check.filter.js';
 
 @Controller({ path: 'health', version: VERSION_NEUTRAL })
 @SkipThrottle()
+@RawResponse()
 @UseFilters(HealthCheckFilter)
 export class HealthController {
   constructor(

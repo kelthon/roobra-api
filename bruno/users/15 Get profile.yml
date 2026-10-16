@@ -16,8 +16,8 @@ runtime:
       code: |-
         test("returns the profile, verified", () => {
           expect(res.status).to.equal(200);
-          expect(res.body.email).to.equal(bru.getVar("email"));
-          expect(res.body.emailVerifiedAt).to.be.a("string");
+          expect(res.body.data.email).to.equal(bru.getVar("email"));
+          expect(res.body.data.emailVerifiedAt).to.be.a("string");
         });
 
 settings:
