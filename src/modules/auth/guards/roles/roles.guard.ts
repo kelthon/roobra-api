@@ -5,8 +5,11 @@ import { SetRoles } from '@app/common/decorators/auth/set-roles.decorator.js';
 import { getJwtPayload } from '@app/common/utils/jwt/jwt.util.js';
 
 /**
- * A route without `@SetRoles()` is open to everyone. Registered in `AuthModule`
- * but not applied to any route yet.
+ * Lets a request through when the signed-in user has one of the roles set by
+ * `@SetRoles()`. A route without roles, or with an empty list, is open to
+ * every user who got past the guards before it. Applied by
+ * `@Authenticated(...roles)` after `JwtAuthGuard`, which puts the user on
+ * the request.
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,7 +20,7 @@ export class RolesGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const roles = this.reflector.get(SetRoles, context.getHandler());
 
-    if (!roles) {
+    if (!roles || (Array.isArray(roles) && roles.length === 0)) {
       return true;
     }
 

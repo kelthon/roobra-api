@@ -31,6 +31,16 @@ describe('RolesGuard', () => {
     expect(result).toBe(true);
   });
 
+  it('should allow the request through when the roles list is empty', () => {
+    (reflectorMock.get as Mock).mockReturnValue([]);
+
+    const result = guard.canActivate(
+      createContext({ sub: 'user-id', role: UserRole.SUBSCRIBER }),
+    );
+
+    expect(result).toBe(true);
+  });
+
   it('should allow the request through when the user has one of the required roles', () => {
     (reflectorMock.get as Mock).mockReturnValue([UserRole.ADMIN]);
 
