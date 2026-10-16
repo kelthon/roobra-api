@@ -24,7 +24,7 @@ deprecated `$use` middleware) return a new client, which a class cannot extend.
 
 ## Decision
 
-A client extension, `softDeleteExtension` (`src/modules/database/soft-delete.extension.ts`),
+A client extension, `softDeleteExtension` (`src/modules/database/extensions/soft-delete/soft-delete.extension.ts`),
 applies to the models in `SOFT_DELETE_MODELS`:
 
 - **Queries skip deleted rows.** Reads, `count`, `aggregate`, `groupBy`, `update`, `updateMany`

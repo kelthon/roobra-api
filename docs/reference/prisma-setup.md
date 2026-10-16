@@ -1,7 +1,7 @@
 # Prisma Setup Reference
 
 **Location:** `prisma/`, `prisma.config.ts` and `src/modules/database/` — verified against branch
-`docs/restructure-documentation`, 2026-09-18.
+`feat/content-api`, 2026-10-16.
 
 ## Schema Layout
 
@@ -39,7 +39,7 @@ A route that takes such an id from the path or the query receives a string and c
 
 Eleven models have a nullable `deletedAt`: `User`, `Key`, `StaffMember`, `Subscription`,
 `Subscriber`, `Promotion`, `Media`, `MediaVolume`, `MediaChapter`, `MediaPage`, `UserReadList`.
-`softDeleteExtension` (`src/modules/database/soft-delete.extension.ts`) enforces it for every query
+`softDeleteExtension` (`src/modules/database/extensions/soft-delete/soft-delete.extension.ts`) enforces it for every query
 of these models ([ADR](../adr/2026-10-14-enforce-soft-delete-with-a-prisma-extension.md)):
 
 | Operation | Behavior |
@@ -59,13 +59,45 @@ of these models ([ADR](../adr/2026-10-14-enforce-soft-delete-with-a-prisma-exten
 - A model that gains a `deletedAt` column must be added to `SOFT_DELETE_MODELS`;
   `soft-delete.extension.spec.ts` fails until it is.
 
+## Paged Lists
+
+`findManyAndCountExtension`
+(`src/modules/database/extensions/find-many-and-count/find-many-and-count.extension.ts`) adds
+`findManyAndCount(args)` to every model
+([ADR](../adr/2026-10-16-count-paged-lists-with-a-prisma-extension.md)). It takes the arguments of
+`findMany` and returns the rows and the number of rows `where` matches, the `totalItems` of a page:
+
+```ts
+const [medias, total] = await this.prisma.media.findManyAndCount({
+  where: { isPrivate: false },
+  select: { id: true, name: true },
+  orderBy: parseOrderByParams(query.orderBy),
+  ...offsetBasedPagination(query.page, query.limit),
+});
+```
+
+- The rows are typed by the `select` or `include`, as with `findMany`.
+- The count reuses only `where`: `skip`, `take`, `cursor`, `orderBy`, `select` and `omit` do not
+  change the total. With `distinct`, the total still counts every row `where` matches.
+- Both queries go through the delegate the method is called on, so the soft delete filter applies
+  to both and `tx.media.findManyAndCount()` stays in `tx`.
+- They run side by side with `Promise.all`, not in one snapshot: a row written between them makes
+  the total differ from the page by that row.
+- A list paged by cursor has no total; it calls `findMany`.
+- A unit test mocks it like any other delegate method: `prisma.media.findManyAndCount`.
+
 ## Client Configuration
 
-`createPrismaClient` (`src/modules/database/prisma.service.ts`) is the single place the client is
-built: a `PrismaClient` with the options below, extended with `softDeleteExtension`. `DatabaseModule`
-provides it under the `PrismaService` token, an abstract class merged with an interface that gives
-it the extended client's type, so services inject `PrismaService` and tests replace it with
-`useValue`. The client inside an interactive transaction is typed `PrismaTransaction`.
+`createPrismaClient` (`src/modules/database/factories/create-prisma-client.factory.ts`) is the single
+place the client is built: a `PrismaClient` with the options below, extended with
+`softDeleteExtension` and `findManyAndCountExtension`. `DatabaseModule` provides it under the
+`PrismaService` token (`prismaServiceProvider`, in `src/modules/database/providers/`), an abstract
+class merged with an interface that gives it the extended client's type, so services inject
+`PrismaService` and tests replace it with `useValue`. The merge only works because both declarations
+are in `src/modules/database/prisma.service.ts`: moved to another file, the interface would be a
+separate type and the extensions would vanish from `PrismaService`. The extended client's type,
+`ExtendedPrismaClient`, and the client inside an interactive transaction, `PrismaTransaction`, are
+in `src/modules/database/types/prisma.type.ts`; `prisma.service.ts` re-exports `PrismaTransaction`.
 
 | Option | Value | Decision |
 | --- | --- | --- |
