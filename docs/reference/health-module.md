@@ -17,7 +17,8 @@ requests. Built on `@nestjs/terminus`.
 
 Unlike every other route, a failed check is not answered as [problem details](./error-responses.md):
 `HealthCheckFilter`, applied to the controller, answers Terminus's 503 with Terminus's report, the
-format monitors and load balancers read.
+format monitors and load balancers read. A successful check is not wrapped in `data` either:
+`@RawResponse()` on the controller keeps it out of the [success envelope](./success-responses.md).
 
 The route is public and differs from every other route in two ways:
 

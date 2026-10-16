@@ -52,6 +52,7 @@ no page is served there yet.
 | `invalid-credentials` | 401 | `POST /v1/auth/login` |
 | `invalid-token` | 400 | `POST /v1/auth/reset-password`, `POST /v1/auth/verify-email`, `POST /v1/auth/refresh-token` (an unknown, expired or reused refresh token) |
 | `incorrect-password` | 400 | `POST /v1/auth/change-password` |
+| `invalid-cursor` | 400 | `decodeCursor`, for a `cursor` query parameter it did not make (see [success responses](./success-responses.md#cursor)). No route takes a cursor yet |
 
 Any other error is `about:blank`:
 

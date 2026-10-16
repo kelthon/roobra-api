@@ -42,6 +42,7 @@ merges into `main`, see [adr/README.md](./adr/README.md).
 - [reference/auth-module.md](./reference/auth-module.md) — Endpoints, guards, tokens.
 - [reference/sessions-module.md](./reference/sessions-module.md) — Issuing, refreshing and revoking sessions.
 - [reference/users-module.md](./reference/users-module.md) — Profile and account deletion.
+- [reference/success-responses.md](./reference/success-responses.md) — The `data` envelope, pagination and cursors.
 - [reference/error-responses.md](./reference/error-responses.md) — The problem details every error is answered with, and the problem types.
 - [reference/health-module.md](./reference/health-module.md) — `GET /health`, its checks and the Docker health check.
 - [reference/notifications-module.md](./reference/notifications-module.md) — Mailer setup, templates, locales.
