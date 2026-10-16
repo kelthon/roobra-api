@@ -7,10 +7,10 @@ import {
   PrismaTransaction,
 } from '@app/modules/database/prisma.service.js';
 import { ConfigService } from '@nestjs/config';
-import { AuthTokensResponse } from '@app/interfaces/auth-response.js';
+import { AuthTokensResponse } from '@app/interfaces/auth-response.interface.js';
 import { SimpleHashService } from '@app/common/services/simple-hash/simple-hash.service.js';
-import { InfoResponse } from '@app/interfaces/info-response.js';
-import { JWTAuthPayload } from '@app/interfaces/jwt-auth-payload.js';
+import { InfoResponse } from '@app/interfaces/info-response.interface.js';
+import { JWTAuthPayload } from '@app/interfaces/jwt-auth-payload.interface.js';
 import { DateTime } from 'luxon';
 import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
 import { SimpleTokenService } from '@app/common/services/simple-token/simple-token.service.js';
