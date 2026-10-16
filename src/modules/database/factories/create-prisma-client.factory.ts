@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@app/db/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { softDeleteExtension } from '../extensions/soft-delete/soft-delete.extension.js';
+import { findManyAndCountExtension } from '../extensions/find-many-and-count/find-many-and-count.extension.js';
 
 /**
  * Builds the client every service uses: it omits credential hashes from every
@@ -42,4 +43,5 @@ export function createPrismaClient(config: ConfigService) {
     },
   })
     .$extends(softDeleteExtension)
+    .$extends(findManyAndCountExtension);
 }
