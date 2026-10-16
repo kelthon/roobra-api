@@ -4,6 +4,13 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
+/**
+ * Validates that the value equals another property of the same object, such as
+ * a confirmation repeating a password.
+ *
+ * @param passwordProperty The name of the property the value must match
+ * @param validationOptions Standard class-validator options
+ */
 export function IsConfirmPassword(
   passwordProperty: string,
   validationOptions?: ValidationOptions,

@@ -3,6 +3,13 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
 import { ConfigService } from '@nestjs/config';
 import { join } from 'node:path';
 
+/**
+ * Sends email through the SMTP server of `mail.*`, with Handlebars templates
+ * per locale that fall back to `en`. Outside production, each email sent is
+ * also opened as a preview in the browser.
+ *
+ * @param config The application config, for `mail.*` and `app.mode`
+ */
 export const mailerOptionsFactory = (config: ConfigService): MailerOptions => ({
   defaults: {
     from: config.getOrThrow<string>('mail.from'),

@@ -33,6 +33,12 @@ export class SessionsService {
     private readonly simpleTokenService: SimpleTokenService,
   ) {}
 
+  /**
+   * Starts a session: signs an access token and stores a new refresh token.
+   *
+   * @param user The user the tokens are for
+   * @param tx The transaction to run in, when the caller has one
+   */
   async generate(
     user: Pick<User, 'id' | 'email' | 'username' | 'role'>,
     tx?: PrismaTransaction,

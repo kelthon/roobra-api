@@ -100,6 +100,7 @@ export class AuthService {
    *
    * @param registerDto The account data
    * @throws ProblemException `email-in-use` or `username-in-use` (409)
+   * @throws ConflictException When another unique field is already in use
    */
   async register(
     registerDto: RegisterUserDto,
@@ -178,6 +179,14 @@ export class AuthService {
     }
   }
 
+  /**
+   * Signs the user out of the session of a refresh token.
+   *
+   * @param userId The user nano id
+   * @param logoutDto The session to end
+   * @param logoutDto.refreshToken The raw refresh token of the session
+   * @throws NotFoundException When the user has no active session for the token
+   */
   async logout(userId: string, logoutDto: LogoutDto) {
     const { refreshToken } = logoutDto;
     return await this.sessionsService.revoke(userId, refreshToken);
@@ -203,6 +212,16 @@ export class AuthService {
     return await this.sessionsService.getActive(userId);
   }
 
+  /**
+   * Exchanges a refresh token for a new pair; see `SessionsService.refresh`.
+   *
+   * @param refreshTokenDto The session to refresh
+   * @param refreshTokenDto.refreshToken The raw refresh token
+   * @throws ProblemException `invalid-token` (400) when the token is unknown,
+   *   expired or revoked
+   * @throws NotFoundException When the user of the token no longer exists or
+   *   is deleted
+   */
   async refreshSession(refreshTokenDto: RefreshTokenDto) {
     const { refreshToken } = refreshTokenDto;
     return await this.sessionsService.refresh(refreshToken);

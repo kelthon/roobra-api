@@ -5,6 +5,12 @@ import {
 } from 'class-validator';
 import { phone } from 'phone';
 
+/**
+ * Validates a mobile phone number. Without a `+` and its country code, the
+ * number is read as one from the USA or Canada.
+ *
+ * @param validationOptions Standard class-validator options
+ */
 export function IsPhoneNumber(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
