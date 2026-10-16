@@ -36,6 +36,10 @@ export const PROBLEM_TYPES = {
     status: HttpStatus.BAD_REQUEST,
     title: 'Incorrect password',
   },
+  'user-no-longer-exists': {
+    status: HttpStatus.UNAUTHORIZED,
+    title: 'User no longer exists',
+  },
 } as const satisfies Record<string, { status: HttpStatus; title: string }>;
 
 export type ProblemType = keyof typeof PROBLEM_TYPES;
