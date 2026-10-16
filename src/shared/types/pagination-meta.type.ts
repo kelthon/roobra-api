@@ -6,7 +6,7 @@ export type PageMeta = {
   totalItems: number;
   nextPageURI?: string;
   previousPageURI?: string;
-} & { type: 'page' };
+};
 
 export type CursorMeta = {
   paginationType: 'cursor';
