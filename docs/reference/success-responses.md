@@ -48,7 +48,7 @@ A paged list:
 | A file (`StreamableFile`) | The file |
 | A route marked `@RawResponse()` (`GET /health`) | What the route returned |
 
-No route is paged yet; the content routes of milestone 2 are the first.
+`GET /v1/users` is the only paged route, by page; no route is paged by cursor yet.
 
 ## Pagination
 
@@ -61,14 +61,33 @@ No route is paged yet; the content routes of milestone 2 are the first.
 | `orderBy` | `field:asc` or `field:desc`, repeatable; each route lists its fields | Set by the route |
 | `cursor` | An opaque cursor from a previous `nextCursor` | None |
 
-`BasePaginationParamsDto` declares `page` and `limit`. A list route extends it with its own
-`orderBy`, validated by `@IsOrderByField(fields)`, and `cursor` when it pages by cursor. An invalid
-parameter is a `validation-failed` problem.
+`BasePaginationParamsDto` declares `page` and `limit` with their defaults. A list route extends it
+with its own `orderBy`, validated by `@IsOrderByField(fields, undefined, { each: true })`, with its
+default order, and `cursor` when it pages by cursor. The defaults live in the DTO only: the service
+reads the query as it is. An invalid parameter, or one the route does not declare, is a
+`validation-failed` problem.
 
-`paginate` turns the parameters into Prisma's `skip`, `take` and `cursor`: by cursor when one is
-given, otherwise by page. `parseOrderByParams` turns `orderBy` into Prisma's list and appends
-`{ id: 'asc' }` unless the order already uses `id`, so rows that share the sorted values keep the
-same order on every page.
+The service turns the query into Prisma's arguments and the `meta` with the functions of
+`src/common/utils/pagination/pagination.util.ts`:
+
+| Function | Gives |
+| --- | --- |
+| `offsetBasedPagination(page, limit)` | `skip` and `take` of a list paged by page |
+| `cursorBasedPagination(cursor, limit)` | `cursor`, `skip: 1` and `take` of a list paged by cursor; the service converts the cursor's id to its model's id type |
+| `parseOrderByParams(orderBy)` | Prisma's `orderBy` list, one field per entry, with `{ id: 'asc' }` appended unless the order already uses `id`, so rows that share the sorted values keep the same order on every page |
+| `buildPageMeta(query, totalItems)` | The `meta` of a list paged by page, with its links built from the query |
+
+`GET /v1/users` is paged by page:
+
+```ts
+const [users, totalItems] = await this.prisma.user.findManyAndCount({
+  select: { username: true, email: true, createdAt: true },
+  orderBy: parseOrderByParams(query.orderBy),
+  ...offsetBasedPagination(query.page, query.limit),
+});
+
+return { data: users, meta: buildPageMeta(query, totalItems) };
+```
 
 ### Meta
 
