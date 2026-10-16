@@ -4,7 +4,7 @@ doc-status: draft
 
 # Auth Module Reference
 
-**Location:** `src/modules/auth/` — verified against branch `fix/login-guard-order`, 2026-10-15.
+**Location:** `src/modules/auth/` — verified against branch `feat/content-api`, 2026-10-16.
 
 Authentication and account security for `roobra-api`. Business rules (BR-001, BR-002, BR-011, BR-012) and
 the cross-service flow live in `roobra-docs` (`business/rules/`, `architecture/use-cases/auth.md`).
@@ -55,15 +55,15 @@ A signed-in user deleted while their access token is still valid gets a 401 `abo
 
 | Decorator | Guards applied | Effect |
 | --- | --- | --- |
-| `@UserOnly()` | `JwtAuthGuard` | Requires a valid access token |
-| `@GuestOnly()` | `OptionalJwtAuthGuard`, `ForbidAuthenticatedGuard` | Rejects requests that carry a valid access token |
+| `@Authenticated()` | `JwtAuthGuard` | Requires a valid access token |
+| `@Authenticated(...roles)` | `JwtAuthGuard`, then `RolesGuard` | Also requires one of the roles in the JWT `role` claim; 403 otherwise. The roles are stored with `@SetRoles()` |
+| `@Guest()` | `OptionalJwtAuthGuard`, `ForbidAuthenticatedGuard` | Rejects requests that carry a valid access token |
 | `@LoginWith('local')` | Passport `AuthGuard('local')` | Validates email and password through `AuthService.validateUser` |
-| `@Roles(...)` with `RolesGuard` | Role check against the JWT `role` claim | **Registered but not applied to any route yet.** Groundwork for content-mutation routes in Milestone 2 (`roobra-docs` `management/backlog.md`, tasks 1.2.1 and 1.2.3) |
 
 `@User()` injects the authenticated user as `UserDto`, mapping the JWT `sub` claim to `id`.
 
-Guards run in the reverse order of their decorators, bottom first. A route with both `@GuestOnly()`
-and `@LoginWith()` lists `@GuestOnly()` below: its `OptionalJwtAuthGuard` sets `request.user`, so run
+Guards run in the reverse order of their decorators, bottom first. A route with both `@Guest()`
+and `@LoginWith()` lists `@Guest()` below: its `OptionalJwtAuthGuard` sets `request.user`, so run
 after `LoginWith` it would erase the user the local strategy found.
 
 ## Tokens
@@ -91,7 +91,7 @@ Why: [refresh tokens](https://github.com/kelthon/roobra-docs/blob/main/adr/2026-
 
 `AuthModule` imports `DatabaseModule`, `NotificationsModule`, `PassportModule` and `SessionsModule`,
 which signs the tokens. It exports `AuthService`. `JwtStrategy` verifies access tokens with the same
-`jwt.secret`; it is registered here and applies to every route that uses `@UserOnly()`, in any module.
+`jwt.secret`; it is registered here and applies to every route that uses `@Authenticated()`, in any module.
 
 ## Behavior Notes
 

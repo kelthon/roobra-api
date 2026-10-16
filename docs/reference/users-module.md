@@ -4,19 +4,20 @@ doc-status: draft
 
 # Users Module Reference
 
-**Location:** `src/modules/users/` — verified against branch `feat/GH-10-soft-delete`, 2026-10-14.
+**Location:** `src/modules/users/` — verified against branch `feat/content-api`, 2026-10-16.
 
 The user's profile and account. Sign-up, sign-in and the password flows stay in the
 [auth module](./auth-module.md); sessions are in the [sessions module](./sessions-module.md).
 
 ## Endpoints
 
-Both routes use `@UserOnly()` and the global rate limit (20 requests per 60 seconds).
+Every route uses `@Authenticated()` and the global rate limit (20 requests per 60 seconds).
 
 | Method and path | Response | Purpose |
 | --- | --- | --- |
 | `GET /v1/users/me` | 200 with the profile; 401 when the signed-in user no longer exists | Current user profile: id, email, username, birthdate, photo URL, `emailVerifiedAt`, `createdAt`, `updatedAt` |
 | `DELETE /v1/users/me` | 204; 401 when the signed-in user no longer exists | Soft-deletes the account and revokes every session |
+| `GET /v1/users` | 200 with a paged list; 403 for any role but `ADMIN` and `SUPPORT_AGENT` | Lists users: username, email, `createdAt`. A first paged route: it reads no query parameters yet and answers the first 10 users with a fixed `meta` |
 
 ## Account Deletion
 
