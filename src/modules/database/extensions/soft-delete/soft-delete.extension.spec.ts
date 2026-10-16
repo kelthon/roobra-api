@@ -10,7 +10,16 @@ import {
 
 /** The models of the Prisma schema that have a `deletedAt` field */
 function modelsWithDeletedAt(): string[] {
-  const dir = join(import.meta.dirname, '..', '..', '..', 'prisma', 'models');
+  const dir = join(
+    import.meta.dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'prisma',
+    'models',
+  );
 
   return readdirSync(dir)
     .filter((file) => file.endsWith('.prisma'))
