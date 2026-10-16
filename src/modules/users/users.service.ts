@@ -1,7 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
+import { PagedResponse } from '@app/interfaces/paged-response.interface.js';
 import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { SessionsService } from '@app/modules/sessions/sessions.service.js';
+import { User } from '@app/db/prisma/client.js';
 
 @Injectable()
 export class UsersService {
@@ -62,5 +64,31 @@ export class UsersService {
 
       throw error;
     }
+  }
+
+  async list(): Promise<PagedResponse<Partial<User>>> {
+    const [users, total] = await this.prisma.user.findManyAndCount({
+      select: {
+        username: true,
+        email: true,
+        createdAt: true,
+      },
+      skip: 0,
+      take: 10,
+      orderBy: [{ updatedAt: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
+    });
+
+    return {
+      data: users,
+      meta: {
+        paginationType: 'page',
+        page: 1,
+        limit: 10,
+        totalPages: 10,
+        totalItems: total,
+        nextPageURI: undefined,
+        previousPageURI: undefined,
+      },
+    };
   }
 }

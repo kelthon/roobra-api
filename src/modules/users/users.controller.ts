@@ -25,4 +25,10 @@ export class UsersController {
   async delete(@User() user: UserDto): Promise<void> {
     await this.usersService.delete(user.id);
   }
+
+  @Authenticated('ADMIN', 'SUPPORT_AGENT')
+  @Get()
+  list() {
+    return this.usersService.list();
+  }
 }
