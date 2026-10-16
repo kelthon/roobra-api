@@ -42,11 +42,24 @@ export function paginate<T = DefaultCursor>(
     : offsetBasedPagination<T>(page ?? 0, pageSize);
 }
 
+/**
+ * Maps `field:direction` pairs to a Prisma `orderBy` list. Each entry holds a
+ * single field, as Prisma requires, and `id` is appended to break ties, so a
+ * page never repeats or skips rows that share the sorted values.
+ *
+ * @param orderBy The validated `field:direction` pairs
+ */
 export function parseOrderByParams(orderBy?: string[]): OrderParams {
-  return (
-    orderBy?.map((param) => {
-      const [field, direction] = param.split(':');
-      return { [field]: direction as 'asc' | 'desc' };
-    }) ?? []
-  );
+  if (!orderBy?.length) {
+    return [];
+  }
+
+  const params: OrderParams = orderBy.map((param) => {
+    const [field, direction] = param.split(':');
+    return { [field]: direction as 'asc' | 'desc' };
+  });
+
+  return params.some((param) => 'id' in param)
+    ? params
+    : [...params, { id: 'asc' }];
 }

@@ -96,11 +96,16 @@ describe('pagination.util', () => {
   });
 
   describe('parseOrderByParams', () => {
-    it('should map each field:direction pair to a Prisma orderBy entry', () => {
+    it('should map each field:direction pair to a Prisma orderBy entry and break ties by id', () => {
       expect(parseOrderByParams(['createdAt:desc', 'name:asc'])).toEqual([
         { createdAt: 'desc' },
         { name: 'asc' },
+        { id: 'asc' },
       ]);
+    });
+
+    it('should not add the id tie-breaker when the order already uses id', () => {
+      expect(parseOrderByParams(['id:desc'])).toEqual([{ id: 'desc' }]);
     });
 
     it('should return an empty list when there is no orderBy', () => {
