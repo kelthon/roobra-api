@@ -14,7 +14,7 @@ describe('UsersService', () => {
     txMock = { user: { softDelete: vi.fn() } };
 
     prismaMock = {
-      user: { findUniqueOrThrow: vi.fn() },
+      user: { findUniqueOrThrow: vi.fn(), findManyAndCount: vi.fn() },
       $transaction: vi.fn((callback: (tx: unknown) => unknown) =>
         callback(txMock),
       ),
@@ -88,6 +88,48 @@ describe('UsersService', () => {
       txMock.user.softDelete.mockRejectedValue(error);
 
       await expect(usersService.delete('user-id')).rejects.toBe(error);
+    });
+  });
+
+  describe('list', () => {
+    const query = { page: 2, limit: 10, orderBy: ['username:asc'] };
+    const user = {
+      username: 'user',
+      email: 'user@roobra.test',
+      createdAt: new Date('2026-10-16T00:00:00.000Z'),
+    };
+
+    beforeEach(() => {
+      (prismaMock.user.findManyAndCount as Mock).mockResolvedValue([
+        [user],
+        25,
+      ]);
+    });
+
+    it('should read the page in the given order, ties broken by id', async () => {
+      await usersService.list(query);
+
+      expect(prismaMock.user.findManyAndCount).toHaveBeenCalledWith({
+        select: { username: true, email: true, createdAt: true },
+        orderBy: [{ username: 'asc' }, { id: 'asc' }],
+        skip: 10,
+        take: 10,
+      });
+    });
+
+    it('should answer the users with the meta of the page', async () => {
+      await expect(usersService.list(query)).resolves.toEqual({
+        data: [user],
+        meta: {
+          paginationType: 'page',
+          page: 2,
+          limit: 10,
+          totalPages: 3,
+          totalItems: 25,
+          nextPageURI: '?page=3&limit=10&orderBy=username%3Aasc',
+          previousPageURI: '?page=1&limit=10&orderBy=username%3Aasc',
+        },
+      });
     });
   });
 });

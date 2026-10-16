@@ -1,9 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
-import { PagedResponse } from '@app/interfaces/paged-response.interface.js';
 import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { SessionsService } from '@app/modules/sessions/sessions.service.js';
-import { User } from '@app/db/prisma/client.js';
+import { UserPaginationParamsDto } from './dto/user-pagination-params.dto.js';
+import {
+  buildPageMeta,
+  offsetBasedPagination,
+  parseOrderByParams,
+} from '@app/common/utils/pagination/pagination.util.js';
 
 @Injectable()
 export class UsersService {
@@ -66,29 +70,22 @@ export class UsersService {
     }
   }
 
-  async list(): Promise<PagedResponse<Partial<User>>> {
-    const [users, total] = await this.prisma.user.findManyAndCount({
+  /**
+   * Lists one page of users, for the staff.
+   *
+   * @param query The page, its size and the order, validated with defaults
+   */
+  async list(query: UserPaginationParamsDto) {
+    const [users, totalItems] = await this.prisma.user.findManyAndCount({
       select: {
         username: true,
         email: true,
         createdAt: true,
       },
-      skip: 0,
-      take: 10,
-      orderBy: [{ updatedAt: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
+      orderBy: parseOrderByParams(query.orderBy),
+      ...offsetBasedPagination(query.page, query.limit),
     });
 
-    return {
-      data: users,
-      meta: {
-        paginationType: 'page',
-        page: 1,
-        limit: 10,
-        totalPages: 10,
-        totalItems: total,
-        nextPageURI: undefined,
-        previousPageURI: undefined,
-      },
-    };
+    return { data: users, meta: buildPageMeta(query, totalItems) };
   }
 }

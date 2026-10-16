@@ -1,8 +1,9 @@
-import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, Query } from '@nestjs/common';
 import { User } from '@app/common/decorators/user-param/user-param.decorator.js';
 import { Authenticated } from '@app/common/decorators/auth/authenticated.decorator.js';
 import { type UserDto } from '@app/common/dto/user-dto.js';
 import { UsersService } from './users.service.js';
+import { UserPaginationParamsDto } from './dto/user-pagination-params.dto.js';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +29,7 @@ export class UsersController {
 
   @Authenticated('ADMIN', 'SUPPORT_AGENT')
   @Get()
-  list() {
-    return this.usersService.list();
+  list(@Query() params: UserPaginationParamsDto) {
+    return this.usersService.list(params);
   }
 }
