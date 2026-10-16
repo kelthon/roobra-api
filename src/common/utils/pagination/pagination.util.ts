@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon';
 import { ProblemException } from '@app/common/exceptions/problem.exception.js';
 import { isRecord } from '@app/common/utils/type-guard/type-guard.util.js';
-import { OrderParams } from '@app/types/order-params.type.js';
+import { FieldsSortOrder } from '@app/types/fields-sort-order.type.js';
+import { PageMeta } from '@app/types/pagination-meta.type.js';
 import {
+  CursorWindow,
   DefaultCursor,
-  PaginationArgs,
-  PaginationParams,
+  PageWindow,
 } from '@app/types/pagination-params.type.js';
 
 /**
@@ -57,51 +58,92 @@ export function decodeCursor(cursor: string): DefaultCursor {
   return { createdAt_id: { createdAt, id } };
 }
 
-export function offsetBasedPagination(
-  page: number,
-  pageSize: number,
-): Omit<PaginationParams, 'cursor'> {
-  const take = Math.min(Math.max(0, pageSize), 100);
-  const skip = Math.max(page - 1, 0) * take;
-  return { take, skip };
-}
-
-export function cursorBasedPagination(
-  cursor: string,
-  pageSize: number,
-): PaginationParams {
-  const cur = decodeCursor(cursor);
-  const take = Math.min(Math.max(0, pageSize), 100);
-  const skip = 1;
-  return { cursor: cur, take, skip };
-}
-
-export function paginate(params: PaginationArgs): PaginationParams {
-  const { cursor, page, pageSize } = params;
-
-  return cursor
-    ? cursorBasedPagination(cursor, pageSize)
-    : offsetBasedPagination(page ?? 0, pageSize);
+/**
+ * Turns a page into Prisma's `skip` and `take`. The query DTO validates both
+ * and gives their defaults, so they are used as they are.
+ *
+ * @param page The page number, starting at 1
+ * @param limit How many rows a page holds
+ */
+export function offsetBasedPagination(page: number, limit: number): PageWindow {
+  return { skip: (page - 1) * limit, take: limit };
 }
 
 /**
- * Maps `field:direction` pairs to a Prisma `orderBy` list. Each entry holds a
- * single field, as Prisma requires, and `id` is appended to break ties, so a
- * page never repeats or skips rows that share the sorted values.
+ * Turns a cursor into Prisma's `cursor`, `skip` and `take`. `skip: 1` leaves
+ * out the row the cursor points at, which ended the previous page. The id of
+ * the cursor is a string or a number: the caller converts it to the type of
+ * its model's id.
  *
- * @param orderBy The validated `field:direction` pairs
+ * @param cursor The opaque cursor from the query string
+ * @param limit How many rows a page holds
+ * @throws ProblemException `invalid-cursor` when it is not one this API made
  */
-export function parseOrderByParams(orderBy?: string[]): OrderParams {
-  if (!orderBy?.length) {
-    return [];
-  }
+export function cursorBasedPagination(
+  cursor: string,
+  limit: number,
+): CursorWindow {
+  return { cursor: decodeCursor(cursor), skip: 1, take: limit };
+}
 
-  const params: OrderParams = orderBy.map((param) => {
-    const [field, direction] = param.split(':');
-    return { [field]: direction as 'asc' | 'desc' };
+/**
+ * Maps `field:order` pairs to a Prisma `orderBy` list. Each entry holds a
+ * single field, as Prisma requires, and `id` is appended to break ties, so a
+ * page never repeats or skips rows that share the sorted values. The pairs
+ * come validated by `@IsOrderByField()`.
+ *
+ * @param orderBy The `field:asc` or `field:desc` pairs
+ */
+export function parseOrderByParams(orderBy: string[]): FieldsSortOrder {
+  const params: FieldsSortOrder = orderBy.map((param) => {
+    const [field, order] = param.split(':');
+    return { [field]: order.toLowerCase() as 'asc' | 'desc' };
   });
 
   return params.some((param) => 'id' in param)
     ? params
     : [...params, { id: 'asc' }];
+}
+
+/**
+ * Builds the `meta` of a list paged by page. The links to the neighboring
+ * pages are query strings that keep every other parameter of the query, such
+ * as `limit`, `orderBy` and the filters.
+ *
+ * @param query The validated query of the list
+ * @param query.page The page sent
+ * @param query.limit The page size sent
+ * @param totalItems How many rows the whole list has
+ */
+export function buildPageMeta<Q extends { page: number; limit: number }>(
+  query: Q,
+  totalItems: number,
+): PageMeta {
+  const { page, limit } = query;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return {
+    paginationType: 'page',
+    page,
+    limit,
+    totalPages,
+    totalItems,
+    nextPageURI: page < totalPages ? pageURI(query, page + 1) : undefined,
+    previousPageURI: page > 1 ? pageURI(query, page - 1) : undefined,
+  };
+}
+
+/** The query string of another page of the same query */
+function pageURI(query: object, page: number): string {
+  const search = new URLSearchParams();
+
+  for (const [key, value] of Object.entries({ ...query, page })) {
+    for (const item of [value].flat()) {
+      if (item !== undefined && item !== null) {
+        search.append(key, String(item));
+      }
+    }
+  }
+
+  return `?${search.toString()}`;
 }

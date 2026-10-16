@@ -5,14 +5,13 @@ export type DefaultCursor = {
   };
 };
 
-export type PaginationArgs = {
-  cursor?: string;
-  page?: number;
-  pageSize: number;
+/** Prisma's arguments for one page of a list paged by page */
+export type PageWindow = {
+  skip: number;
+  take: number;
 };
 
-export type PaginationParams<T = DefaultCursor> = {
-  cursor?: T;
-  take?: number;
-  skip?: number;
+/** Prisma's arguments for one page of a list paged by cursor */
+export type CursorWindow = PageWindow & {
+  cursor: DefaultCursor;
 };

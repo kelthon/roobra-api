@@ -1,11 +1,11 @@
 import { DefaultCursor } from '@app/types/pagination-params.type.js';
 import {
+  buildPageMeta,
   cursorBasedPagination,
   decodeCursor,
   encodeCursor,
   isDefaultCursor,
   offsetBasedPagination,
-  paginate,
   parseOrderByParams,
 } from './pagination.util.js';
 
@@ -77,19 +77,11 @@ describe('pagination.util', () => {
 
   describe('offsetBasedPagination', () => {
     it('should skip the previous pages', () => {
-      expect(offsetBasedPagination(3, 20)).toEqual({ take: 20, skip: 40 });
+      expect(offsetBasedPagination(3, 20)).toEqual({ skip: 40, take: 20 });
     });
 
-    it.each([0, 1, -5])('should not skip when the page is %p', (page) => {
-      expect(offsetBasedPagination(page, 20)).toEqual({ take: 20, skip: 0 });
-    });
-
-    it('should cap the page size at 100', () => {
-      expect(offsetBasedPagination(2, 500)).toEqual({ take: 100, skip: 100 });
-    });
-
-    it('should not take a negative page size', () => {
-      expect(offsetBasedPagination(2, -10)).toEqual({ take: 0, skip: 0 });
+    it('should not skip on the first page', () => {
+      expect(offsetBasedPagination(1, 20)).toEqual({ skip: 0, take: 20 });
     });
   });
 
@@ -97,57 +89,30 @@ describe('pagination.util', () => {
     it('should decode the cursor and skip the cursor record', () => {
       expect(cursorBasedPagination(encodeCursor(cursorData), 20)).toEqual({
         cursor: cursorData,
-        take: 20,
         skip: 1,
+        take: 20,
       });
     });
 
-    it('should cap the page size at 100', () => {
-      expect(cursorBasedPagination(encodeCursor(cursorData), 500).take).toBe(
-        100,
+    it('should answer invalid-cursor to a cursor it did not make', () => {
+      expect(() => cursorBasedPagination('not-a-cursor', 20)).toThrow(
+        expect.objectContaining({ type: 'invalid-cursor' }),
       );
-    });
-
-    it('should not take a negative page size', () => {
-      expect(cursorBasedPagination(encodeCursor(cursorData), -10).take).toBe(0);
-    });
-  });
-
-  describe('paginate', () => {
-    it('should use the cursor when one is given', () => {
-      const cursor = encodeCursor(cursorData);
-
-      expect(paginate({ cursor, page: 3, pageSize: 20 })).toEqual({
-        cursor: cursorData,
-        take: 20,
-        skip: 1,
-      });
-    });
-
-    it('should use the page when there is no cursor', () => {
-      expect(paginate({ page: 3, pageSize: 20 })).toEqual({
-        take: 20,
-        skip: 40,
-      });
-    });
-
-    it('should start at the first page when there is no cursor or page', () => {
-      expect(paginate({ pageSize: 20 })).toEqual({ take: 20, skip: 0 });
-    });
-
-    it('should use the page when the cursor is empty', () => {
-      expect(paginate({ cursor: '', page: 2, pageSize: 20 })).toEqual({
-        take: 20,
-        skip: 20,
-      });
     });
   });
 
   describe('parseOrderByParams', () => {
-    it('should map each field:direction pair to a Prisma orderBy entry and break ties by id', () => {
+    it('should map each field:order pair to a Prisma orderBy entry and break ties by id', () => {
       expect(parseOrderByParams(['createdAt:desc', 'name:asc'])).toEqual([
         { createdAt: 'desc' },
         { name: 'asc' },
+        { id: 'asc' },
+      ]);
+    });
+
+    it('should lowercase the order, which the validator accepts in any case', () => {
+      expect(parseOrderByParams(['name:DESC'])).toEqual([
+        { name: 'desc' },
         { id: 'asc' },
       ]);
     });
@@ -156,8 +121,58 @@ describe('pagination.util', () => {
       expect(parseOrderByParams(['id:desc'])).toEqual([{ id: 'desc' }]);
     });
 
-    it('should return an empty list when there is no orderBy', () => {
-      expect(parseOrderByParams()).toEqual([]);
+    it('should order by id alone when there is no pair', () => {
+      expect(parseOrderByParams([])).toEqual([{ id: 'asc' }]);
+    });
+  });
+
+  describe('buildPageMeta', () => {
+    const query = { page: 2, limit: 10, orderBy: ['createdAt:desc'] };
+
+    it('should count the pages and link both neighbors with the same query', () => {
+      expect(buildPageMeta(query, 42)).toEqual({
+        paginationType: 'page',
+        page: 2,
+        limit: 10,
+        totalPages: 5,
+        totalItems: 42,
+        nextPageURI: '?page=3&limit=10&orderBy=createdAt%3Adesc',
+        previousPageURI: '?page=1&limit=10&orderBy=createdAt%3Adesc',
+      });
+    });
+
+    it('should have no previous page on the first page', () => {
+      expect(
+        buildPageMeta({ ...query, page: 1 }, 42).previousPageURI,
+      ).toBeUndefined();
+    });
+
+    it('should have no next page on the last page', () => {
+      expect(
+        buildPageMeta({ ...query, page: 5 }, 42).nextPageURI,
+      ).toBeUndefined();
+    });
+
+    it('should repeat a parameter that has several values', () => {
+      expect(
+        buildPageMeta({ ...query, orderBy: ['name:asc', 'createdAt:desc'] }, 42)
+          .nextPageURI,
+      ).toBe('?page=3&limit=10&orderBy=name%3Aasc&orderBy=createdAt%3Adesc');
+    });
+
+    it('should leave out the parameters that were not sent', () => {
+      expect(
+        buildPageMeta({ page: 1, limit: 10, cursor: undefined }, 42)
+          .nextPageURI,
+      ).toBe('?page=2&limit=10');
+    });
+
+    it('should have no pages and no links for an empty list', () => {
+      expect(buildPageMeta({ ...query, page: 1 }, 0)).toMatchObject({
+        totalPages: 0,
+        nextPageURI: undefined,
+        previousPageURI: undefined,
+      });
     });
   });
 });
