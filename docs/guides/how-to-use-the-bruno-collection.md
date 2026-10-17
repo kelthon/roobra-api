@@ -20,6 +20,8 @@ account.
 
 - The development stack runs, with Mailpit (see [how to run with Docker](./how-to-run-with-docker.md)).
 - `.env` points the mailer at Mailpit (see [how to test email](./how-to-test-email.md), step 1).
+- The development data is loaded, for the requests that sign in as `admin@roobra.test` (see
+  [how to run with Docker](./how-to-run-with-docker.md), step 3).
 - A Bruno desktop app that opens YAML (OpenCollection) collections, or Node.js for the command line
   (`npx @usebruno/cli`).
 
@@ -35,6 +37,7 @@ account.
    | `baseUrl` | `http://localhost:3000` | The API, without the version: each request adds `/v1` |
    | `mailpitUrl` | `http://localhost:8025` | Mailpit's API, where the requests read the emails the API sends |
    | `password` | `Password123!` | The first password of the account the flow creates |
+   | `seedPassword` | `Seed@12345` | The password of the seeded accounts, from `prisma/seeds/constants.ts` |
 
 3. Run the whole flow: right-click the collection and choose **Run**. Each request keeps in runtime
    variables what the next ones need, so the flow covers every auth route without copying a token by
@@ -42,27 +45,36 @@ account.
 
    | Request | Does | Keeps |
    | --- | --- | --- |
-   | `auth/01 Register` | Creates a new account, `test-<id>@roobra.test` and `tester_<id>`, so every run starts clean | `email`, `username`, `password`, `accessToken`, `refreshToken` |
-   | `auth/02 Login` | Signs in with `email` and `password` | `accessToken`, `refreshToken` |
-   | `auth/03 List sessions` | `GET /v1/auth/sessions`: at least the register and login sessions | — |
-   | `auth/04 Refresh token` | Rotates the refresh token, and checks it changed | `accessToken`, `refreshToken` |
-   | `auth/05 Send verification email` | `GET /v1/auth/verify-email` | — |
-   | `auth/06 Read verification email (Mailpit)` | Reads Mailpit's latest email, checks it went to `email`, and takes the token from its link | `verificationToken` |
-   | `auth/07 Verify email` | `POST /v1/auth/verify-email` with that token | — |
-   | `auth/08 Change password` | From `password` to `Changed456!` | `password` (the new one) |
-   | `auth/09 Forgot password` | Emails a reset link to `email` | — |
-   | `auth/10 Read reset email (Mailpit)` | Takes the reset token from the latest email | `resetToken` |
-   | `auth/11 Reset password` | Sets `Reset789!` with the reset token | `password` (the new one) |
-   | `auth/12 Login with the reset password` | Signs in with the password the reset set | `accessToken`, `refreshToken` |
-   | `auth/13 Logout` | Revokes the current refresh token | — |
-   | `auth/14 Logout from every session` | Revokes the account's other sessions | — |
-   | `health/00 Health check` | `GET /health` | — |
-   | `users/15 Get profile` | `GET /v1/users/me`: the account, with `emailVerifiedAt` set | — |
-   | `users/16 Delete account` | `DELETE /v1/users/me` | — |
+   | `auth/Register` | Creates a new account, `test-<id>@roobra.test` and `tester_<id>`, so every run starts clean | `email`, `username`, `password`, `accessToken`, `refreshToken` |
+   | `auth/Login` | Signs in with `email` and `password` | `accessToken`, `refreshToken` |
+   | `auth/List sessions` | `GET /v1/auth/sessions`: at least the register and login sessions | — |
+   | `auth/Refresh token` | Rotates the refresh token, and checks it changed | `accessToken`, `refreshToken` |
+   | `auth/Send verification email` | `GET /v1/auth/verify-email` | — |
+   | `auth/Read verification email (Mailpit)` | Reads Mailpit's latest email, checks it went to `email`, and takes the token from its link | `verificationToken` |
+   | `auth/Verify email` | `POST /v1/auth/verify-email` with that token | — |
+   | `auth/Change password` | From `password` to `Changed456!` | `password` (the new one) |
+   | `auth/Forgot password` | Emails a reset link to `email` | — |
+   | `auth/Read reset email (Mailpit)` | Takes the reset token from the latest email | `resetToken` |
+   | `auth/Reset password` | Sets `Reset789!` with the reset token | `password` (the new one) |
+   | `auth/Login with the reset password` | Signs in with the password the reset set | `accessToken`, `refreshToken` |
+   | `auth/Logout` | Revokes the current refresh token | — |
+   | `auth/Logout from every session` | Revokes the account's other sessions | — |
+   | `health/Health check` | `GET /health` | — |
+   | `users/Get profile` | `GET /v1/users/me`: the account, with `emailVerifiedAt` set | — |
+   | `users/Delete account` | `DELETE /v1/users/me` | — |
+   | `users/Login as the seeded admin` | Signs in as `admin@roobra.test` with `seedPassword` | `adminAccessToken` |
+   | `users/List users` | `GET /v1/users` with the defaults: the first 10 users, newest first, and the `meta` | — |
+   | `users/List users by a query` | `?page=2&limit=2&orderBy=username:asc`: the page, the order and the link to the previous page | — |
+   | `users/List users by a term` | `?term=ADMIN`: only users whose username or email contains `admin`, in any case | — |
+   | `users/List users with an invalid query` | `limit` over 100, a field that cannot be sorted by and an unknown `cursor`: a `validation-failed` problem listing the three | — |
+   | `users/List users as a subscriber` | `GET /v1/users` with the flow's own token, a subscriber's: 403 | — |
 
-   The runner takes the folders in alphabetical order and the requests by `seq` inside each one.
-   `users` comes after `auth`, so the account is deleted last; the access token still works after
-   the logouts, because a JWT stays valid until it expires.
+   The table lists the requests in the order they run: the runner takes the folders in alphabetical
+   order and the requests by `seq` inside each one, starting at 1 in each folder. File names carry no
+   number; the order is only in `seq`.
+   `users` comes after `auth`, so the account is deleted after the auth routes; the access token
+   still works after the logouts and the deletion, because a JWT stays valid until it expires, which
+   is what lets `users/List users as a subscriber` check the role of a subscriber.
 
 4. Or run one request: select it and press `Ctrl+Enter`. A request reads the variables the earlier
    ones kept in this session, so run **Register** first; after it, any request can be run on its own,
@@ -78,7 +90,7 @@ account.
 ## Notes
 
 - `register`, `login`, `refresh-token`, `forgot-password` and `reset-password` accept 5 requests per
-  minute; the flow calls `login` twice, so running it more than twice a minute answers `429`.
+  minute; the flow calls `login` three times, so running it twice within a minute answers `429`.
 - The Mailpit requests read the **latest** email. Something else sending email between a request that
   sends one and the request that reads it makes the read fail its check that the email went to
   `email`.

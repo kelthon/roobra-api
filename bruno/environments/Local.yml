@@ -6,3 +6,5 @@ variables:
     value: http://localhost:8025
   - name: password
     value: Password123!
+  - name: seedPassword
+    value: Seed@12345

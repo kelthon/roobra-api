@@ -1,11 +1,11 @@
 info:
-  name: Delete account
+  name: List users as a subscriber
   type: http
-  seq: 16
+  seq: 8
 
 http:
-  method: DELETE
-  url: "{{baseUrl}}/v1/users/me"
+  method: GET
+  url: "{{baseUrl}}/v1/users"
   auth:
     type: bearer
     token: "{{accessToken}}"
@@ -14,8 +14,9 @@ runtime:
   scripts:
     - type: tests
       code: |-
-        test("deletes the account", () => {
-          expect(res.status).to.equal(204);
+        test("forbids a subscriber", () => {
+          expect(res.status).to.equal(403);
+          expect(res.body.type).to.equal("about:blank");
         });
 
 settings:

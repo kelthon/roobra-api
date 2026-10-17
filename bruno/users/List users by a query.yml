@@ -1,0 +1,37 @@
+info:
+  name: List users by a query
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/v1/users?page=2&limit=2&orderBy=username:asc"
+  auth:
+    type: bearer
+    token: "{{adminAccessToken}}"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("answers the second page of two users, by username", () => {
+          expect(res.status).to.equal(200);
+          expect(res.body.data).to.have.length.of.at.most(2);
+          expect(res.body.meta).to.include({ page: 2, limit: 2 });
+
+          const names = res.body.data.map((user) => user.username);
+          expect(names).to.deep.equal([...names].sort());
+        });
+
+        test("links the previous page with the same query", () => {
+          expect(res.body.meta.previousPageURI).to.equal(
+            "?page=1&limit=2&orderBy=username%3Aasc",
+          );
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
