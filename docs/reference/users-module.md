@@ -17,7 +17,7 @@ Every route uses `@Authenticated()` and the global rate limit (20 requests per 6
 | --- | --- | --- |
 | `GET /v1/users/me` | 200 with the profile; 401 when the signed-in user no longer exists | Current user profile: id, email, username, birthdate, photo URL, `emailVerifiedAt`, `createdAt`, `updatedAt` |
 | `DELETE /v1/users/me` | 204; 401 when the signed-in user no longer exists | Soft-deletes the account and revokes every session |
-| `GET /v1/users` | 200 with a paged list; 403 for any role but `ADMIN` and `SUPPORT_AGENT` | Lists users, paged by page: username, email, `createdAt`. Query: `page`, `limit` and `orderBy` by `username`, `email`, `createdAt` or `updatedAt`, newest first by default ([success responses](./success-responses.md#pagination)) |
+| `GET /v1/users` | 200 with a paged list; 403 for any role but `ADMIN` and `SUPPORT_AGENT` | Lists users, paged by page: username, email, `createdAt`. Query: `page`, `limit`, `orderBy` by `username`, `email`, `createdAt` or `updatedAt`, newest first by default, and `term`, up to 100 characters, which keeps the users whose username or email contains it, in any case ([success responses](./success-responses.md#pagination)) |
 
 ## Account Deletion
 

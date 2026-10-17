@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isRecordNotFoundError } from '@app/common/utils/database/database.util.js';
 import { PrismaService } from '@app/modules/database/prisma.service.js';
 import { SessionsService } from '@app/modules/sessions/sessions.service.js';
-import { UserPaginationParamsDto } from './dto/user-pagination-params.dto.js';
+import { ListUsersQueryDto } from './dto/list-users-query.dto.js';
 import {
   buildPageMeta,
   offsetBasedPagination,
@@ -71,17 +71,27 @@ export class UsersService {
   }
 
   /**
-   * Lists one page of users, for the staff.
+   * Lists one page of users, for the staff. A `term` keeps the users whose
+   * username or email contains it, in any case.
    *
-   * @param query The page, its size and the order, validated with defaults
+   * @param query The page, its size, the order and the term, validated with
+   *   defaults
    */
-  async list(query: UserPaginationParamsDto) {
+  async list(query: ListUsersQueryDto) {
     const [users, totalItems] = await this.prisma.user.findManyAndCount({
       select: {
         username: true,
         email: true,
         createdAt: true,
       },
+      where: query.term
+        ? {
+            OR: [
+              { username: { contains: query.term, mode: 'insensitive' } },
+              { email: { contains: query.term, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
       orderBy: parseOrderByParams(query.orderBy),
       ...offsetBasedPagination(query.page, query.limit),
     });

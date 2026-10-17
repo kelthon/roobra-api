@@ -117,6 +117,29 @@ describe('UsersService', () => {
       });
     });
 
+    it('should not filter the users when there is no term', async () => {
+      await usersService.list(query);
+
+      expect(
+        (prismaMock.user.findManyAndCount as Mock).mock.calls[0][0].where,
+      ).toBeUndefined();
+    });
+
+    it('should keep the users whose username or email contains the term', async () => {
+      await usersService.list({ ...query, term: 'Ana' });
+
+      expect(prismaMock.user.findManyAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            OR: [
+              { username: { contains: 'Ana', mode: 'insensitive' } },
+              { email: { contains: 'Ana', mode: 'insensitive' } },
+            ],
+          },
+        }),
+      );
+    });
+
     it('should answer the users with the meta of the page', async () => {
       await expect(usersService.list(query)).resolves.toEqual({
         data: [user],

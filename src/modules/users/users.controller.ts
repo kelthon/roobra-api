@@ -3,7 +3,7 @@ import { User } from '@app/common/decorators/user-param/user-param.decorator.js'
 import { Authenticated } from '@app/common/decorators/auth/authenticated.decorator.js';
 import { type UserDto } from '@app/common/dto/user-dto.js';
 import { UsersService } from './users.service.js';
-import { UserPaginationParamsDto } from './dto/user-pagination-params.dto.js';
+import { ListUsersQueryDto } from './dto/list-users-query.dto.js';
 
 @Controller('users')
 export class UsersController {
@@ -29,7 +29,7 @@ export class UsersController {
 
   @Authenticated('ADMIN', 'SUPPORT_AGENT')
   @Get()
-  list(@Query() params: UserPaginationParamsDto) {
+  list(@Query() params: ListUsersQueryDto) {
     return this.usersService.list(params);
   }
 }

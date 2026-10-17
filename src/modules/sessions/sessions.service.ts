@@ -66,6 +66,7 @@ export class SessionsService {
   }
 
   private async generateRefreshToken(userId: string, tx?: PrismaTransaction) {
+    // TODO: add limit of 5 session per user, after invalidate older sessions
     const prisma = tx ?? this.prisma;
 
     const refreshToken = this.simpleTokenService.generate(

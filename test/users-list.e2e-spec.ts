@@ -95,7 +95,24 @@ describe('Users list (e2e)', () => {
     );
   });
 
+  it('should filter by the term and keep it in the page links', async () => {
+    const response = await list('?term=ana&limit=5').expect(200);
+
+    expect(queryArgs()).toMatchObject({
+      where: {
+        OR: [
+          { username: { contains: 'ana', mode: 'insensitive' } },
+          { email: { contains: 'ana', mode: 'insensitive' } },
+        ],
+      },
+    });
+    expect(response.body.meta.nextPageURI).toBe(
+      '?page=2&limit=5&term=ana&orderBy=createdAt%3Adesc',
+    );
+  });
+
   it.each([
+    ['a term over 100 characters', `?term=${'a'.repeat(101)}`],
     ['an order by a field that is not listed', '?orderBy=hashedPassword:asc'],
     ['an order without a direction', '?orderBy=username'],
     ['a page size over 100', '?limit=101'],
